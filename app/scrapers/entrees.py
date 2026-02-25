@@ -104,7 +104,7 @@ async def scrape_entrees(page: Page) -> list[Evento]:
                     
                     // Imagen
                     const img = card.querySelector('img');
-                    const imgSrc = img ? (img.src || img.dataset.src) : null;
+                    const imgSrc = img ? (img.getAttribute('data-image') || img.src || img.dataset.src) : null;
                     
                     // Badge de ciudad (suele estar al fondo de la tarjeta)
                     const badges = card.querySelectorAll('[class*="badge"], [class*="city"], [class*="tag"]');

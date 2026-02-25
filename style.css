@@ -455,6 +455,46 @@ select {
     flex-shrink: 0;
 }
 
+/* Mobile Filter Button */
+.mobile-filter-btn {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.mobile-filter-btn:hover {
+    background: var(--card-hover);
+    color: var(--text);
+}
+
+.mobile-filter-btn.active {
+    background: var(--ocean);
+    color: #fff;
+    border-color: var(--ocean);
+}
+
+@media (max-width: 768px) {
+    .mobile-filter-btn {
+        display: flex;
+    }
+    .hide-on-mobile {
+        display: none !important;
+    }
+    #category-filters {
+        width: 100%;
+        margin-top: 8px;
+    }
+}
+
 /* Pills */
 .pill,
 .cat-pill {

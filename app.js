@@ -106,7 +106,7 @@ function formatPrice(p) {
 // SUPABASE DATA LAYER — replaces all API calls
 // ══════════════════════════════════════════════════════════════════
 
-async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inicio, fecha_fin } = {}) {
+async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inicio, fecha_fin, sort } = {}) {
   const today = toISO(new Date());
   const effectiveInicio = fecha_inicio || today;
 
@@ -114,8 +114,15 @@ async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inici
     .from('evento')
     .select('*', { count: 'exact' })
     .not('fecha_iso', 'is', null)
-    .gte('fecha_iso', effectiveInicio)
-    .order('fecha_iso', { ascending: true });
+    .gte('fecha_iso', effectiveInicio);
+
+  if (sort === 'precio_asc') {
+    query = query.order('precio_num', { ascending: true, nullsFirst: false }).order('fecha_iso', { ascending: true });
+  } else if (sort === 'precio_desc') {
+    query = query.order('precio_num', { ascending: false, nullsFirst: false }).order('fecha_iso', { ascending: true });
+  } else {
+    query = query.order('fecha_iso', { ascending: true });
+  }
 
   if (categoria) query = query.eq('estilo', categoria);
   if (fecha_fin) query = query.lte('fecha_iso', fecha_fin);
@@ -186,7 +193,7 @@ async function fetchAllEvents() {
 }
 
 function buildQuery() {
-  const q = { page: state.page, size: PAGE_SIZE };
+  const q = { page: state.page, size: PAGE_SIZE, sort: state.sort };
   if (state.categoria) q.categoria = state.categoria;
   const dr = dateRange(state.dateFilter);
   if (dr.fecha_inicio) q.fecha_inicio = dr.fecha_inicio;
@@ -278,7 +285,11 @@ function renderGridView() {
           <button class="pill" data-date="month">Este mes</button>
         </div>
         <div class="filter-divider"></div>
-        <div class="filter-group" id="category-filters">
+        <button class="mobile-filter-btn" id="mobile-filter-btn" aria-expanded="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+          Filtrar categorías
+        </button>
+        <div class="filter-group hide-on-mobile" id="category-filters">
           <button class="cat-pill active" data-cat="">Todo</button>
         </div>
       </div>
@@ -313,6 +324,16 @@ function renderGridView() {
     state.sort = e.target.value;
     loadGrid();
   });
+
+  // Mobile filter toggle
+  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+  const catFilters = document.getElementById('category-filters');
+  if (mobileFilterBtn && catFilters) {
+    mobileFilterBtn.addEventListener('click', () => {
+      catFilters.classList.toggle('hide-on-mobile');
+      mobileFilterBtn.classList.toggle('active');
+    });
+  }
 
   // Load categories then events
   loadCategorias();
@@ -369,10 +390,6 @@ async function loadGrid() {
         (ev.estilo && ev.estilo.toLowerCase().includes(kw))
       );
     }
-
-    // Client-side sort
-    if (state.sort === 'precio_asc') items.sort((a, b) => (a.precio_num ?? Infinity) - (b.precio_num ?? Infinity));
-    else if (state.sort === 'precio_desc') items.sort((a, b) => (b.precio_num ?? -Infinity) - (a.precio_num ?? -Infinity));
 
     state.total = data.total;
     state.pages = data.pages;
