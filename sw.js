@@ -3,7 +3,7 @@
    Cache-first for static assets, network-first for API
    ================================================================ */
 
-const CACHE_NAME = 'agenda-gc-v2';
+const CACHE_NAME = 'agenda-gc-v3';
 const STATIC_ASSETS = [
     '/',
     '/index.html',

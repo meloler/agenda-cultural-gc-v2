@@ -217,19 +217,24 @@ function badgeClass(cat) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// ROUTER — Hash-based SPA routing
+// ROUTER — History API SPA routing
 // ═══════════════════════════════════════════════════════════════════
+function navigateTo(url) {
+  history.pushState(null, '', url);
+  router();
+}
+
 function router() {
-  const hash = location.hash || '#/';
+  const path = location.pathname || '/';
 
   // Update nav active state
   document.querySelectorAll('.nav-link,.mobile-nav-links a').forEach(link => {
     const view = link.dataset.view;
     link.classList.toggle('active',
-      (view === 'grid' && (hash === '#/' || hash === '#')) ||
-      (view === 'week' && hash.startsWith('#/semana')) ||
-      (view === 'calendar' && hash.startsWith('#/calendario')) ||
-      (view === 'map' && hash.startsWith('#/mapa'))
+      (view === 'grid' && (path === '/' || path === '')) ||
+      (view === 'week' && path.startsWith('/semana')) ||
+      (view === 'calendar' && path.startsWith('/calendario')) ||
+      (view === 'map' && path.startsWith('/mapa'))
     );
   });
 
@@ -237,18 +242,18 @@ function router() {
   document.getElementById('mobile-nav-drawer')?.classList.add('hidden');
   document.getElementById('mobile-menu-btn')?.classList.remove('open');
 
-  if (hash.startsWith('#/evento/')) {
-    const id = parseInt(hash.split('/')[2]);
+  if (path.startsWith('/evento/')) {
+    const id = parseInt(path.split('/')[2]);
     state.view = 'event';
     state.eventId = id;
     renderEventDetail(id);
-  } else if (hash === '#/semana') {
+  } else if (path === '/semana') {
     state.view = 'week';
     renderWeekView();
-  } else if (hash === '#/calendario') {
+  } else if (path === '/calendario') {
     state.view = 'calendar';
     renderCalendarView();
-  } else if (hash === '#/mapa') {
+  } else if (path === '/mapa') {
     state.view = 'map';
     renderMapView();
   } else {
@@ -386,7 +391,7 @@ async function loadGrid() {
 
     // Card click → navigate to event detail
     grid.querySelectorAll('.card').forEach(card => {
-      const go = () => location.hash = `#/evento/${card.dataset.id}`;
+      const go = () => navigateTo(`/evento/${card.dataset.id}`);
       card.addEventListener('click', go);
       card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(); });
     });
@@ -473,7 +478,7 @@ function resetFilters() {
   state.categoria = ''; state.dateFilter = 'all'; state.search = ''; state.page = 1;
   const searchEl = document.getElementById('search-input');
   if (searchEl) searchEl.value = '';
-  location.hash = '#/';
+  navigateTo('/');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -545,7 +550,7 @@ function renderWeekDays(events) {
           ${dayEvents.length === 0
         ? '<div class="day-empty">Sin eventos programados</div>'
         : dayEvents.map(ev => `
-              <div class="day-event-row" onclick="location.hash='#/evento/${ev.id}'" role="button" tabindex="0">
+              <div class="day-event-row" onclick="navigateTo('/evento/${ev.id}')" role="button" tabindex="0">
                 <div class="day-event-time">${ev.hora || '—'}</div>
                 <div class="day-event-img">
                   ${ev.imagen_url
@@ -689,7 +694,7 @@ async function showCalDay(iso) {
       <h3>📅 ${dateStr} — ${dayEvs.length} evento${dayEvs.length > 1 ? 's' : ''}</h3>
       <div class="day-events">
         ${dayEvs.map(ev => `
-          <div class="day-event-row" onclick="location.hash='#/evento/${ev.id}'" role="button" tabindex="0">
+          <div class="day-event-row" onclick="navigateTo('/evento/${ev.id}')" role="button" tabindex="0">
             <div class="day-event-time">${ev.hora || '—'}</div>
             <div class="day-event-img">
               ${ev.imagen_url
@@ -715,6 +720,7 @@ window.calNav = calNav;
 window.weekNav = weekNav;
 window.goPage = goPage;
 window.resetFilters = resetFilters;
+window.navigateTo = navigateTo;
 
 // ═══════════════════════════════════════════════════════════════════
 // VIEW: MAP
@@ -783,7 +789,7 @@ function initMap(events) {
       <div class="map-popup">
         <div class="map-popup-title">${ev.nombre}</div>
         <div class="map-popup-meta">${formatDate(ev.fecha_iso)} ${ev.hora ? '· ' + ev.hora : ''}<br>${ev.lugar}</div>
-        <button class="map-popup-btn" onclick="location.hash='#/evento/${ev.id}'">Ver detalle</button>
+        <button class="map-popup-btn" onclick="navigateTo('/evento/${ev.id}')">Ver detalle</button>
       </div>
     `);
   });
@@ -816,11 +822,11 @@ async function renderEventDetail(id) {
       : null;
 
     const shareText = `🎭 ${ev.nombre} — ${formatDate(ev.fecha_iso)} en ${ev.lugar}`;
-    const shareUrl = `${SITE_URL}/#/evento/${ev.id}`;
+    const shareUrl = `${SITE_URL}/evento/${ev.id}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
 
     detailContainer.innerHTML = `
-      <a href="#/" class="event-detail-back">${ICONS.back} Volver a eventos</a>
+      <a href="/" class="event-detail-back">${ICONS.back} Volver a eventos</a>
 
       ${ev.imagen_url ? `
         <div class="event-detail-image">
@@ -884,12 +890,12 @@ async function renderEventDetail(id) {
   } catch (err) {
     console.error(err);
     main.querySelector('.event-detail-view').innerHTML = `
-      <a href="#/" class="event-detail-back">${ICONS.back} Volver</a>
+      <a href="/" class="event-detail-back">${ICONS.back} Volver</a>
       <div class="empty-state">
         <div class="empty-icon">😕</div>
         <h3>Evento no encontrado</h3>
         <p>Es posible que el evento haya sido eliminado o que el enlace sea incorrecto.</p>
-        <a href="#/" class="btn-reset">Volver al inicio</a>
+        <a href="/" class="btn-reset">Volver al inicio</a>
       </div>
     `;
   }
@@ -948,7 +954,7 @@ function injectEventJsonLd(ev) {
 
 // ── Share helpers ─────────────────────────────────────────────────
 async function shareEvent(id, name) {
-  const url = `${SITE_URL}/#/evento/${id}`;
+  const url = `${SITE_URL}/evento/${id}`;
   const text = `🎭 ${name} — Agenda Cultural Gran Canaria`;
 
   if (navigator.share) {
@@ -1072,7 +1078,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  window.addEventListener('hashchange', router);
+  window.addEventListener('popstate', router);
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a');
+    if (a && a.href && a.href.startsWith(window.location.origin) && !a.href.includes('/rss.xml')) {
+      // Allow new tabs
+      if (a.target === '_blank' || e.ctrlKey || e.metaKey) return;
+
+      e.preventDefault();
+      const path = a.getAttribute('href');
+      navigateTo(path.startsWith('/') ? path : '/' + path);
+    }
+  });
+
   router();
 });
 
