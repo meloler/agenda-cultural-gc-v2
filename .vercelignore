@@ -1,28 +1,17 @@
-# Python backend (not needed for Vercel deployment)
-api/
-app/
-migrations/
-deploy_backend/
-requirements.txt
+# Ignore Python/Scrapers folder
+scrapers/
+
+# Environment and logs
 .env
-*.xlsx
-*.json
-analisis_resultado.txt
-analizar_excel.py
-check_pasados.py
-docker-compose.yml
-test_*.py
-main.py
-upload_to_supabase.py
-do_upload.py
-_supabase_upload*.json
 output.log
-vercel.backend.json
 __pycache__/
 .pytest_cache/
 .venv/
-*.py[cod]
+
+# Documentation and drafts
 Agents.md
 prd.md
 sessions.md
 github_profile_proposal.md
+analisis_resultado.txt
+*.xlsx

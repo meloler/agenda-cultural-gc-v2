@@ -25,7 +25,9 @@ El sistema sigue un flujo optimizado en 8 pasos:
 5.  **Enriquecimiento IA**: Extracción de descripciones, precios reales y validación de imágenes.
 6.  **Geolocalización (GIS)**: Conversión de lugares a coordenadas exactas (Lat/Lon).
 7.  **Sanitización Final**: Filtrado de títulos basura y precios absurdos (>300€).
-8.  **Excel Export**: Generación de reportes limpios y organizados para consumo final.
+8.  **Exportación & DB**: Generación de reportes (Excel) y volcado final en **Supabase** (que es consumido end-to-end por nuestro **Frontend en Vercel**).
+
+(Consulta [`ARCHITECTURE.md`](./ARCHITECTURE.md) para más detalles sobre la integración de sistemas).
 
 ---
 

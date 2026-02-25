@@ -5,13 +5,17 @@
    ================================================================ */
 
 // ── Supabase config ──────────────────────────────────────────────
-const SUPABASE_URL = 'https://jjballixujlppsfeuhad.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqYmFsbGl4dWpscHBzZmV1aGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMTMzMDksImV4cCI6MjA4NzU4OTMwOX0.XwVgi8rnHEUcc-q0FeCi7UgYrkMdx_v2fEutRWYZYbQ';
+const SUPABASE_URL = window.ENV?.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.ENV?.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.warn("⚠️ Advertencia: No se encontraron las credenciales de Supabase. Genera el env.js corriendo 'npm run build'.");
+}
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const PAGE_SIZE = 18;
-const SITE_URL = 'https://agenda-cultural-gc.vercel.app';
+const SITE_URL = window.location.origin;
 
 // ── State ──────────────────────────────────────────────────────────
 const state = {
@@ -1098,7 +1102,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('popstate', router);
   document.addEventListener('click', e => {
     const a = e.target.closest('a');
-    if (a && a.href && a.href.startsWith(window.location.origin) && !a.href.includes('/rss.xml')) {
+    if (a && a.href && a.href.startsWith(window.location.origin)) {
       // Allow new tabs
       if (a.target === '_blank' || e.ctrlKey || e.metaKey) return;
 

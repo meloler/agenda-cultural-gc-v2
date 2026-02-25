@@ -17,7 +17,7 @@
   <meta property="og:description"
     content="Todos los eventos culturales de la isla en un solo lugar. Conciertos, teatro, humor, cine, danza y más." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://agendaculturalgc.com" />
+  <meta property="og:url" content="http://localhost:3000" />
   <meta property="og:locale" content="es_ES" />
   <meta property="og:site_name" content="Agenda Cultural GC" />
 
@@ -27,7 +27,7 @@
   <meta name="twitter:description" content="Todos los eventos culturales de la isla en un solo lugar." />
 
   <!-- Canonical -->
-  <link rel="canonical" href="https://agendaculturalgc.com" />
+  <link rel="canonical" href="http://localhost:3000" />
 
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="Agenda Cultural GC RSS" href="/rss.xml" />
@@ -62,12 +62,12 @@
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Agenda Cultural Gran Canaria",
-    "url": "https://agendaculturalgc.com",
+    "url": "http://localhost:3000",
     "description": "La guía cultural más completa de Gran Canaria: conciertos, teatro, cine, humor y más.",
     "inLanguage": "es",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://agendaculturalgc.com/buscar/{search_term_string}",
+      "target": "http://localhost:3000/buscar/{search_term_string}",
       "query-input": "required name=search_term_string"
     }
   }
@@ -206,6 +206,7 @@
   <!-- TOAST for share feedback -->
   <div class="toast hidden" id="toast"></div>
 
+  <script src="env.js"></script>
   <script src="app.js"></script>
 </body>
 

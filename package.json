@@ -1,0 +1,26 @@
+{
+  "name": "eventos-v2",
+  "version": "1.0.0",
+  "description": "![Canarias](https://img.shields.io/badge/Region-Gran%20Canaria-blue?style=for-the-badge&logoColor=white)\r ![Python](https://img.shields.io/badge/python-3.10+-yellow?style=for-the-badge&logo=python&logoColor=white)\r ![Playwright](https://img.shields.io/badge/Scraper-Playwright-green?style=for-the-badge&logo=playwright&logoColor=white)\r ![IA](https://img.shields.io/badge/AI-Enrichment-blueviolet?style=for-the-badge&logo=openai&logoColor=white)",
+  "main": "app.js",
+  "scripts": {
+    "build": "node scripts/inject_env.mjs && node scripts/generate_feeds.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meloler/agenda-cultural-gc-v2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/meloler/agenda-cultural-gc-v2/issues"
+  },
+  "homepage": "https://github.com/meloler/agenda-cultural-gc-v2#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
+    "dotenv": "^17.3.1"
+  }
+}

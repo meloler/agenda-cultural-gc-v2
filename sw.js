@@ -34,11 +34,6 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
-    // API requests: network only (always fresh data)
-    if (url.pathname.startsWith('/api/') || url.pathname === '/rss.xml') {
-        event.respondWith(fetch(event.request));
-        return;
-    }
 
     // Static assets: cache-first, fallback to network
     event.respondWith(
