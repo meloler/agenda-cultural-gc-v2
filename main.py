@@ -6,7 +6,7 @@ Regla: eventos sin fecha_iso son 'Borrador' y no aparecen en el Excel limpio.
 """
 
 import asyncio
-from datetime import datetime
+from datetime import datetime, date
 import pandas as pd
 from dotenv import load_dotenv
 from playwright.async_api import async_playwright
@@ -28,6 +28,10 @@ from app.scrapers.tomaticket import scrape_tomaticket
 from app.scrapers.cultura_canaria import scrape_cultura_canaria
 from app.scrapers.tickety import scrape_tickety
 from app.scrapers.institucional import scrape_cicca, scrape_guiniguada
+from app.scrapers.entradas_com import scrape_entradas_com
+from app.scrapers.entrees import scrape_entrees
+from app.scrapers.entradas_canarias import scrape_entradas_canarias
+from app.scrapers.telde_cultura import scrape_telde_cultura
 
 
 async def run_all_scrapers() -> list[Evento]:
@@ -45,6 +49,10 @@ async def run_all_scrapers() -> list[Evento]:
         page_guiniguada = await browser.new_page()
         page_tomaticket = await browser.new_page()
         page_tickety = await browser.new_page()
+        page_entradas_com = await browser.new_page()
+        page_entrees = await browser.new_page()
+        page_entradas_canarias = await browser.new_page()
+        page_telde = await browser.new_page()
 
         # Lanzar en paralelo
         results = await asyncio.gather(
@@ -55,6 +63,10 @@ async def run_all_scrapers() -> list[Evento]:
             scrape_guiniguada(page_guiniguada),
             scrape_tomaticket(page_tomaticket),
             scrape_tickety(page_tickety),
+            scrape_entradas_com(page_entradas_com),
+            scrape_entrees(page_entrees),
+            scrape_entradas_canarias(page_entradas_canarias),
+            scrape_telde_cultura(page_telde),
             return_exceptions=True,
         )
 
@@ -62,7 +74,8 @@ async def run_all_scrapers() -> list[Evento]:
 
     scraper_names = [
         "Ticketmaster Web", "Auditorio A. Kraus", "Teatro Pérez Galdós",
-        "CICCA", "Teatro Guiniguada", "Tomaticket", "Tickety"
+        "CICCA", "Teatro Guiniguada", "Tomaticket", "Tickety",
+        "Entradas.com", "Entrées.es", "EntradasCanarias", "TeldeCultura",
     ]
 
     for name, result in zip(scraper_names, results):
@@ -128,6 +141,9 @@ async def main():
 
     # 4. Limpieza básica en DB
     ejecutar_limpieza_db()
+
+    # 4b. Purgar eventos pasados de la DB
+    purgar_eventos_pasados()
 
     # 5. Auditoría (Detective v2) - Aquí es donde se arreglan los "Gran Canaria"
     await auditar_eventos()
@@ -223,6 +239,24 @@ async def main():
         df_borr_export = df_borradores[list(columnas_excel.keys())].rename(columns=columnas_excel)
         df_borr_export.to_excel(filename_borradores, index=False)
         print(f"   ⚠️ Eventos sin fecha (Borradores): {len(df_borradores)}")
+
+
+def purgar_eventos_pasados():
+    """Elimina eventos con fecha_iso anterior a hoy."""
+    hoy = str(date.today())
+    print(f"\n🗑️ Purgando eventos anteriores a {hoy}...")
+    with get_session() as session:
+        pasados = list(session.exec(
+            sql_select(Evento).where(Evento.fecha_iso < hoy, Evento.fecha_iso.is_not(None))
+        ).all())
+        if pasados:
+            for ev in pasados:
+                session.delete(ev)
+            session.commit()
+            print(f"   ✅ {len(pasados)} eventos pasados eliminados de la DB.")
+        else:
+            print("   ✨ No hay eventos pasados. Todo limpio.")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
