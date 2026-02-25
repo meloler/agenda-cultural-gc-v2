@@ -1,15 +1,21 @@
 /* ================================================================
-   Agenda Cultural GC — app.js v2.0
+   Agenda Cultural GC — app.js v3.0
    SPA with hash routing, 4 views, PWA, share, JSON-LD
+   Direct Supabase connection (no backend API needed)
    ================================================================ */
 
-const API = 'http://localhost:8000/api';
+// ── Supabase config ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://jjballixujlppsfeuhad.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqYmFsbGl4dWpscHBzZmV1aGFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMTMzMDksImV4cCI6MjA4NzU4OTMwOX0.XwVgi8rnHEUcc-q0FeCi7UgYrkMdx_v2fEutRWYZYbQ';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const PAGE_SIZE = 18;
-const SITE_URL = 'https://agendaculturalgc.com';
+const SITE_URL = 'https://agenda-cultural-gc.vercel.app';
 
 // ── State ──────────────────────────────────────────────────────────
 const state = {
-  view: 'grid',        // grid | week | calendar | map | event
+  view: 'grid',
   page: 1,
   total: 0,
   pages: 0,
@@ -18,10 +24,10 @@ const state = {
   search: '',
   sort: 'fecha',
   debounceTimer: null,
-  allEvents: null,     // cached for map/calendar/week
+  allEvents: null,
   calMonth: new Date().getMonth(),
   calYear: new Date().getFullYear(),
-  weekOffset: 0,       // 0 = this week, 1 = next week, etc.
+  weekOffset: 0,
   mapInstance: null,
   eventId: null,
 };
@@ -30,12 +36,13 @@ const state = {
 const CAT_EMOJI = {
   'Música': '🎵', 'Teatro': '🎭', 'Cine': '🎬', 'Danza': '💃', 'Humor': '🤣',
   'Gastronomía': '🍽️', 'Deporte': '⚽', 'Infantil': '🎈', 'Formación': '📚',
-  'Exposición': '🖼️', 'Carnaval': '🎉', 'Otros': '🌴',
+  'Exposición': '🖼️', 'Carnaval': '🎉', 'Cultura/Teatro': '🎭', 'Otros': '🌴',
 };
 const CAT_COLOR = {
   'Música': '#38bdf8', 'Teatro': '#a78bfa', 'Cine': '#94a3b8', 'Danza': '#f472b6',
   'Humor': '#fbbf24', 'Gastronomía': '#f59e0b', 'Deporte': '#4ade80', 'Infantil': '#f472b6',
-  'Formación': '#fbbf24', 'Exposición': '#22d3ee', 'Carnaval': '#fb7185', 'Otros': '#94a3b8',
+  'Formación': '#fbbf24', 'Exposición': '#22d3ee', 'Carnaval': '#fb7185',
+  'Cultura/Teatro': '#a78bfa', 'Otros': '#94a3b8',
 };
 
 function catEmoji(cat) {
@@ -95,28 +102,86 @@ function formatPrice(p) {
   return `${p.toFixed(2).replace('.', ',')} €`;
 }
 
-// ── API calls ─────────────────────────────────────────────────────
-async function fetchEventos(params = {}) {
-  const url = new URL(`${API}/eventos/`);
-  Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') url.searchParams.set(k, v); });
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`API ${r.status}`);
-  return r.json();
+// ══════════════════════════════════════════════════════════════════
+// SUPABASE DATA LAYER — replaces all API calls
+// ══════════════════════════════════════════════════════════════════
+
+async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inicio, fecha_fin } = {}) {
+  const today = toISO(new Date());
+  const effectiveInicio = fecha_inicio || today;
+
+  let query = sb
+    .from('evento')
+    .select('*', { count: 'exact' })
+    .not('fecha_iso', 'is', null)
+    .gte('fecha_iso', effectiveInicio)
+    .order('fecha_iso', { ascending: true });
+
+  if (categoria) query = query.eq('estilo', categoria);
+  if (fecha_fin) query = query.lte('fecha_iso', fecha_fin);
+
+  // Pagination
+  const from = (page - 1) * size;
+  const to = from + size - 1;
+  query = query.range(from, to);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  return {
+    items: data || [],
+    total: count || 0,
+    page,
+    size,
+    pages: Math.ceil((count || 0) / size),
+  };
 }
+
 async function fetchEventoDetail(id) {
-  const r = await fetch(`${API}/eventos/${id}`);
-  if (!r.ok) throw new Error(`API ${r.status}`);
-  return r.json();
+  const { data, error } = await sb
+    .from('evento')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) throw error;
+  return data;
 }
+
 async function fetchCategorias() {
-  const r = await fetch(`${API}/categorias`);
-  return r.ok ? r.json() : [];
+  const today = toISO(new Date());
+  const { data, error } = await sb
+    .from('evento')
+    .select('estilo')
+    .not('fecha_iso', 'is', null)
+    .gte('fecha_iso', today);
+
+  if (error) throw error;
+
+  // Group by estilo and count
+  const counts = {};
+  (data || []).forEach(r => {
+    const cat = r.estilo || 'Otros';
+    counts[cat] = (counts[cat] || 0) + 1;
+  });
+
+  return Object.entries(counts)
+    .map(([nombre, total]) => ({ nombre, total }))
+    .sort((a, b) => b.total - a.total);
 }
+
 async function fetchAllEvents() {
   if (state.allEvents) return state.allEvents;
-  const r = await fetch(`${API}/all-eventos`);
-  if (!r.ok) throw new Error(`API ${r.status}`);
-  state.allEvents = await r.json();
+  const today = toISO(new Date());
+
+  const { data, error } = await sb
+    .from('evento')
+    .select('*')
+    .not('fecha_iso', 'is', null)
+    .gte('fecha_iso', today)
+    .order('fecha_iso', { ascending: true });
+
+  if (error) throw error;
+  state.allEvents = data || [];
   return state.allEvents;
 }
 
@@ -156,7 +221,6 @@ function badgeClass(cat) {
 // ═══════════════════════════════════════════════════════════════════
 function router() {
   const hash = location.hash || '#/';
-  const main = document.getElementById('app-main');
 
   // Update nav active state
   document.querySelectorAll('.nav-link,.mobile-nav-links a').forEach(link => {
@@ -331,7 +395,7 @@ async function loadGrid() {
     grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-3)">
         <div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>
-        <p>No se pudo conectar con la API.<br>Asegúrate de que el servidor está corriendo en <strong>localhost:8000</strong>.</p>
+        <p>No se pudo conectar con la base de datos.<br>Intenta recargar la página.</p>
       </div>`;
   }
 }
@@ -442,7 +506,6 @@ function renderWeekDays(events) {
   const titleEl = document.getElementById('week-title');
   if (!container) return;
 
-  // Calculate week start (Monday)
   const now = new Date();
   const monday = new Date(now);
   const dayOfWeek = now.getDay() || 7;
@@ -547,11 +610,10 @@ function renderCalGrid(events) {
 
   const firstDay = new Date(y, m, 1);
   const lastDay = new Date(y, m + 1, 0);
-  const startDay = (firstDay.getDay() + 6) % 7; // Mon=0
+  const startDay = (firstDay.getDay() + 6) % 7;
 
   const todayStr = toISO(new Date());
 
-  // Build event map by date
   const evMap = {};
   events.forEach(e => {
     if (!evMap[e.fecha_iso]) evMap[e.fecha_iso] = [];
@@ -562,13 +624,11 @@ function renderCalGrid(events) {
   let html = '<div class="cal-grid">';
   dayHeaders.forEach(d => { html += `<div class="cal-day-header">${d}</div>`; });
 
-  // Previous month filler
   for (let i = 0; i < startDay; i++) {
     const d = new Date(y, m, -startDay + i + 1);
     html += `<div class="cal-cell other-month"><span class="cal-date">${d.getDate()}</span></div>`;
   }
 
-  // Current month
   for (let day = 1; day <= lastDay.getDate(); day++) {
     const iso = `${y}-${pad(m + 1)}-${pad(day)}`;
     const isToday = iso === todayStr;
@@ -590,7 +650,6 @@ function renderCalGrid(events) {
     `;
   }
 
-  // Next month filler
   const totalCells = startDay + lastDay.getDate();
   const remaining = (7 - totalCells % 7) % 7;
   for (let i = 1; i <= remaining; i++) {
@@ -696,13 +755,11 @@ function initMap(events) {
   const container = document.getElementById('map-container');
   if (!container) return;
 
-  // Destroy previous map
   if (state.mapInstance) { state.mapInstance.remove(); state.mapInstance = null; }
 
   const map = L.map('map-container').setView([28.1, -15.43], 11);
   state.mapInstance = map;
 
-  // Tile layer
   const isDark = document.body.classList.contains('theme-dark');
   L.tileLayer(
     isDark
@@ -711,7 +768,6 @@ function initMap(events) {
     { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>', maxZoom: 19 }
   ).addTo(map);
 
-  // Add markers
   const geoEvents = events.filter(e => e.latitud && e.longitud);
   geoEvents.forEach(ev => {
     const color = catColor(ev.estilo);
@@ -732,13 +788,11 @@ function initMap(events) {
     `);
   });
 
-  // Fit bounds if events exist
   if (geoEvents.length > 0) {
     const bounds = L.latLngBounds(geoEvents.map(e => [e.latitud, e.longitud]));
     map.fitBounds(bounds, { padding: [30, 30] });
   }
 
-  // Fix map size after render
   setTimeout(() => map.invalidateSize(), 200);
 }
 
@@ -761,7 +815,6 @@ async function renderEventDetail(id) {
       ? `https://www.google.com/maps?q=${ev.latitud},${ev.longitud}`
       : null;
 
-    // Build share URLs
     const shareText = `🎭 ${ev.nombre} — ${formatDate(ev.fecha_iso)} en ${ev.lugar}`;
     const shareUrl = `${SITE_URL}/#/evento/${ev.id}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
@@ -820,19 +873,12 @@ async function renderEventDetail(id) {
         <a class="btn-buy" href="${ev.url_venta}" target="_blank" rel="noopener">🎟️ Comprar entradas</a>
         ${mapUrl ? `<a class="btn-secondary" href="${mapUrl}" target="_blank" rel="noopener">${ICONS.map} Ver en mapa</a>` : ''}
         <a class="btn-secondary btn-share-whatsapp" href="${waUrl}" target="_blank" rel="noopener">${ICONS.whatsapp} WhatsApp</a>
-        <button class="btn-secondary" onclick="shareEvent(${ev.id},'${ev.nombre.replace(/'/g, "\\'")}')">
-          ${ICONS.share} Compartir
-        </button>
-        <button class="btn-secondary" onclick="copyLink('${shareUrl}')">
-          ${ICONS.copy} Copiar enlace
-        </button>
+        <button class="btn-secondary" onclick="shareEvent(${ev.id},'${ev.nombre.replace(/'/g, "\\'")}')">${ICONS.share} Compartir</button>
+        <button class="btn-secondary" onclick="copyLink('${shareUrl}')">${ICONS.copy} Copiar enlace</button>
       </div>
     `;
 
-    // Inject JSON-LD for this event
     injectEventJsonLd(ev);
-
-    // Update page title
     document.title = `${ev.nombre} — Agenda Cultural Gran Canaria`;
 
   } catch (err) {
@@ -942,7 +988,6 @@ function initTheme() {
   if (saved) {
     document.body.className = saved;
   } else {
-    // Auto-detect
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     document.body.className = prefersDark ? 'theme-dark' : 'theme-light';
   }
@@ -953,7 +998,6 @@ function toggleTheme() {
   document.body.className = isDark ? 'theme-light' : 'theme-dark';
   localStorage.setItem('agcgc-theme', document.body.className);
 
-  // Update map tiles if on map view
   if (state.view === 'map' && state.mapInstance) {
     state.mapInstance.remove();
     state.mapInstance = null;
@@ -983,7 +1027,6 @@ function initMobileMenu() {
     btn.classList.toggle('open');
   });
 
-  // Close on link click
   drawer.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       drawer.classList.add('hidden');
@@ -991,7 +1034,6 @@ function initMobileMenu() {
     });
   });
 
-  // Mobile search
   const mobileSearch = document.getElementById('mobile-search-input');
   if (mobileSearch) {
     mobileSearch.addEventListener('input', e => {
@@ -1013,10 +1055,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initPWA();
   initMobileMenu();
 
-  // Theme toggle
   document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
 
-  // Search with debounce
   document.getElementById('search-input')?.addEventListener('input', e => {
     clearTimeout(state.debounceTimer);
     state.debounceTimer = setTimeout(() => {
@@ -1026,14 +1066,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 350);
   });
 
-  // Modal close
   document.getElementById('modal-close')?.addEventListener('click', closeModal);
   document.getElementById('modal-overlay')?.addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  // Initial route
   window.addEventListener('hashchange', router);
   router();
 });

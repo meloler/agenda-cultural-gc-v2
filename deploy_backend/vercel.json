@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "name": "api-agenda-cultural-gc",
+    "builds": [
+        {
+            "src": "api/main.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "api/main.py"
+        },
+        {
+            "source": "/rss.xml",
+            "destination": "api/main.py"
+        },
+        {
+            "source": "/sitemap.xml",
+            "destination": "api/main.py"
+        },
+        {
+            "source": "/robots.txt",
+            "destination": "api/main.py"
+        }
+    ]
+}
