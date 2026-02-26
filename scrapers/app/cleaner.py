@@ -47,7 +47,7 @@ def ejecutar_limpieza_db() -> dict[str, int]:
     """Analiza la tabla de eventos y detecta/fusiona duplicados cross-fuente.
 
     Algoritmo:
-        1. Extrae todos los eventos y los agrupa por `fecha_iso`.
+        1. Extrae todos los eventos y los agrupa por `(fecha_iso, hora, lugar_norm)`.
         2. Dentro de cada grupo, compara nombres con `token_set_ratio`.
         3. Si similitud > UMBRAL_SIMILITUD → fusiona:
            - Maestro: fuente prioritaria + descripción más larga.
@@ -71,23 +71,24 @@ def ejecutar_limpieza_db() -> dict[str, int]:
         todos: list[Evento] = list(session.exec(select(Evento)).all())
         print(f"   📊 Total eventos en DB: {len(todos)}")
 
-        # Agrupar por fecha_iso (incluyendo None como grupo propio)
-        grupos: dict[str | None, list[Evento]] = defaultdict(list)
+        # Agrupar por (fecha_iso, hora, lugar_norm)
+        grupos: dict[tuple[str | None, str, str], list[Evento]] = defaultdict(list)
         for ev in todos:
-            grupos[ev.fecha_iso].append(ev)
+            lugar_norm = ev.lugar.lower().strip() if ev.lugar else ""
+            hora_norm = ev.hora.strip() if ev.hora else ""
+            grupo_key = (ev.fecha_iso, hora_norm, lugar_norm)
+            grupos[grupo_key].append(ev)
 
-        fechas = sorted(
-            [f for f in grupos.keys() if f is not None],
-        ) + ([None] if None in grupos else [])
+        llaves_grupo = list(grupos.keys())
 
-        print(f"   📅 Grupos de fecha únicos: {len(fechas)}")
+        print(f"   📅 Grupos únicos (fecha/hora/lugar): {len(llaves_grupo)}")
         print("-" * 60)
 
         ids_a_eliminar: list[int] = []
         maestros_a_actualizar: list[tuple[int, dict]] = []
 
-        for fecha in fechas:
-            grupo = grupos[fecha]
+        for llave in llaves_grupo:
+            grupo = grupos[llave]
             if len(grupo) < 2:
                 continue
 
@@ -130,8 +131,10 @@ def ejecutar_limpieza_db() -> dict[str, int]:
                 duplicados = cluster[1:]
 
                 # Log del cluster encontrado
-                fecha_label = fecha or "Sin fecha"
-                print(f"\n   🔗 Cluster detectado [{fecha_label}]:")
+                fecha_str, hora_str, lugar_str = llave
+                fecha_label = fecha_str or "Sin fecha"
+                hora_label = hora_str or "Sin hora"
+                print(f"\n   🔗 Cluster detectado [{fecha_label} a las {hora_label} en {lugar_str}]:")
                 print(f"      ⭐ MAESTRO: [{maestro.organiza}] {maestro.nombre}")
                 desc_len = len(maestro.descripcion) if maestro.descripcion else 0
                 print(f"         Descripción: {desc_len} chars | URL: {maestro.url_venta}")
