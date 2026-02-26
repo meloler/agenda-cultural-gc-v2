@@ -20,7 +20,7 @@ class Evento(SQLModel, table=True):
 
     Tabla: 'evento' (nombre automático en snake_case).
     PK: id autoincremental.
-    Unique: url_venta (para lógica de upsert).
+    Unique: hash_id (para lógica de upsert robusta).
 
     Regla: eventos sin fecha_iso son 'Borrador' y no aparecen en el Excel limpio.
     """
@@ -33,7 +33,8 @@ class Evento(SQLModel, table=True):
     fecha_raw: str = "Sin fecha"
     fecha_iso: Optional[str] = None
     organiza: str = "Desconocido"
-    url_venta: str = Field(unique=True, index=True)
+    url_venta: str
+    hash_id: str = Field(unique=True, index=True)
     imagen_url: Optional[str] = None
     descripcion: Optional[str] = Field(default=None, sa_column=Column(Text, nullable=True))
     estilo: str = "Otros"

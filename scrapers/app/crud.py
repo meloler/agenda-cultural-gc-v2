@@ -3,6 +3,7 @@ Operaciones CRUD para la tabla de eventos.
 v3 — Scraping de Precisión: sin columna 'precio', usa precio_num/hora directos.
 """
 
+import hashlib
 from sqlmodel import Session, select
 
 from app.database import get_session
@@ -23,7 +24,12 @@ def guardar_eventos_db(eventos: list[Evento]) -> dict[str, int]:
 
     with get_session() as session:
         for evento in eventos:
-            statement = select(Evento).where(Evento.url_venta == evento.url_venta)
+            # Generar hash determinista para identificar de forma única a este evento/sesión
+            raw_id = f"{evento.organiza}|{evento.url_venta}|{evento.fecha_iso}|{evento.hora}"
+            hash_str = hashlib.sha256(raw_id.encode('utf-8')).hexdigest()
+            evento.hash_id = hash_str
+
+            statement = select(Evento).where(Evento.hash_id == evento.hash_id)
             existente = session.exec(statement).first()
 
             if existente:
@@ -60,6 +66,7 @@ def guardar_eventos_db(eventos: list[Evento]) -> dict[str, int]:
                     source_id=evento.source_id,
                     precio_num=evento.precio_num,
                     hora=evento.hora,
+                    hash_id=evento.hash_id,
                     enriquecido=False,
                 )
                 session.add(nuevo)
