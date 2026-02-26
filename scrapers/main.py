@@ -142,8 +142,8 @@ async def main():
     # 4. Limpieza básica en DB
     ejecutar_limpieza_db()
 
-    # 4b. Purgar eventos pasados de la DB
-    purgar_eventos_pasados()
+    # 4b. Marcar eventos pasados como "past" en lugar de eliminarlos
+    actualizar_estado_eventos()
 
     # 5. Auditoría (Detective v2) - Aquí es donde se arreglan los "Gran Canaria"
     await auditar_eventos()
@@ -241,21 +241,26 @@ async def main():
         print(f"   ⚠️ Eventos sin fecha (Borradores): {len(df_borradores)}")
 
 
-def purgar_eventos_pasados():
-    """Elimina eventos con fecha_iso anterior a hoy."""
+def actualizar_estado_eventos():
+    """Marca como 'past' los eventos con fecha_iso anterior a hoy para conservar el histórico."""
     hoy = str(date.today())
-    print(f"\n🗑️ Purgando eventos anteriores a {hoy}...")
+    print(f"\n🏷️ Actualizando estado a 'past' para eventos anteriores a {hoy}...")
     with get_session() as session:
         pasados = list(session.exec(
-            sql_select(Evento).where(Evento.fecha_iso < hoy, Evento.fecha_iso.is_not(None))
+            sql_select(Evento).where(
+                Evento.fecha_iso < hoy, 
+                Evento.fecha_iso.is_not(None), 
+                Evento.estado != "past"
+            )
         ).all())
         if pasados:
             for ev in pasados:
-                session.delete(ev)
+                ev.estado = "past"
+                session.add(ev)
             session.commit()
-            print(f"   ✅ {len(pasados)} eventos pasados eliminados de la DB.")
+            print(f"   ✅ {len(pasados)} eventos marcados como 'past' (Histórico conservado).")
         else:
-            print("   ✨ No hay eventos pasados. Todo limpio.")
+            print("   ✨ No hay eventos para actualizar. Todo al día.")
 
 
 if __name__ == "__main__":

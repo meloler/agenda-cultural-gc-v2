@@ -45,6 +45,7 @@ class Evento(SQLModel, table=True):
     # Datos duros extraídos por scraping/IA
     precio_num: Optional[float] = None
     hora: Optional[str] = None
+    estado: str = Field(default="upcoming", index=True)
     enriquecido: bool = Field(default=False)
 
     @property
