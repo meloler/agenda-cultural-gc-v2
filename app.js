@@ -110,7 +110,7 @@ function formatPrice(p) {
 // SUPABASE DATA LAYER — replaces all API calls
 // ══════════════════════════════════════════════════════════════════
 
-async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inicio, fecha_fin, sort } = {}) {
+async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inicio, fecha_fin, sort, search } = {}) {
   const today = toISO(new Date());
   const effectiveInicio = fecha_inicio || today;
 
@@ -119,6 +119,16 @@ async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inici
     .select('*', { count: 'exact' })
     .not('fecha_iso', 'is', null)
     .gte('fecha_iso', effectiveInicio);
+
+  // Full Text Search applied directly in the DB
+  if (search && search.trim()) {
+    // Escapar comillas para evitar errores de sintaxis en websearch_to_tsquery
+    const safeSearch = search.trim().replace(/'/g, "''");
+    query = query.textSearch('fts', safeSearch, {
+      type: 'websearch',
+      config: 'spanish'
+    });
+  }
 
   if (sort === 'precio_asc') {
     query = query.order('precio_num', { ascending: true, nullsFirst: false }).order('fecha_iso', { ascending: true });
@@ -197,7 +207,7 @@ async function fetchAllEvents() {
 }
 
 function buildQuery() {
-  const q = { page: state.page, size: PAGE_SIZE, sort: state.sort };
+  const q = { page: state.page, size: PAGE_SIZE, sort: state.sort, search: state.search };
   if (state.categoria) q.categoria = state.categoria;
   const dr = dateRange(state.dateFilter);
   if (dr.fecha_inicio) q.fecha_inicio = dr.fecha_inicio;
@@ -384,16 +394,6 @@ async function loadGrid() {
     const q = buildQuery();
     const data = await fetchEventos(q);
     let items = data.items;
-
-    // Client-side search
-    if (state.search.trim()) {
-      const kw = state.search.toLowerCase();
-      items = items.filter(ev =>
-        ev.nombre.toLowerCase().includes(kw) ||
-        ev.lugar.toLowerCase().includes(kw) ||
-        (ev.estilo && ev.estilo.toLowerCase().includes(kw))
-      );
-    }
 
     state.total = data.total;
     state.pages = data.pages;
