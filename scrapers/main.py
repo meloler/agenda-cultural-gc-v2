@@ -78,13 +78,23 @@ async def run_all_scrapers() -> list[Evento]:
         "Entradas.com", "Entrées.es", "EntradasCanarias", "TeldeCultura",
     ]
 
+    fallos_scraper = 0
+
     for name, result in zip(scraper_names, results):
         if isinstance(result, Exception):
-            print(f"   ⚠️ {name} falló: {result}")
+            print(f"   🚨 ALERTA DevOps: {name} falló críticamente (Exception): {result}")
+            fallos_scraper += 1
         elif isinstance(result, list):
+            if len(result) == 0:
+                print(f"   🚨 ALERTA DevOps: {name} extrajo 0 eventos. (¿Cambio de DOM o IP bloqueada?)")
             all_eventos.extend(result)
         else:
             print(f"   ⚠️ {name} devolvió un resultado inesperado: {type(result)}")
+            fallos_scraper += 1
+
+    error_ratio = (fallos_scraper / len(scraper_names)) * 100
+    if error_ratio > 30:
+        print(f"\n🔥 ALERTA DevOps: Ratio de error excepcionalmente alto: {error_ratio:.1f}% de las fuentes fracasaron.\n")
 
     return all_eventos
 
@@ -201,7 +211,11 @@ async def main():
 
     post_sanitize = len(df)
     if pre_sanitize != post_sanitize:
-        print(f"   🧹 Sanitización: {pre_sanitize} → {post_sanitize} eventos (-{pre_sanitize - post_sanitize} eliminados)")
+        eliminados = pre_sanitize - post_sanitize
+        drop_ratio = (eliminados / pre_sanitize) * 100
+        print(f"   🧹 Sanitización: {pre_sanitize} → {post_sanitize} eventos (-{eliminados} eliminados)")
+        if drop_ratio >= 40:
+            print(f"   🚨 ALERTA DevOps: Caída repentina de calidad. Más del {drop_ratio:.1f}% de los datos se identificó como basura.")
 
     # 4️⃣ Generación de Mapa Seguro
     df["ver_mapa"] = df.apply(generar_enlace_mapa_seguro, axis=1)

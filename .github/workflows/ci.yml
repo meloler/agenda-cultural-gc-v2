@@ -1,0 +1,60 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "dev", "main" ]
+  pull_request:
+    branches: [ "dev", "main" ]
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  test-and-lint:
+    name: Backend CI (Lint, Tests & Smoke)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scrapers
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Linting
+        run: |
+          # Solo check de sintaxis crítico, --exit-zero para no bloquear por estilo
+          ruff check . --exit-zero 
+
+      - name: Unit Tests (Parsing, Fechas, NLP)
+        run: |
+          python -m pytest test_precision.py -v
+
+      - name: Smoke / Dry-run Scraper
+        run: |
+          # Simula cargar los imports y arrancar un contexto básico sin base de datos
+          python -c "import asyncio; from app.models import Evento; print('✅ Smoke Test: Modelos OK')"
+
+  frontend-build:
+    name: Frontend Assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Verificación de Vanilla JS/CSS
+        run: |
+          echo "Comprobando que los archivos clave del frontend existan..."
+          test -f index.html
+          test -f app.js
+          test -f style.css
+          echo "✅ Frontend verificado"
