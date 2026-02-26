@@ -364,7 +364,7 @@ function renderGridView() {
 function cardHTML(ev) {
   const emoji = catEmoji(ev.estilo);
   const imgHTML = ev.imagen_url
-    ? `<img src="${ev.imagen_url}" alt="${ev.nombre}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;card-image-placeholder&quot;>${emoji}</div>'">`
+    ? `<img src="${ev.imagen_url}" alt="${ev.nombre}" loading="lazy" class="card-img" data-emoji="${emoji}">`
     : `<div class="card-image-placeholder">${emoji}</div>`;
 
   return `
@@ -414,8 +414,16 @@ async function loadGrid() {
       return;
     }
 
-    grid.innerHTML = items.map(cardHTML).join('');
+    // Sanitize fully before injecting
+    grid.innerHTML = DOMPurify.sanitize(items.map(cardHTML).join(''), { ADD_ATTR: ['target'] });
     renderPagination();
+
+    // Attach native image error fallbacks (CSP friendly)
+    grid.querySelectorAll('.card-img').forEach(img => {
+      img.addEventListener('error', function () {
+        this.parentElement.innerHTML = `<div class="card-image-placeholder">${this.dataset.emoji}</div>`;
+      });
+    });
 
     // Card click → navigate to event detail
     grid.querySelectorAll('.card').forEach(card => {
@@ -853,13 +861,12 @@ async function renderEventDetail(id) {
     const shareUrl = `${SITE_URL}/evento/${ev.id}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
 
-    detailContainer.innerHTML = `
+    const rawHTML = `
       <a href="/" class="event-detail-back">${ICONS.back} Volver a eventos</a>
 
       ${ev.imagen_url ? `
         <div class="event-detail-image">
-          <img src="${ev.imagen_url}" alt="${ev.nombre}" loading="lazy"
-               onerror="this.parentElement.innerHTML='<div class=&quot;card-image-placeholder&quot; style=&quot;height:240px&quot;>${emoji}</div>'">
+          <img src="${ev.imagen_url}" alt="${ev.nombre}" loading="lazy" class="detail-img" data-emoji="${emoji}">
         </div>
       ` : ''}
 
@@ -907,10 +914,27 @@ async function renderEventDetail(id) {
         <a class="btn-buy" href="${ev.url_venta}" target="_blank" rel="noopener">🎟️ Comprar entradas</a>
         ${mapUrl ? `<a class="btn-secondary" href="${mapUrl}" target="_blank" rel="noopener">${ICONS.map} Ver en mapa</a>` : ''}
         <a class="btn-secondary btn-share-whatsapp" href="${waUrl}" target="_blank" rel="noopener">${ICONS.whatsapp} WhatsApp</a>
-        <button class="btn-secondary" onclick="shareEvent(${ev.id},'${ev.nombre.replace(/'/g, "\\'")}')">${ICONS.share} Compartir</button>
-        <button class="btn-secondary" onclick="copyLink('${shareUrl}')">${ICONS.copy} Copiar enlace</button>
+        <button class="btn-secondary" id="btn-share-native">${ICONS.share} Compartir</button>
+        <button class="btn-secondary" id="btn-share-copy">${ICONS.copy} Copiar enlace</button>
       </div>
     `;
+
+    // Strict DOMPurify sanitization
+    detailContainer.innerHTML = DOMPurify.sanitize(rawHTML, { ADD_ATTR: ['target'] });
+
+    // Fallback for detail image
+    const detailImg = detailContainer.querySelector('.detail-img');
+    if (detailImg) {
+      detailImg.addEventListener('error', function () {
+        this.parentElement.innerHTML = `<div class="card-image-placeholder" style="height:240px">${this.dataset.emoji}</div>`;
+      });
+    }
+
+    // Connect share actions dynamically (CSP friendly)
+    const btnNative = detailContainer.querySelector('#btn-share-native');
+    const btnCopy = detailContainer.querySelector('#btn-share-copy');
+    if (btnNative) btnNative.addEventListener('click', () => shareEvent(ev.id, ev.nombre));
+    if (btnCopy) btnCopy.addEventListener('click', () => copyLink(shareUrl));
 
     injectEventJsonLd(ev);
     document.title = `${ev.nombre} — Agenda Cultural Gran Canaria`;
