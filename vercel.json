@@ -1,18 +1,7 @@
 {
-    "version": 2,
-    "name": "agenda-cultural-gc",
     "cleanUrls": true,
     "framework": null,
-    "builds": [
-        {
-            "src": "package.json",
-            "use": "@vercel/static-build"
-        },
-        {
-            "src": "index.html",
-            "use": "@vercel/static"
-        }
-    ],
+    "outputDirectory": ".",
     "rewrites": [
         {
             "source": "/(.*)",
