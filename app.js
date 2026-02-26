@@ -116,7 +116,7 @@ async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inici
 
   let query = sb
     .from('evento')
-    .select('*', { count: 'exact' })
+    .select('id, nombre, imagen_url, estilo, fecha_iso, hora, precio_num, lugar', { count: 'exact' })
     .not('fecha_iso', 'is', null)
     .gte('fecha_iso', effectiveInicio);
 
@@ -192,13 +192,20 @@ async function fetchCategorias() {
 
 async function fetchAllEvents() {
   if (state.allEvents) return state.allEvents;
-  const today = toISO(new Date());
+
+  const now = new Date();
+  const maxDate = new Date(now);
+  maxDate.setDate(now.getDate() + 90);
+
+  const today = toISO(now);
+  const finVentana = toISO(maxDate);
 
   const { data, error } = await sb
     .from('evento')
-    .select('*')
+    .select('id, nombre, latitud, longitud, estilo, fecha_iso, hora, lugar, imagen_url')
     .not('fecha_iso', 'is', null)
     .gte('fecha_iso', today)
+    .lte('fecha_iso', finVentana)
     .order('fecha_iso', { ascending: true });
 
   if (error) throw error;
