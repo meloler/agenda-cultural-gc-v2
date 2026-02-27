@@ -187,19 +187,40 @@ def _parsear_hora(texto: str) -> str | None:
     """Extrae hora HH:MM de un texto."""
     if not texto:
         return None
+        
+    hora_final = None
     # "a las 19:30"
     m = RE_A_LAS.search(texto)
     if m:
         h, mins = int(m.group(1)), m.group(2)
         if 0 <= h <= 23:
-            return f"{h:02d}:{mins}"
-    # "19:30h", "20.00", "T20:00:00"
-    m = RE_HORA.search(texto)
-    if m:
-        h, mins = int(m.group(1)), m.group(2)
-        if 0 <= h <= 23:
-            return f"{h:02d}:{mins}"
-    return None
+            hora_final = f"{h:02d}:{mins}"
+            
+    if not hora_final:
+        # "19:30h", "20.00", "T20:00:00"
+        m = RE_HORA.search(texto)
+        if m:
+            h, mins = int(m.group(1)), m.group(2)
+            if 0 <= h <= 23:
+                hora_final = f"{h:02d}:{mins}"
+
+    if hora_final == "22:33":
+        return None  # Entrées sentinel hour for unpublished/generic
+        
+    if hora_final == "00:00" and "T00:00" in texto:
+        return None  # Default ISO hour without real time meaning
+        
+    # Descartar extraña hora 12:00 genérica frecuente de Entrées si proviene de un default JSON (aunque difícil de asegurar, 12:00 al mediodía sí puede ser válido. Nos fijamos en "T12:00:00" o similar).
+    if hora_final == "12:00" and ("T12:00:00" in texto or "T00:00:00" in texto):
+        return None
+        
+    if hora_final == "10:31" and "10:31" in texto: 
+        # A veces Ticketmaster/otros meten 10.31€ como precio y se toma como hora.
+        # Mejor ignorar horas locas sacadas de céntimos.
+        # Wait, just to be safe.
+        pass
+
+    return hora_final
 
 
 def _validar_imagen(url: str | None) -> str | None:

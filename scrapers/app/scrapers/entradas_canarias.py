@@ -123,32 +123,51 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                 
                 url_full = item.get("url") or f"https://ventas.entradascanarias.com/events/{slug}"
                 
-                # Para deduplicar internamente (slug + fecha + venue)
                 sessions = item.get("sessions", [])
-                date_str = sessions[0].get("date", "") if sessions else ""
                 venue = item.get("venue", "")
+                master_id = item.get("masterId", "")
                 
-                dup_key = f"{slug}_{date_str}_{venue}"
-                if dup_key in seen_keys:
-                    continue
-                seen_keys.add(dup_key)
-                
-                # Filtro Geográfico
+                # Filtro Geográfico general del item
                 loc_str = f"{item.get('province', '')} {item.get('city', '')} {venue}".lower()
                 if not _es_gran_canaria(loc_str):
                     continue
                     
                 lugar = limpiar_texto(venue) or "Gran Canaria"
-                
-                eventos_raw.append({
-                    "nombre": limpiar_texto(nombre),
-                    "url_full": url_full,
-                    "img_card": _validar_imagen(item.get("imageUrl")),
-                    "lugar": lugar,
-                    "precio_api": item.get("minPrice"),
-                    "fecha_raw": date_str or "Sin fecha",
-                    "fecha_iso": date_str[:10] if date_str and len(date_str) >= 10 else None,
-                })
+
+                if not sessions:
+                    # Fallback si no hay sessions, aunque es raro
+                    sessions = [{"date": ""}]
+
+                for sess in sessions:
+                    date_str = sess.get("date", "")
+                    fecha_iso_val = None
+                    hora_val = None
+                    if date_str:
+                        try:
+                            if "T" in date_str:
+                                fecha_iso_val = date_str.split("T")[0]
+                                hora_val = date_str.split("T")[1][:5]
+                            else:
+                                fecha_iso_val = date_str[:10]
+                        except Exception:
+                            pass
+
+                    # Para deduplicar internamente (masterId + fecha o slug + fecha + venue)
+                    dup_key = f"{master_id}_{fecha_iso_val}" if master_id and fecha_iso_val else f"{slug}_{fecha_iso_val}_{venue}"
+                    if dup_key in seen_keys:
+                        continue
+                    seen_keys.add(dup_key)
+                    
+                    eventos_raw.append({
+                        "nombre": limpiar_texto(nombre),
+                        "url_full": url_full,
+                        "img_card": _validar_imagen(item.get("imageUrl")),
+                        "lugar": lugar,
+                        "precio_api": item.get("minPrice"),
+                        "fecha_raw": date_str or "Sin fecha",
+                        "fecha_iso": fecha_iso_val,
+                        "hora_api": hora_val,
+                    })
             except Exception:
                 continue
                 
@@ -202,21 +221,21 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                     fecha_iso = detalle["fecha_iso"] or raw["fecha_iso"]
                     fecha_raw = detalle.get("fecha_raw") or raw["fecha_raw"]
                     precio = detalle["precio_num"]
-                    hora = detalle["hora"]
+                    hora = detalle["hora"] or raw.get("hora_api")
                     descripcion = detalle["descripcion"]
                 except Exception:
                     imagen_final = raw["img_card"]
                     fecha_iso = raw["fecha_iso"]
                     fecha_raw = raw["fecha_raw"]
                     precio = None
-                    hora = None
+                    hora = raw.get("hora_api")
                     descripcion = None
             else:
                 imagen_final = raw["img_card"]
                 fecha_iso = raw["fecha_iso"]
                 fecha_raw = raw["fecha_raw"]
                 precio = None
-                hora = None
+                hora = raw.get("hora_api")
                 descripcion = None
 
             eventos.append(

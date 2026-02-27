@@ -169,11 +169,15 @@ async def main():
     # 5. Auditoría (Detective v2) - Aquí es donde se arreglan los "Gran Canaria"
     await auditar_eventos()
 
+    import os
     # 6. Clasificación IA
-    await categorizar_eventos()
+    if os.getenv("SKIP_AI", "false").lower() == "true":
+        print("\n⏩ Saltando Clasificación y Enriquecimiento IA (Modo Test)")
+    else:
+        await categorizar_eventos()
 
-    # 7. Enriquecimiento IA
-    await enriquecer_eventos()
+        # 7. Enriquecimiento IA
+        await enriquecer_eventos()
 
     # 8. Geolocalización (GIS)
     geolocalizar_eventos()
@@ -198,13 +202,41 @@ async def main():
     # ===================================================================
     pre_sanitize = len(df)
 
-    # 1️⃣ Títulos basura: len < 3 (ej: "Dr.", "2", "A")
-    df = df[df["nombre"].str.strip().str.len() >= 3]
+    # 1️⃣ Títulos basura: len < 3 (ej: "Dr.", "2", "A") y patrones irregulares
+    import re
+    def es_titulo_basura(t) -> bool:
+        t = (str(t) if pd.notna(t) else "").strip()
+        low = t.lower()
+        if low in {"ext", "nan", "none", "null", ""}: return True
+        if len(t) <= 4: return True
+        if len(t) >= 110: return True
+        if re.search(r"\b\d{3}\b.*\b\d{3}\b", t): return True
+        if t.endswith("..."): return True
+        return False
+
+    df = df[~df["nombre"].apply(es_titulo_basura)]
+
+    # 1.5️⃣ Sanitización de lugar
+    def limpiar_lugar(lugar) -> str | None:
+        l = (str(lugar) if pd.notna(lugar) else "").strip()
+        if not l: return None
+        leak_tokens = ["paseo nocturno", "prepárate", "descubre", "que no olvidarás", "la cara más natural", "calle y los"]
+        if len(l) > 70: return None
+        if any(tok in l.lower() for tok in leak_tokens): return None
+        return l or None
+
+    df["lugar"] = df["lugar"].apply(limpiar_lugar)
 
     # 2️⃣ Precios absurdos: > 300€ se consideran error de año (2025/2026)
     # Convertimos a numérico forzoso por si acaso
     df["precio_num"] = pd.to_numeric(df["precio_num"], errors='coerce')
     df.loc[df["precio_num"] > 300, "precio_num"] = None
+
+    # 2.2️⃣ QA Gate: Hora vacía
+    pct_hora_vacia = df["hora"].isna().mean() * 100
+    if len(df) > 0 and pct_hora_vacia > 25.0:
+        print(f"\n🔥 ALERTA P0 DevOps FULL STOP: Demasiados eventos sin hora ({pct_hora_vacia:.1f}% > 25%). Abortando exportación.\n")
+        return
 
     # 2.5️⃣ QA Gate: Títulos genéricos (P0)
     df["_es_generico_titulo"] = df["nombre"].apply(lambda x: es_titulo_generico(str(x)))
@@ -219,6 +251,10 @@ async def main():
             
     # Limpiamos preventivamente los que hayan pasado (si <= 5%)
     df = df[~df["_es_generico_titulo"]]
+
+    # 2.8️⃣ Política temporal: Recortar pasados (agenda es futura)
+    today_iso = date.today().isoformat()
+    df = df[(df["fecha_iso"].isna()) | (df["fecha_iso"] >= today_iso)]
 
     # 3️⃣ Smart Deduplication V2 (Clave compuesta)
     # Priorizamos: 1. Lugar Específico, 2. Descripción más larga
@@ -235,15 +271,31 @@ async def main():
     
     # Clave fuerte para evitar fusionar eventos distintos el mismo día
     df = df.drop_duplicates(subset=["_titulo_norm", "fecha_iso", "_lugar_norm", "_hora_norm"], keep="first")
-    df = df.drop(columns=["_titulo_norm", "_lugar_norm", "_hora_norm", "_es_generico_lugar", "_len_desc", "_es_generico_titulo"])
+
+    # 3.5️⃣ Deduplicación de consolidación multi-fuente (canonical+fecha)
+    PREF = {"Ticketmaster": 100, "EntradasCanarias": 90, "Tickety": 80, "Tomaticket": 70, "CICCA": 65, "Teatro Guiniguada": 65, "Entrées.es": 40}
+
+    def quality_score(r):
+        s = PREF.get(r["organiza"], 50)
+        s += 10 if pd.notna(r["hora"]) and str(r["hora"]).strip() else 0
+        s += 10 if pd.notna(r["precio_num"]) else 0
+        s += 10 if pd.notna(r["lugar"]) and str(r["lugar"]).strip() else 0
+        return s
+
+    df["_canon"] = df["nombre"].apply(lambda x: _normalizar(str(x)))
+    df["_score"] = df.apply(quality_score, axis=1)
+    df = df.sort_values(["_canon", "fecha_iso", "_score"], ascending=[True, True, False])
+    df = df.drop_duplicates(subset=["_canon", "fecha_iso"], keep="first")
+
+    df = df.drop(columns=["_titulo_norm", "_lugar_norm", "_hora_norm", "_es_generico_lugar", "_len_desc", "_es_generico_titulo", "_canon", "_score"])
 
     post_sanitize = len(df)
     if pre_sanitize != post_sanitize:
         eliminados = pre_sanitize - post_sanitize
         drop_ratio = (eliminados / pre_sanitize) * 100
         print(f"   🧹 Sanitización: {pre_sanitize} → {post_sanitize} eventos (-{eliminados} eliminados)")
-        if drop_ratio >= 40:
-            print(f"   🚨 ALERTA DevOps: Caída repentina de calidad. Más del {drop_ratio:.1f}% de los datos se identificó como basura.")
+        if drop_ratio >= 60:
+            print(f"   🚨 ALERTA DevOps: Caída repentina de calidad. Más del {drop_ratio:.1f}% de los datos se eliminó.")
 
     # 4️⃣ Generación de Mapa Seguro
     df["ver_mapa"] = df.apply(generar_enlace_mapa_seguro, axis=1)

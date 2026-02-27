@@ -5,6 +5,7 @@ import pandas as pd
 import json
 import re
 import sys
+import math
 
 df = pd.read_excel("agenda_cultural_LIMPIA.xlsx")
 
@@ -74,6 +75,8 @@ for r in records:
         if r.get("precio_num") is not None:
             try:
                 r["precio_num"] = float(r["precio_num"])
+                if math.isnan(r["precio_num"]):
+                    r["precio_num"] = None
             except (ValueError, TypeError):
                 r["precio_num"] = None
                 
@@ -84,7 +87,7 @@ for r in records:
 records = valid_records
 
 # Imprimir como JSON para uso posterior
-output = json.dumps(records, ensure_ascii=False, default=str)
+output = json.dumps(records, ensure_ascii=False, default=str, allow_nan=False)
 sys.stdout.write(f"TOTAL_RECORDS:{len(records)}\n")
 sys.stdout.flush()
 
