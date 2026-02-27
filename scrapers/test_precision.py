@@ -10,6 +10,7 @@ from app.scrapers._enrichment import (
     _parsear_hora,
     _validar_imagen,
     _detectar_dominio,
+    es_titulo_generico,
 )
 
 
@@ -158,3 +159,24 @@ class TestDetectarDominio:
 
     def test_generico(self):
         assert _detectar_dominio("https://www.example.com/event") == "generico"
+
+
+class TestEsTituloGenerico:
+    def test_titulos_genericos_exactos(self):
+        assert es_titulo_generico("entradas para los mejores eventos") is True
+        assert es_titulo_generico("COMPRAR ENTRADAS") is True
+        assert es_titulo_generico("agenda gc") is True
+
+    def test_titulos_genericos_parciales(self):
+        assert es_titulo_generico("Inicio - EntradasCanarias") is True
+        assert es_titulo_generico("Eventos en Gran Canaria | Entrees") is True
+
+    def test_titulo_real(self):
+        assert es_titulo_generico("Concierto de Quevedo") is False
+        assert es_titulo_generico("Obra de teatro: El Alcalde de Zalamea") is False
+        assert es_titulo_generico("Taller de cerámica artesanal") is False
+        assert es_titulo_generico("2") is True  # len < 3 is generic
+        assert es_titulo_generico("ABC") is False
+
+    def test_espacios_y_simbolos(self):
+        assert es_titulo_generico("  Comprar  entradas... ") is True

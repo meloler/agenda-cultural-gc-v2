@@ -17,7 +17,7 @@ import asyncio
 from playwright.async_api import Page
 
 from app.models import Evento
-from app.scrapers._enrichment import enriquecer_evento, _validar_imagen
+from app.scrapers._enrichment import enriquecer_evento, _validar_imagen, es_titulo_generico
 from app.utils.text_processing import categorizar_pro, limpiar_texto, normalizar_fecha
 
 
@@ -59,6 +59,16 @@ async def scrape_entrees(page: Page) -> list[Evento]:
             wait_until="domcontentloaded",
             timeout=25000,
         )
+
+        # Detectar bloqueo Cloudflare / Anti-bot
+        try:
+            body_text = await page.inner_text("body", timeout=3000)
+            bt_lower = body_text.lower()
+            if "security verification" in bt_lower or "cloudflare" in bt_lower or "just a moment" in bt_lower:
+                print("   🚫 Bloqueo anti-bot / Cloudflare detectado en Entrées.es. Abortando limpiamente.")
+                return []
+        except Exception:
+            pass
 
         # Esperar a que carguen las tarjetas
         try:
@@ -116,6 +126,13 @@ async def scrape_entrees(page: Page) -> list[Evento]:
                         }
                     });
                     
+                    // Precio (fallback)
+                    let precio_text = '';
+                    const pe = card.querySelector('[class*="price"], [class*="precio"]');
+                    if (pe) {
+                        precio_text = pe.textContent.trim();
+                    }
+                    
                     results.push({
                         nombre: nombre,
                         url: url,
@@ -123,6 +140,7 @@ async def scrape_entrees(page: Page) -> list[Evento]:
                         ciudad: ciudad,
                         fullText: fullText.substring(0, 600),
                         img: imgSrc,
+                        precio_text: precio_text,
                     });
                 }
                 return results;
@@ -139,6 +157,7 @@ async def scrape_entrees(page: Page) -> list[Evento]:
             ciudad = item.get("ciudad", "")
             texto_completo = item.get("fullText", "")
             img = _validar_imagen(item.get("img"))
+            precio_text = item.get("precio_text", "")
 
             if not nombre or not url:
                 continue
@@ -156,11 +175,23 @@ async def scrape_entrees(page: Page) -> list[Evento]:
             # Determinar lugar más específico
             lugar = limpiar_texto(ubicacion) if ubicacion else "Gran Canaria"
 
+            # Intentar parsear precio fallback
+            precio_num = None
+            if precio_text:
+                import re
+                match = re.search(r'(\d+[.,]?\d*)\s*€', precio_text)
+                if match:
+                    try:
+                        precio_num = float(match.group(1).replace(",", "."))
+                    except ValueError:
+                        pass
+            
             eventos_raw.append({
                 "nombre": nombre,
                 "url_full": url,
                 "img_card": img,
                 "lugar": lugar,
+                "precio_num": precio_num,
             })
 
         print(f"   -> {len(eventos_raw)} eventos en Gran Canaria (filtrados)")
@@ -174,19 +205,39 @@ async def scrape_entrees(page: Page) -> list[Evento]:
             detalle = await enriquecer_evento(page, raw["url_full"], raw["nombre"], seen_texts)
             imagen_final = _validar_imagen(detalle["imagen_url"]) or raw["img_card"]
 
+            precio = detalle["precio_num"]
+            if precio is None and raw["precio_num"] is not None:
+                precio = raw["precio_num"]
+
+            # Resolver el mejor nombre final (evitar genéricos)
+            nombre_final = ""
+            if detalle.get("nombre_deep") and not es_titulo_generico(detalle["nombre_deep"]):
+                nombre_final = detalle["nombre_deep"]
+            elif raw["nombre"] and not es_titulo_generico(raw["nombre"]):
+                nombre_final = raw["nombre"]
+            else:
+                import re
+                match = re.search(r'/(?:evento|entradas)/([^/]+)', raw["url_full"])
+                if match:
+                    nombre_final = match.group(1).replace("-", " ").title()
+
+            if not nombre_final or es_titulo_generico(nombre_final):
+                print(f"      ⚠️ Evento descartado (título irremediablemente genérico): {raw['url_full']}")
+                continue
+
             eventos.append(
                 Evento(
-                    nombre=raw["nombre"],
+                    nombre=nombre_final,
                     lugar=raw["lugar"],
                     fecha_raw=detalle.get("fecha_raw") or "Sin fecha",
                     fecha_iso=detalle["fecha_iso"],
-                    precio_num=detalle["precio_num"],
+                    precio_num=precio,
                     hora=detalle["hora"],
                     organiza="Entrées.es",
                     url_venta=raw["url_full"],
                     imagen_url=imagen_final,
                     descripcion=detalle["descripcion"],
-                    estilo=categorizar_pro(raw["nombre"], "Entrées.es"),
+                    estilo=categorizar_pro(nombre_final, "Entrées.es"),
                 )
             )
 

@@ -27,50 +27,61 @@ async def scrape_cultura_canaria(page: Page, url_base: str, recinto: str) -> lis
     eventos_raw: list[dict] = []
 
     try:
-        await page.goto(
-            f"{url_base}/programacion",
-            wait_until="networkidle",
-            timeout=20000,
-        )
-
-        links = await page.query_selector_all("a[href*='/evento/']")
+        import json
         seen: set[str] = set()
-
-        print(f"   -> {len(links)} enlaces detectados en {recinto}")
-
-        for link in links:
+        page_num = 1
+        
+        while page_num <= 5:
+            api_url = f"{url_base}/eventos/0?page={page_num}"
             try:
-                href = await link.get_attribute("href")
-                if not href or href in seen:
+                await page.goto(api_url, wait_until="domcontentloaded", timeout=15000)
+                body_text = await page.inner_text("body", timeout=5000)
+                data = json.loads(body_text)
+            except Exception as e:
+                print(f"      [DEBUG] Fin de paginación o error en API: {e}")
+                break
+            
+            items = data.get("data", data) if isinstance(data, dict) else data
+            if not isinstance(items, list) or len(items) == 0:
+                break
+                
+            for item in items:
+                try:
+                    nombre = item.get("title", "")
+                    
+                    # URL local del evento
+                    url_full = item.get("url")
+                    if not url_full:
+                        slug = item.get("slug")
+                        if slug:
+                            url_full = f"{url_base}/evento/{slug}"
+                    
+                    # A veces la URL viene relativa
+                    if url_full and url_full.startswith("/"):
+                        url_full = f"{url_base}{url_full}"
+                        
+                    if not url_full or url_full in seen:
+                        continue
+                    seen.add(url_full)
+                    
+                    # Imagen
+                    img_card = item.get("image") or item.get("image_url") or item.get("poster")
+                    if isinstance(img_card, str):
+                        if img_card.startswith("/"):
+                            img_card = f"{url_base}{img_card}"
+                        img_card = _validar_imagen(img_card)
+                    
+                    eventos_raw.append({
+                        "nombre": limpiar_texto(nombre) or inferir_nombre(url_full),
+                        "url_full": url_full,
+                        "img_card": img_card,
+                    })
+                except Exception:
                     continue
-                seen.add(href)
+                    
+            page_num += 1
 
-                url_full = href if href.startswith("http") else f"{url_base}{href}"
-
-                nombre = await link.inner_text()
-                nombre = limpiar_texto(nombre)
-
-                if not nombre or len(nombre) < 3 or nombre.lower() in ["imagen", "ver más", "entradas"]:
-                    nombre = await link.get_attribute("title")
-                    if not nombre:
-                        nombre = inferir_nombre(href)
-
-                nombre = limpiar_texto(nombre)
-
-                # Imagen de la card (fallback)
-                img_el = await link.query_selector("img")
-                img_card = None
-                if img_el:
-                    img_src = await img_el.get_attribute("src") or await img_el.get_attribute("data-src")
-                    img_card = _validar_imagen(img_src)
-
-                eventos_raw.append({
-                    "nombre": nombre,
-                    "url_full": url_full,
-                    "img_card": img_card,
-                })
-            except Exception:
-                continue
+        print(f"   -> {len(eventos_raw)} enlaces detectados en {recinto} (vía API)")
 
         # === FASE 2: Deep Scraping de Precisión ===
         print(f"   -> Iniciando deep scraping de {len(eventos_raw)} eventos de {recinto}...")

@@ -93,147 +93,100 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
     eventos_raw: list[dict] = []
 
     try:
-        # === FASE 1: Carga completa con paginación ===
-        await page.goto(
-            "https://entradascanarias.com/",
-            wait_until="domcontentloaded",
-            timeout=25000,
-        )
-
-        # Esperar a que carguen los eventos
-        await asyncio.sleep(3)
-
-        # Click en "Cargar más" varias veces para obtener todos los eventos
-        for _ in range(5):
+        # === FASE 1: Fetch desde APIs ===
+        api_current = "https://12bwlcduo0.execute-api.eu-west-1.amazonaws.com/events/current-events"
+        api_slider = "https://12bwlcduo0.execute-api.eu-west-1.amazonaws.com/events/slider-events"
+        
+        try:
+            resp_curr = await page.request.get(api_current, timeout=15000)
+            data_curr = await resp_curr.json() if resp_curr.ok else []
+        except Exception as e:
+            print(f"      [DEBUG] Error fetching current-events: {e}")
+            data_curr = []
+            
+        try:
+            resp_slid = await page.request.get(api_slider, timeout=15000)
+            data_slid = await resp_slid.json() if resp_slid.ok else []
+        except Exception as e:
+            print(f"      [DEBUG] Error fetching slider-events: {e}")
+            data_slid = []
+            
+        seen_keys = set()
+        
+        # Procesar current-events
+        for item in data_curr:
             try:
-                btn = await page.query_selector("button:has-text('Cargar más'), button:has-text('cargar más')")
-                if btn:
-                    visible = await btn.is_visible()
-                    if visible:
-                        await btn.click()
-                        await asyncio.sleep(2)
-                    else:
-                        break
-                else:
-                    break
-            except Exception:
-                break
-
-        # Scroll adicional
-        for _ in range(3):
-            await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            await asyncio.sleep(1)
-
-        # === FASE 2: Extracción con JS ===
-        items = await page.evaluate("""
-            () => {
-                const results = [];
-                // Buscar todas las tarjetas de evento (divs con h5 que tienen nombre)
-                const headings = document.querySelectorAll('h5');
-                const seen = new Set();
-                
-                for (const h5 of headings) {
-                    const nombre = h5.textContent.trim();
-                    if (!nombre || nombre.length < 3 || seen.has(nombre)) continue;
-                    seen.add(nombre);
-                    
-                    // Buscar el contenedor padre
-                    let container = h5.closest('div[class*="card"], div[class*="evento"], a, div');
-                    if (!container) continue;
-                    
-                    // Recoger texto completo del contenedor (incluye ubicación, fecha, etc.)
-                    const fullText = container.textContent || '';
-                    
-                    // Buscar enlace
-                    let link = container.closest('a');
-                    if (!link) link = container.querySelector('a');
-                    let url = link ? link.href : '';
-                    
-                    // Buscar botón "Comprar entradas"
-                    if (!url) {
-                        const btn = container.querySelector('a[href*="entradas"], button');
-                        if (btn && btn.href) url = btn.href;
-                    }
-                    
-                    // Imagen
-                    const img = container.querySelector('img');
-                    const imgSrc = img ? (img.src || img.dataset.src) : null;
-                    
-                    // Extraer líneas de texto para parsear fecha y ubicación
-                    const lines = fullText.split('\\n').map(l => l.trim()).filter(l => l);
-                    
-                    results.push({
-                        nombre: nombre,
-                        url: url,
-                        fullText: fullText.substring(0, 500),
-                        lines: lines.slice(0, 10),
-                        img: imgSrc,
-                    });
-                }
-                return results;
-            }
-        """)
-
-        print(f"   -> {len(items)} tarjetas totales en EntradasCanarias")
-
-        # Procesar y filtrar
-        for item in items:
-            nombre = limpiar_texto(item.get("nombre", ""))
-            url = item.get("url", "")
-            texto = item.get("fullText", "")
-            lines = item.get("lines", [])
-            img = _validar_imagen(item.get("img"))
-
-            if not nombre or nombre.upper() in ["DESTACADOS", "CONCIERTOS", "FESTIVALES", "OTROS", "FIESTAS Y CLUBS", "TEATRO"]:
-                continue
-
-            # Extraer ubicación del texto
-            ubicacion = ""
-            for line in lines:
-                if any(x in line.lower() for x in ["recintos", "ciudades"]):
+                nombre = item.get("title", "")
+                slug = item.get("slug", "")
+                if not nombre or not slug: 
                     continue
-                if any(c in line for c in ["📍", "Palmas", "Telde", "Gran Canaria", "Maspalomas", "Infecar"]):
-                    ubicacion = line.strip().lstrip("📍 ").strip()
-                    break
-
-            # Si no encontramos ubicación explícita, buscar en texto completo
-            if not ubicacion:
-                for loc in UBICACIONES_GC:
-                    if loc in texto.lower():
-                        ubicacion = loc.title()
-                        break
-
-            # Filtro geográfico
-            es_gc = _es_gran_canaria(texto)
-            if not es_gc:
+                
+                url_full = item.get("url") or f"https://ventas.entradascanarias.com/events/{slug}"
+                
+                # Para deduplicar internamente (slug + fecha + venue)
+                sessions = item.get("sessions", [])
+                date_str = sessions[0].get("date", "") if sessions else ""
+                venue = item.get("venue", "")
+                
+                dup_key = f"{slug}_{date_str}_{venue}"
+                if dup_key in seen_keys:
+                    continue
+                seen_keys.add(dup_key)
+                
+                # Filtro Geográfico
+                loc_str = f"{item.get('province', '')} {item.get('city', '')} {venue}".lower()
+                if not _es_gran_canaria(loc_str):
+                    continue
+                    
+                lugar = limpiar_texto(venue) or "Gran Canaria"
+                
+                eventos_raw.append({
+                    "nombre": limpiar_texto(nombre),
+                    "url_full": url_full,
+                    "img_card": _validar_imagen(item.get("imageUrl")),
+                    "lugar": lugar,
+                    "precio_api": item.get("minPrice"),
+                    "fecha_raw": date_str or "Sin fecha",
+                    "fecha_iso": date_str[:10] if date_str and len(date_str) >= 10 else None,
+                })
+            except Exception:
+                continue
+                
+        # Procesar slider-events
+        for item in data_slid:
+            try:
+                nombre = item.get("eventTitle", "")
+                url_full = item.get("eventUrl", "")
+                venue = item.get("eventLocation", "")
+                date_str = item.get("eventDate", "")
+                
+                if not nombre or not url_full: 
+                    continue
+                
+                dup_key = f"{nombre}_{venue}"
+                if dup_key in seen_keys:
+                    continue
+                seen_keys.add(dup_key)
+                
+                loc_str = venue.lower()
+                if not _es_gran_canaria(loc_str):
+                    continue
+                    
+                lugar = limpiar_texto(venue) or "Gran Canaria"
+                
+                eventos_raw.append({
+                    "nombre": limpiar_texto(nombre),
+                    "url_full": url_full,
+                    "img_card": _validar_imagen(item.get("imageUrl")),
+                    "lugar": lugar,
+                    "precio_api": None,
+                    "fecha_raw": date_str or "Sin fecha",
+                    "fecha_iso": None,
+                })
+            except Exception:
                 continue
 
-            # Parsear fecha del badge
-            fecha_iso = None
-            fecha_raw = "Sin fecha"
-            for i, line in enumerate(lines):
-                if line.isdigit() and len(line) <= 2 and i + 1 < len(lines):
-                    next_line = lines[i + 1]
-                    if len(next_line) == 3 and next_line.isalpha():
-                        fecha_iso = _parsear_fecha_badge(line, next_line)
-                        fecha_raw = f"{line} {next_line}"
-                        break
-                if "varias fechas" in line.lower():
-                    fecha_raw = "Varias fechas"
-                    break
-
-            lugar = limpiar_texto(ubicacion) if ubicacion else "Gran Canaria"
-
-            eventos_raw.append({
-                "nombre": nombre,
-                "url_full": url if url else f"https://entradascanarias.com/",
-                "img_card": img,
-                "lugar": lugar,
-                "fecha_iso": fecha_iso,
-                "fecha_raw": fecha_raw,
-            })
-
-        print(f"   -> {len(eventos_raw)} eventos de Gran Canaria (filtrados)")
+        print(f"   -> {len(eventos_raw)} eventos de Gran Canaria (filtrados vía API)")
 
         # === FASE 3: Deep Scraping (solo si tenemos URL individual) ===
         print(f"   -> Procesando {len(eventos_raw)} eventos de EntradasCanarias...")

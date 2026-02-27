@@ -184,7 +184,7 @@ async def scrape_entradas_com(page: Page) -> list[Evento]:
 
             eventos.append(
                 Evento(
-                    nombre=raw["nombre"],
+                    nombre=detalle.get("nombre_deep") or raw["nombre"],
                     lugar="Las Palmas de Gran Canaria",
                     fecha_raw=detalle.get("fecha_raw") or "Sin fecha",
                     fecha_iso=detalle["fecha_iso"],

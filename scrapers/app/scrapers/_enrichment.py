@@ -36,6 +36,23 @@ BLACKLIST = [
     "barra libre", "mayores de 18",
 ]
 
+GENERIC_TITLES = [
+    "entradas para los mejores eventos", "entradas para", 
+    "tickets for the best events", "tickets for",
+    "compra tus entradas", "anuncio genérico", "entradas",
+    "abono", "bono", "agenda gc", "inicio -", "entrees", "tomaticket", "tickety"
+]
+
+def es_titulo_generico(titulo: str) -> bool:
+    """Detecta si un título es propaganda genérica del portal en lugar de un evento."""
+    if not titulo:
+        return True
+    t = titulo.lower().strip()
+    if len(t) < 3:
+        return True
+    return any(g in t for g in GENERIC_TITLES)
+
+
 # ─────────────────────────────────────────────────────────────────────
 # Regex patterns compilados
 # ─────────────────────────────────────────────────────────────────────
@@ -50,7 +67,7 @@ RE_HORA = re.compile(
     re.IGNORECASE,
 )
 RE_FECHA_ISO = re.compile(r'(\d{4})-(\d{2})-(\d{2})')
-RE_FECHA_DMY_SLASH = re.compile(r'(\d{1,2})/(\d{1,2})/(\d{4})')
+RE_FECHA_DMY_SLASH = re.compile(r'(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})')
 RE_FECHA_DMY_TEXT = re.compile(
     r'(\d{1,2})\s*(?:de\s+)?(?:del?\s+)?'
     r'(enero|febrero|marzo|abril|mayo|junio|julio|agosto|'
@@ -96,6 +113,14 @@ def _detectar_dominio(url: str) -> str:
         return "ticketmaster"
     if "janto" in domain:
         return "janto"
+    if "entrees" in domain:
+        return "entrees"
+    if "entradascanarias" in domain:
+        return "entradascanarias"
+    if "entradas.com" in domain:
+        return "entradas_com"
+    if "teldecultura" in domain:
+        return "teldecultura"
     return "generico"
 
 
@@ -140,10 +165,12 @@ def _parsear_fecha(texto: str) -> str | None:
     m = RE_FECHA_ISO.search(texto)
     if m:
         return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-    # dd/mm/yyyy
+    # dd/mm/yyyy o dd/mm/yy o dd-mm-yyyy
     m = RE_FECHA_DMY_SLASH.search(texto)
     if m:
         dia, mes, anio = m.group(1).zfill(2), m.group(2).zfill(2), m.group(3)
+        if len(anio) == 2:
+            anio = "20" + anio # asume 20xx
         return f"{anio}-{mes}-{dia}"
     # "14 de febrero 2026"
     m = RE_FECHA_DMY_TEXT.search(texto)
@@ -588,6 +615,7 @@ async def enriquecer_evento(
         "fecha_iso": None,
         "hora": None,
         "fecha_raw": None,
+        "nombre_deep": None,
     }
 
     # Guardar la URL original para poder volver (en caso de Janto navigation)
@@ -615,6 +643,20 @@ async def enriquecer_evento(
             print(f"      [FECHA]  {datos['fecha_iso']}")
         if datos["hora"]:
             print(f"      [HORA]   {datos['hora']}")
+
+        # Buscar el nombre real (h1) sin truncar
+        try:
+            h1 = page.locator("h1").first
+            if await h1.count() > 0:
+                h1_text = await h1.inner_text(timeout=2000)
+                if h1_text and len(h1_text.strip()) > 5:
+                    nombre_posible = h1_text.strip()
+                    if not es_titulo_generico(nombre_posible):
+                        detalle["nombre_deep"] = nombre_posible
+                    else:
+                        print(f"      ⚠️ Título H1 ignorado por ser genérico: '{nombre_posible}'")
+        except Exception:
+            pass
 
         # Si Janto navigation changed the URL, go back to original for desc/image
         current_url = page.url

@@ -21,8 +21,10 @@ from app.crud import guardar_eventos_db
 from app.database import init_db, get_session
 from app.enricher import enriquecer_eventos
 from app.geocoder import geolocalizar_eventos, _normalizar, es_lugar_generico
+from app.scrapers._enrichment import es_titulo_generico
 
 # Scrapers
+from app.scrapers.ticketmaster import scrape_ticketmaster_api
 from app.scrapers.ticketmaster_web import scrape_ticketmaster_web
 from app.scrapers.tomaticket import scrape_tomaticket
 from app.scrapers.cultura_canaria import scrape_cultura_canaria
@@ -32,6 +34,15 @@ from app.scrapers.entradas_com import scrape_entradas_com
 from app.scrapers.entrees import scrape_entrees
 from app.scrapers.entradas_canarias import scrape_entradas_canarias
 from app.scrapers.telde_cultura import scrape_telde_cultura
+
+
+async def _scrape_ticketmaster_smart(page) -> list[Evento]:
+    """Prueba la API primero; si falla o está vacía, usa Web."""
+    eventos = await scrape_ticketmaster_api()
+    if not eventos:
+        print("   🌐 Ticketmaster Fallback: Usando Web Scraper...")
+        eventos = await scrape_ticketmaster_web(page)
+    return eventos
 
 
 async def run_all_scrapers() -> list[Evento]:
@@ -56,7 +67,7 @@ async def run_all_scrapers() -> list[Evento]:
 
         # Lanzar en paralelo
         results = await asyncio.gather(
-            scrape_ticketmaster_web(page_ticketmaster),
+            _scrape_ticketmaster_smart(page_ticketmaster),
             scrape_cultura_canaria(page_auditorio, "https://auditorioalfredokraus.es", "Auditorio A. Kraus"),
             scrape_cultura_canaria(page_galdos, "https://teatroperezgaldos.es", "Teatro Pérez Galdós"),
             scrape_cicca(page_cicca),
@@ -132,7 +143,7 @@ async def main():
     load_dotenv()
 
     print("=" * 60)
-    print("🚀 AGENDA CULTURAL GC – v5.1 (Pipeline de Precisión + Deep Scrape)")
+    print("START: AGENDA CULTURAL GC - v5.1 (Pipeline de Precision + Deep Scrape)")
     print("=" * 60)
 
     # 1. Inicializar DB
@@ -195,19 +206,36 @@ async def main():
     df["precio_num"] = pd.to_numeric(df["precio_num"], errors='coerce')
     df.loc[df["precio_num"] > 300, "precio_num"] = None
 
-    # 3️⃣ Smart Deduplication
+    # 2.5️⃣ QA Gate: Títulos genéricos (P0)
+    df["_es_generico_titulo"] = df["nombre"].apply(lambda x: es_titulo_generico(str(x)))
+    if len(df) > 0:
+        generic_count = df["_es_generico_titulo"].sum()
+        generic_ratio = (generic_count / len(df)) * 100
+        if generic_count > 0:
+            print(f"   📊 QA Títulos Genéricos detectados: {generic_count} ({generic_ratio:.1f}%)")
+        if generic_ratio > 5.0:
+            print(f"\n🔥 ALERTA P0 DevOps FULL STOP: Demasiados títulos genéricos ({generic_ratio:.1f}% > 5%). Abortando exportación para no corromper Excel/DB.\n")
+            return
+            
+    # Limpiamos preventivamente los que hayan pasado (si <= 5%)
+    df = df[~df["_es_generico_titulo"]]
+
+    # 3️⃣ Smart Deduplication V2 (Clave compuesta)
     # Priorizamos: 1. Lugar Específico, 2. Descripción más larga
     df["_titulo_norm"] = df["nombre"].apply(lambda x: _normalizar(str(x)))
-    df["_es_generico"] = df["lugar"].apply(lambda x: es_lugar_generico(str(x)))
+    df["_lugar_norm"] = df["lugar"].apply(lambda x: _normalizar(str(x)) if pd.notna(x) else "")
+    df["_hora_norm"] = df["hora"].fillna("")
+    df["_es_generico_lugar"] = df["lugar"].apply(lambda x: es_lugar_generico(str(x)))
     df["_len_desc"] = df["descripcion"].str.len().fillna(0)
 
     df = df.sort_values(
-        by=["_titulo_norm", "_es_generico", "_len_desc"],
+        by=["_titulo_norm", "_es_generico_lugar", "_len_desc"],
         ascending=[True, True, False] # False (Específico) primero, luego Desc más larga
     )
     
-    df = df.drop_duplicates(subset="_titulo_norm", keep="first")
-    df = df.drop(columns=["_titulo_norm", "_es_generico", "_len_desc"])
+    # Clave fuerte para evitar fusionar eventos distintos el mismo día
+    df = df.drop_duplicates(subset=["_titulo_norm", "fecha_iso", "_lugar_norm", "_hora_norm"], keep="first")
+    df = df.drop(columns=["_titulo_norm", "_lugar_norm", "_hora_norm", "_es_generico_lugar", "_len_desc", "_es_generico_titulo"])
 
     post_sanitize = len(df)
     if pre_sanitize != post_sanitize:

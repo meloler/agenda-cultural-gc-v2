@@ -4,15 +4,17 @@ Data_Refinery_Agent.
 """
 
 import os
-
+from dotenv import load_dotenv
 from sqlmodel import Session, SQLModel, create_engine
 
-# Default: PostgreSQL local levantado con docker-compose
-DEFAULT_DB_URL = "postgresql://admin:admin123@localhost:5432/agenda_cultural"
+# Cargar las variables de entorno desde el fichero .env
+load_dotenv()
 
+# Default: PostgreSQL local levantado con docker-compose
+# Offline: Usar SQLite local para evitar problemas de conexión DNS con Supabase
 engine = create_engine(
-    os.getenv("DATABASE_URL", DEFAULT_DB_URL),
-    echo=False,  # True para ver SQL en consola (debug)
+    "sqlite:///local_events.db",
+    echo=False,
 )
 
 

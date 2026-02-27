@@ -146,7 +146,7 @@ async def scrape_ticketmaster_web(page: Page) -> list[Evento]:
 
             eventos.append(
                 Evento(
-                    nombre=raw["nombre"],
+                    nombre=detalle.get("nombre_deep") or raw["nombre"],
                     lugar=raw["lugar"],
                     fecha_raw=fecha_raw or "Sin fecha",
                     fecha_iso=fecha_iso,

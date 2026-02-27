@@ -12,6 +12,8 @@ from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models import Evento
+from app.geocoder import _normalizar
+from app.scrapers._enrichment import es_titulo_generico
 
 # Prioridad de fuentes: a menor índice, mayor fiabilidad del dato.
 # Los eventos de fuentes prioritarias se preservan como "maestros".
@@ -26,7 +28,7 @@ PRIORIDAD_FUENTE: dict[str, int] = {
 }
 
 # Umbral de similitud por encima del cual dos nombres se consideran el mismo evento
-UMBRAL_SIMILITUD = 85
+UMBRAL_SIMILITUD = 90
 
 
 def _puntuacion_maestro(evento: Evento) -> tuple[int, int]:
@@ -71,17 +73,20 @@ def ejecutar_limpieza_db() -> dict[str, int]:
         todos: list[Evento] = list(session.exec(select(Evento)).all())
         print(f"   📊 Total eventos en DB: {len(todos)}")
 
-        # Agrupar por (fecha_iso, hora, lugar_norm)
-        grupos: dict[tuple[str | None, str, str], list[Evento]] = defaultdict(list)
+        # Agrupar por fecha_iso, hora y lugar_norm
+        grupos: dict[tuple, list[Evento]] = defaultdict(list)
         for ev in todos:
-            lugar_norm = ev.lugar.lower().strip() if ev.lugar else ""
-            hora_norm = ev.hora.strip() if ev.hora else ""
-            grupo_key = (ev.fecha_iso, hora_norm, lugar_norm)
+            # Excluir los títulos genéricos de los clusters fuzzy para no absorber válidos
+            if es_titulo_generico(ev.nombre):
+                continue
+            hora_fija = ev.hora if ev.hora else ""
+            lugar_norm = _normalizar(ev.lugar) if ev.lugar else ""
+            grupo_key = (ev.fecha_iso, hora_fija, lugar_norm)
             grupos[grupo_key].append(ev)
 
         llaves_grupo = list(grupos.keys())
 
-        print(f"   📅 Grupos únicos (fecha/hora/lugar): {len(llaves_grupo)}")
+        print(f"   📅 Grupos únicos de fecha: {len(llaves_grupo)}")
         print("-" * 60)
 
         ids_a_eliminar: list[int] = []
@@ -131,10 +136,9 @@ def ejecutar_limpieza_db() -> dict[str, int]:
                 duplicados = cluster[1:]
 
                 # Log del cluster encontrado
-                fecha_str, hora_str, lugar_str = llave
-                fecha_label = fecha_str or "Sin fecha"
-                hora_label = hora_str or "Sin hora"
-                print(f"\n   🔗 Cluster detectado [{fecha_label} a las {hora_label} en {lugar_str}]:")
+                fecha_label = llave[0] or "Sin fecha"
+                hora_label = llave[1] or "Sin hora"
+                print(f"\n   🔗 Cluster detectado [{fecha_label} {hora_label}]:")
                 print(f"      ⭐ MAESTRO: [{maestro.organiza}] {maestro.nombre}")
                 desc_len = len(maestro.descripcion) if maestro.descripcion else 0
                 print(f"         Descripción: {desc_len} chars | URL: {maestro.url_venta}")

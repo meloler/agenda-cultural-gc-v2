@@ -18,11 +18,22 @@ async def scrape_tickety(page: Page) -> list[Evento]:
     eventos_raw: list[dict] = []
 
     try:
-        await page.goto(
-            "https://tickety.es/search/gran%20canaria",
-            wait_until="networkidle",
-            timeout=20000,
-        )
+        loaded = False
+        for attempt in range(3):
+            try:
+                await page.goto(
+                    "https://tickety.es/search/gran%20canaria",
+                    wait_until="networkidle",
+                    timeout=20000,
+                )
+                loaded = True
+                break
+            except Exception as e:
+                print(f"   ⚠️ Reintento {attempt+1}/3 al cargar Tickety: {e}")
+                await asyncio.sleep(2)
+        
+        if not loaded:
+            raise Exception("No se pudo cargar la página principal de Tickety")
 
         # Scroll para cargar más eventos (infinite scroll)
         for _ in range(5):
@@ -73,10 +84,11 @@ async def scrape_tickety(page: Page) -> list[Evento]:
         for raw in eventos_raw:
             detalle = await enriquecer_evento(page, raw["url_full"], raw["nombre"], seen_texts)
             imagen_final = _validar_imagen(detalle["imagen_url"]) or raw["img_card"]
+            nombre_final = detalle.get("nombre_deep") or raw["nombre"]
 
             eventos.append(
                 Evento(
-                    nombre=raw["nombre"],
+                    nombre=nombre_final,
                     lugar="Gran Canaria",
                     fecha_raw=detalle.get("fecha_raw") or "Sin fecha",
                     fecha_iso=detalle["fecha_iso"],

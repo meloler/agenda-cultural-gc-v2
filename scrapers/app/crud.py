@@ -8,6 +8,7 @@ from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models import Evento
+from app.geocoder import _normalizar
 
 
 def guardar_eventos_db(eventos: list[Evento]) -> dict[str, int]:
@@ -25,7 +26,11 @@ def guardar_eventos_db(eventos: list[Evento]) -> dict[str, int]:
     with get_session() as session:
         for evento in eventos:
             # Generar hash determinista para identificar de forma única a este evento/sesión
-            raw_id = f"{evento.organiza}|{evento.url_venta}|{evento.fecha_iso}|{evento.hora}"
+            titulo_norm = _normalizar(evento.nombre)
+            lugar_norm = _normalizar(evento.lugar) if evento.lugar else ""
+            hora_n = str(evento.hora).strip() if evento.hora else ""
+            
+            raw_id = f"{evento.organiza}|{titulo_norm}|{evento.fecha_iso}|{hora_n}|{lugar_norm}"
             hash_str = hashlib.sha256(raw_id.encode('utf-8')).hexdigest()
             evento.hash_id = hash_str
 
@@ -46,6 +51,8 @@ def guardar_eventos_db(eventos: list[Evento]) -> dict[str, int]:
                 # Datos duros del scraping de precisión
                 existente.precio_num = evento.precio_num
                 existente.hora = evento.hora
+                existente.lugar = evento.lugar
+                existente.url_venta = evento.url_venta
                 # Resetear flag para re-enriquecer con IA si los datos cambiaron
                 existente.enriquecido = False
                 session.add(existente)

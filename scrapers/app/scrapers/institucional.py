@@ -26,16 +26,16 @@ async def scrape_cicca(page: Page) -> list[Evento]:
             timeout=20000,
         )
 
-        cards = await page.query_selector_all("article")
+        cards = await page.query_selector_all("article.et_pb_post")
 
         for card in cards:
             try:
-                link = await card.query_selector("a")
+                link = await card.query_selector("h4.entry-title a")
                 url = await link.get_attribute("href") if link else ""
                 if not url:
                     continue
 
-                tit = await card.query_selector("h2, h3")
+                tit = await card.query_selector("h4.entry-title")
                 nombre = await tit.inner_text() if tit else ""
                 if not nombre:
                     nombre = inferir_nombre(url)
@@ -102,9 +102,12 @@ async def scrape_guiniguada(page: Page) -> list[Evento]:
         for link in links:
             try:
                 href = await link.get_attribute("href")
-                if not href or href in seen:
+                if not href:
                     continue
-                if "/category/" in href or "/tag/" in href:
+                href = href.split("?")[0].rstrip("/")
+                if href in seen:
+                    continue
+                if any(x in href for x in ["/category/", "/tag/", "/author/", "/page/"]):
                     continue
                 seen.add(href)
 

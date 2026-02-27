@@ -115,54 +115,41 @@ async def scrape_telde_cultura(page: Page) -> list[Evento]:
         items = await page.evaluate("""
             () => {
                 const results = [];
-                // Buscar artículos o divs con contenido de evento
-                const containers = document.querySelectorAll('article, .event-card, .card, .evento');
-                
-                // Si no hay articles, buscar por estructura alternativa
-                let cards = containers.length > 0 ? containers :
-                    document.querySelectorAll('div[class*="event"], div[class*="actividad"]');
-                
-                // Fallback: buscar por la estructura visible (título + fecha)
-                if (cards.length === 0) {
-                    const allLinks = document.querySelectorAll('a[href]');
-                    for (const link of allLinks) {
-                        const text = link.textContent.trim();
-                        // Buscar enlaces que contengan fechas (formato dd.mm.yyyy)
-                        if (/\d{2}\.\d{2}\.\d{4}/.test(text) && text.length > 20) {
-                            results.push({
-                                nombre: '',
-                                url: link.href,
-                                fullText: text.substring(0, 500),
-                                img: null,
-                            });
-                        }
-                    }
-                    return results;
-                }
-                
+                const links = document.querySelectorAll('a[href*=\"/event/\"], a[href*=\"/evento/\"]');
                 const seen = new Set();
-                for (const card of cards) {
-                    const text = card.textContent || '';
+                
+                for (const link of links) {
+                    let url = link.href.split(\"?\")[0];
+                    if (url.endsWith(\"/\")) {
+                        url = url.slice(0, -1);
+                    }
                     
-                    // Buscar enlace principal
-                    const link = card.querySelector('a[href]');
-                    const url = link ? link.href : '';
-                    if (url && seen.has(url)) continue;
-                    if (url) seen.add(url);
+                    if (!url || seen.has(url)) continue;
+                    // Ignore category or archive links if they match the pattern
+                    if (url.includes(\"/category/\") || url.includes(\"/tag/\")) continue;
                     
-                    // Nombre: buscar h1, h2, h3 o título
-                    const heading = card.querySelector('h1, h2, h3, h4, [class*="title"]');
-                    let nombre = heading ? heading.textContent.trim() : '';
+                    seen.add(url);
+                    
+                    const container = link.closest(\"article, div[class*='event']\") || link.parentElement;
+                    const text = container ? container.textContent : link.textContent;
+                    
+                    // Nombre
+                    const heading = container ? container.querySelector(\"h1, h2, h3, h4\") : null;
+                    let nombre = heading ? heading.textContent.trim() : link.textContent.trim();
+                    if (!nombre || nombre.length < 4) continue;
                     
                     // Imagen
-                    const img = card.querySelector('img');
-                    const imgSrc = img ? (img.src || img.dataset.src) : null;
+                    let imgSrc = null;
+                    if (container) {
+                        const img = container.querySelector(\"img\");
+                        imgSrc = img ? (img.src || img.dataset.src) : null;
+                    }
                     
                     results.push({
                         nombre: nombre,
-                        url: url || '',
-                        fullText: text.substring(0, 500),
-                        img: imgSrc,
+                        url: url,
+                        fullText: text ? text.substring(0, 500) : \"\",
+                        img: imgSrc
                     });
                 }
                 return results;

@@ -46,10 +46,20 @@ async def scrape_tomaticket(page: Page) -> list[Evento]:
         except Exception:
             pass
 
-        # Scroll para cargar más eventos (lazy loading)
-        for _ in range(3):
+        # Scroll dinámico para cargar más eventos (lazy loading)
+        prev_count = 0
+        paciencia = 0
+        for _ in range(15):
             await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            await asyncio.sleep(1)
+            await asyncio.sleep(1.5)
+            cards_count = await page.locator("a.eventtt").count()
+            if cards_count == prev_count:
+                paciencia += 1
+                if paciencia >= 2:  # Si tras 2 scrolls no hay nuevos, parar
+                    break
+            else:
+                paciencia = 0
+            prev_count = cards_count
 
         cards = await page.query_selector_all("a.eventtt")
         seen: set[str] = set()
@@ -66,7 +76,7 @@ async def scrape_tomaticket(page: Page) -> list[Evento]:
                     f"https://www.tomaticket.es{url}"
                     if url.startswith("/")
                     else f"https://www.tomaticket.es/es-es/{url}"
-                )
+                ).split("?")[0]
 
                 if url_full in seen:
                     continue
@@ -122,7 +132,7 @@ async def scrape_tomaticket(page: Page) -> list[Evento]:
 
             eventos.append(
                 Evento(
-                    nombre=raw["nombre"],
+                    nombre=detalle.get("nombre_deep") or raw["nombre"],
                     lugar="Gran Canaria",
                     fecha_raw=limpiar_texto(fecha_raw or raw.get("fecha_card") or "Sin fecha"),
                     fecha_iso=fecha_iso,

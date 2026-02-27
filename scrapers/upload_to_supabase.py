@@ -23,6 +23,12 @@ COLUMN_MAP = {
     "Ver en Mapa": "_ver_mapa",
 }
 
+# Validar que las columnas requeridas existen
+missing_cols = [col for col in COLUMN_MAP.keys() if col not in df.columns]
+if missing_cols:
+    print(f"❌ Faltan columnas requeridas en el Excel: {missing_cols}")
+    sys.exit(1)
+
 df = df.rename(columns=COLUMN_MAP)
 
 # Extraer latitud/longitud del enlace de Google Maps
@@ -34,8 +40,12 @@ def extract_coords(url):
         return float(m.group(1)), float(m.group(2))
     return None, None
 
-df[["latitud", "longitud"]] = df["_ver_mapa"].apply(lambda x: pd.Series(extract_coords(x)))
-df = df.drop(columns=["_ver_mapa"])
+if "_ver_mapa" in df.columns:
+    df[["latitud", "longitud"]] = df["_ver_mapa"].apply(lambda x: pd.Series(extract_coords(x)))
+    df = df.drop(columns=["_ver_mapa"])
+else:
+    df["latitud"] = None
+    df["longitud"] = None
 
 # Limpiar NaN → None para JSON
 df = df.where(pd.notnull(df), None)
@@ -44,16 +54,34 @@ df = df.where(pd.notnull(df), None)
 records = df.to_dict(orient="records")
 
 # Limpiar cada registro
+valid_records = []
 for r in records:
-    # Asegurar que precio_num es float o None
-    if r.get("precio_num") is not None:
-        try:
-            r["precio_num"] = float(r["precio_num"])
-        except (ValueError, TypeError):
-            r["precio_num"] = None
-    # Asegurar que fecha_iso es string
-    if r.get("fecha_iso") is not None:
-        r["fecha_iso"] = str(r["fecha_iso"])[:10]  # Solo YYYY-MM-DD
+    try:
+        # Asegurar que fecha_iso existe y es válida
+        fecha_raw = str(r.get("fecha_iso") or "").strip()
+        if not fecha_raw or fecha_raw == "NaT" or fecha_raw == "None":
+            print(f"   ⚠️ Fecha nula, ignorando: {r.get('nombre')}")
+            continue
+            
+        fecha_str = fecha_raw[:10]  # YYYY-MM-DD
+        if not re.match(r'^\d{4}-\d{2}-\d{2}$', fecha_str):
+            print(f"   ⚠️ Fecha inválida '{fecha_str}', ignorando: {r.get('nombre')}")
+            continue
+            
+        r["fecha_iso"] = fecha_str
+
+        # Asegurar que precio_num es float o None
+        if r.get("precio_num") is not None:
+            try:
+                r["precio_num"] = float(r["precio_num"])
+            except (ValueError, TypeError):
+                r["precio_num"] = None
+                
+        valid_records.append(r)
+    except Exception as e:
+        print(f"   ❌ Error parseando registro {r.get('nombre')}: {e}")
+
+records = valid_records
 
 # Imprimir como JSON para uso posterior
 output = json.dumps(records, ensure_ascii=False, default=str)
