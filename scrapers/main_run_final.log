@@ -1,0 +1,2622 @@
+============================================================
+START: AGENDA CULTURAL GC - v5.1 (Pipeline de Precision + Deep Scrape)
+============================================================
+✅ Base de datos inicializada (tablas creadas si no existían).
+🔥 Ticketmaster (API Discovery - Stealth Mode)...
+🎭 Auditorio A. Kraus...
+🎭 Teatro Pérez Galdós...
+🏛️ CICCA...
+🎬 Teatro Guiniguada...
+🍅 Tomaticket...
+🎫 Tickety...
+🎟️ Entradas.com...
+🎪 Entrées.es...
+🏝️ EntradasCanarias.com...
+🏘️ TeldeCultura.org...
+   [A-City] Respuesta vacía pero válida (totalElements=0)
+   -> 131 eventos de Gran Canaria (filtrados vía API)
+   -> Procesando 131 eventos de EntradasCanarias...
+   -> Enriqueciendo: Carlitos Brownie Band
+   ✅ [B-Keyword] 2 eventos recibidos (totalElements=2)
+   -> Ticketmaster TOTAL: 2 eventos únicos procesados.
+   ⚠️ Reintentando Entradas.com por error de protocolo HTTP2...
+   ❌ Error Entradas.com: Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.entradas.com/search/?affiliate=EES&searchterm=Gran+canaria
+Call log:
+  - navigating to "https://www.entradas.com/search/?affiliate=EES&searchterm=Gran+canaria", waiting until "commit"
+
+   -> Iniciando deep scraping de 12 eventos de T. Guiniguada...
+   -> Enriqueciendo: Patrimonio Cultural El Milagro La Maldicion Y El Burro 494 1
+      [PRECIO] 10.0€
+      [FECHA]  2026-03-06
+      [HORA]   20:30
+   -> Enriqueciendo: Macramé y conecta
+      [PRECIO] 40.0€
+      [FECHA]  2026-03-25
+      [HORA]   16:00
+   -> Enriqueciendo: Iacopo Meille & Francesco Bottai Live @ IMAGINARIO
+      [FECHA]  2026-03-03
+      [HORA]   07:00
+   -> Enriqueciendo: Concierto Didactico Las Posibilidades Del Saxofon Fuera De S
+   -> Iniciando deep scraping de 21 eventos de CICCA...
+   -> Enriqueciendo: STARS GALA DE BALLET CLÁSICO – INTERNATIONAL BALLET COMPANY
+   -> 20 enlaces detectados en Teatro Pérez Galdós (vía API)
+   -> Iniciando deep scraping de 20 eventos de Teatro Pérez Galdós...
+   -> Enriqueciendo: Poliedro de amor
+      [PRECIO] 15.5€
+      [FECHA]  2026-06-19
+      [HORA]   21:30
+   -> Enriqueciendo: Aula de cine. "Las damas del bosque de Bolonia"
+      [PRECIO] 4.0€
+      [FECHA]  2026-03-05
+      [HORA]   06:00
+   -> Enriqueciendo: The Matrix Rebooted El Sonido De La Conspiracion Juno Reacto
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-06
+      [HORA]   19:00
+   -> Enriqueciendo: Aula de cine. "Con los ojos cerrados"
+   -> Enriqueciendo: ¡Soy Salvaje!
+      [PRECIO] 38.0€
+      [FECHA]  2026-06-09
+      [HORA]   20:00
+   -> Enriqueciendo: ABORÁ FEMME en el CICCA
+      [PRECIO] 4.0€
+      [FECHA]  2026-03-07
+      [HORA]   08:00
+   -> Enriqueciendo: Taller De Danza Contemporanea Fragil I Cia Nomada
+   -> Iniciando deep scraping de 12 eventos de Tickety...
+   -> Enriqueciendo: Encuentro Bitácora: CONVIÉRTETE EN EL LÍDER DE TU EQUIPO
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-29
+      [HORA]   19:00
+   -> Enriqueciendo: A por Ellos! Tributo de Loquillo en Canarias en Vivo
+   -> Enriqueciendo: Los cuernos de Don Friolera
+   -> 50 enlaces detectados en Auditorio A. Kraus (vía API)
+   -> Iniciando deep scraping de 50 eventos de Auditorio A. Kraus...
+   -> Enriqueciendo: Diana Navarro
+   -> 0 tarjetas detectadas en TeldeCultura
+   -> Procesando 0 eventos de TeldeCultura...
+   -> TeldeCultura: 0 eventos (precio:0 fecha:0 hora:0 img:0)
+      [FECHA]  2026-03-13
+      [HORA]   05:00
+      [FECHA]  2026-02-26
+      [HORA]   18:30
+      [PRECIO] 10.31€
+      [FECHA]  2026-04-11
+      [HORA]   22:00
+      [PRECIO] 16.0€
+      [FECHA]  2026-04-17
+   -> Enriqueciendo: Aula Cultural De Ciencia & Gastronomía. "Comer Y Mostrar: La
+   -> Enriqueciendo: Ad Libitum Ana Gil
+   -> Enriqueciendo: El Rey Leoncio
+   -> Enriqueciendo: BLACK BANJO Live @ IMAGINARIO
+   -> Enriqueciendo: Cartas a Néstor
+   -> Enriqueciendo: Gran Canaria´s Women Band 10 ANIVERSARIO
+      [PRECIO] 2003.0€
+      [FECHA]  2026-02-26
+      [HORA]   17:00
+   -> Enriqueciendo: Paula Ojeda
+      [PRECIO] 16.5€
+      [FECHA]  2026-03-13
+      [HORA]   21:00
+   -> Enriqueciendo: Aula de cine. "El nadador"
+   -> Enriqueciendo: Señora Einstein
+      [PRECIO] 4.0€
+      [FECHA]  2026-03-13
+      [HORA]   08:00
+   -> Enriqueciendo: Fragil Cia Nomada 2
+      [PRECIO] 15.0€
+      [FECHA]  2026-03-20
+      [HORA]   20:30
+   -> Enriqueciendo: EL CICCA CELEBRA LOS 20 AÑOS DE HISTORIA DEL BELÉN DE ARENA
+   -> Enriqueciendo: La Pasión según San Juan (TOP 5)
+      [FECHA]  2026-02-27
+      [HORA]   20:00
+   -> Enriqueciendo: Aula De Cine. "Los Ángeles Del Pecado"
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-22
+      [HORA]   19:00
+   -> Enriqueciendo: SELVATICA "CARNIVAL EDITION"
+   -> Enriqueciendo: Concentus Musicus Wien
+      [PRECIO] 4.0€
+      [FECHA]  2026-03-14
+      [HORA]   08:00
+   -> Enriqueciendo: Tus Hijos Version Libre De Medea De Euripides
+   -> Enriqueciendo: La Pasión según San Juan
+      [FECHA]  2026-02-27
+      [HORA]   19:00
+   -> Enriqueciendo: Espectaculo Luis Olmedo
+   -> Enriqueciendo: Javi Durán - DOPAMINA en Las Palmas
+      [PRECIO] 0.0€
+      [FECHA]  2026-12-18
+   -> Enriqueciendo: Muestra de Danza de la Escuela profesional de danza Rubén T.
+   -> Enriqueciendo: OTELLO
+   -> 319 tarjetas totales en Entrées.es
+   -> 253 eventos en Gran Canaria (filtrados)
+   -> Iniciando deep scraping de 253 eventos de Entrées.es...
+   -> Enriqueciendo: RALLY ISLAS CANARIAS 2026 en Gran Canaria
+      [PRECIO] 4.0€
+      [FECHA]  2026-03-19
+      [HORA]   08:00
+   -> Enriqueciendo: Georgina
+   -> Enriqueciendo: Retama Volumen 11 Cia Natalia Medina
+      [PRECIO] 15.0€
+      [FECHA]  2026-02-28
+      [HORA]   19:30
+   -> Enriqueciendo: Las Palmas De Gran Canaria Carnival 2026 – Float Parade Tick
+      [PRECIO] 15.0€
+      [FECHA]  2026-03-22
+      [HORA]   13:00
+   -> Enriqueciendo: The Class Carnival
+   -> Enriqueciendo: Javier Santaolalla. El Club de la Tusa. ¿Qué es el tiempo?
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-23
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Tour en buggy por Gran Canaria en Puerto Rico
+      [PRECIO] 20.0€
+      [FECHA]  2025-12-13
+      [HORA]   20:00
+   -> Enriqueciendo: FESTIVAL MUJERES INFINITAS
+   -> Enriqueciendo: MAGGIE REILLY
+   -> 140 cards detectadas en Tomaticket
+      [PRECIO] 10.0€
+      [FECHA]  2026-03-21
+      [HORA]   08:00
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+   -> Enriqueciendo: Entradas Carroza Cabalgata Carnaval Las Palmas GC 2026
+   -> Enriqueciendo: Burbuja Cia Titeres Sin Cabeza
+   -> Enriqueciendo: IX Garita's ROCK
+      [PRECIO] 130.0€
+      [FECHA]  2025-12-02
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Ed Sheeran vs. Coldplay en Las Palmas de Gran C
+   -> Enriqueciendo: Acis y Galatea
+   -> Iniciando deep scraping de 57 eventos...
+   -> Enriqueciendo: La Reina del Flow en Gran Canaria
+   -> Enriqueciendo: Resilientes
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+   -> Enriqueciendo: Concierto De Evergreen En Canarias En Vivo
+      [PRECIO] 10.0€
+      [FECHA]  2026-09-07
+      [HORA]   19:00
+   -> Enriqueciendo: Carles Sans De Tricicle - Por Fin Me Voy
+      [PRECIO] 0.0€
+      [FECHA]  2026-10-31
+      [HORA]   19:30
+      [PRECIO] 4.0€
+      [FECHA]  2026-03-22
+      [HORA]   16:30
+   -> Enriqueciendo: PULGARCITA, EL REGRESO A LA CHARCA
+   -> Enriqueciendo: Con Siete Estrellas Verdes Docudrama De Una Actriz Canaria L
+      [PRECIO] 30.5€
+      [FECHA]  2026-05-29
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+   -> Enriqueciendo: La Oreja de Van Gogh en LAS PALMAS DE GRAN CANARIA
+   -> Enriqueciendo: ¿Dónde está Alicia?
+      [TOMATICKET] fecha-info: 'Concierto 10/07/2026 a las 21:00'
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-10
+      [HORA]   21:00
+   -> Enriqueciendo: UNIVERSITY SANTO 2026 en Gran Canaria
+   -> Enriqueciendo: Dr. Karaoke en Canarias en Vivo-karaoke en Las Palmas
+      [PRECIO] 10.52€
+      [FECHA]  2026-03-06
+      [HORA]   22:00
+   -> Enriqueciendo: ANDREA MOTIS & LA PERINKÉ BIG BAND
+   -> Enriqueciendo: ESCALANIFI VOL.1
+      [PRECIO] 55.0€
+      [FECHA]  2026-10-23
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Fito y Fitipaldis en Gran Canaria - Plaza de la Música
+      [PRECIO] 3.0€
+      [FECHA]  2026-03-27
+      [HORA]   08:00
+   -> Enriqueciendo: Nick Cave Y The Birthday Party Monopol Music Festival
+   -> Enriqueciendo: SIMON BOCCANEGRA
+      [TOMATICKET] fecha-info: 'Festival 04/04/2026 a las 23:58'
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-04
+      [HORA]   23:58
+   -> Enriqueciendo: Festival "Somos Latinos" en Las Palmas de Gran Can...
+      [PRECIO] 8.0€
+      [FECHA]  2025-12-05
+      [HORA]   17:00
+   -> Enriqueciendo: «Universo en Danza”
+      [PRECIO] 5.16€
+      [FECHA]  2026-03-12
+      [HORA]   20:00
+   -> Enriqueciendo: RING OF CASH Live @ IMAGINARIO
+      [FECHA]  2026-03-06
+      [HORA]   20:30
+   -> Enriqueciendo: Aula De Cine. "Las Damas Del Bosque De Bolonia"
+   -> Enriqueciendo: Te Toca. Moving Concerts
+      [PRECIO] 35.0€
+      [FECHA]  2026-03-13
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Kany García en LAS PALMAS DE GRAN CANARIA
+      [TOMATICKET] fecha-info: 'SOMOS LATINOS 11/07/2026'
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-11
+   -> Enriqueciendo: GRANCA Live Fest 2026
+   -> Enriqueciendo: Empaque
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-08
+      [HORA]   08:00
+   -> Enriqueciendo: Queer As Punk I Monopol Music Festival
+      [PRECIO] 13.5€
+      [FECHA]  2026-05-22
+      [HORA]   21:30
+   -> Enriqueciendo: G POINT tributo hombres G
+      [FECHA]  2026-03-06
+      [HORA]   19:00
+   -> Enriqueciendo: Lettering, El Arte De Dibujar Con Letras
+   -> Enriqueciendo: Andy Timmons
+      [PRECIO] 38.5€
+      [FECHA]  2026-06-26
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Fiesta Bresh en Maspalomas - Gran Canaria
+      [PRECIO] 17.0€
+      [FECHA]  2026-07-02
+      [HORA]   19:00
+   -> Enriqueciendo: Disparate – Un show de Omayra Cazorla
+      [TOMATICKET] fecha-info: 'Varias Fechas'
+      [PRECIO] 71.5€
+      [FECHA]  2026-03-26
+   -> Enriqueciendo: Hades66 en Gran Canaria
+   -> Enriqueciendo: Música para Hitler
+      [PRECIO] 10.0€
+      [FECHA]  2026-05-23
+      [HORA]   20:00
+   -> Enriqueciendo: Aula de cine. "El viaje a ninguna parte"
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-09
+      [HORA]   06:30
+      [FECHA]  2026-03-06
+      [HORA]   17:30
+   -> Teatro Guiniguada: 12 eventos enriquecidos.
+   -> Enriqueciendo: Concierto De Queen Of Limerick Tributo A The Cranberries En 
+   -> Enriqueciendo: Miguel Ríos
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-04
+      [HORA]   18:04
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Lucho RK + La Pantera en Gran Canaria
+      [TOMATICKET] fecha-info: 'Apertura de puertas 19:00 03/04/2026'
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-03
+      [HORA]   19:00
+   -> Enriqueciendo: Dinosaurios Live en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-26
+      [HORA]   19:00
+   -> Enriqueciendo: El Último Presidente
+   -> Enriqueciendo: Los BIG Party Games
+      [PRECIO] 10.52€
+      [FECHA]  2026-03-06
+      [HORA]   22:00
+      [PRECIO] 18.0€
+      [FECHA]  2026-07-24
+      [HORA]   20:30
+   -> Enriqueciendo: The Jury Experience – Muerte por IA: ¿Quién Paga el precio?
+   -> Tickety: 12 eventos (precio:5 fecha:12 hora:12)
+   -> Enriqueciendo: THE BEST OF SOUL 2026
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-14
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [TOMATICKET] fecha-info: 'Varias Fechas'
+      [PRECIO] 9.6€
+      [FECHA]  2026-03-26
+   -> Enriqueciendo: Luck Ra y Valentino Merlo en Gran Canaria
+   -> Enriqueciendo: Aqualand Maspalomas
+      [PRECIO] 90.0€
+      [FECHA]  2026-03-06
+      [HORA]   20:00
+   -> Enriqueciendo: Dr. Karaoke en Canarias en Vivo-karaoke en Las Palmas
+   -> Enriqueciendo: ANDREA CHÉNIER
+      [TOMATICKET] fecha-info: 'Gran Canaria 20/06/2026'
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-20
+   -> Enriqueciendo: Sergio Dalma
+   -> Enriqueciendo: Saúl Romero en Gran Canaria
+   -> Enriqueciendo: » ADULTO EN PRÁCTICAS ” DE HIMAR ARMAS
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+   -> Enriqueciendo: Las Palmas de Gran Canaria Carnival 2026 – Float Parade Tick
+      [PRECIO] 5.16€
+      [FECHA]  2026-03-05
+      [HORA]   20:00
+   -> Enriqueciendo: Aula de cine. En torno a la ópera. 17ª edición. "María Calla
+   -> Enriqueciendo: Sir Stephen Hough
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 15,00 €'
+      [TOMATICKET] fecha-info: 'Comedia 15/03/2026 a las 19:00'
+      [PRECIO] 15.0€
+      [FECHA]  2026-03-15
+      [HORA]   19:00
+   -> Enriqueciendo: Emily Estefan en los Carnavales de Gran Canaria
+   -> Enriqueciendo: La Mare y Xerach
+      [PRECIO] 80.0€
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Free Tour Leyendas y Misterios de Las Palmas en Las Palmas d
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-04
+      [HORA]   19:00
+   -> Enriqueciendo: CAMPEONATO CANARIAS MMA - THE BATTLE CHAMPIONSHIP
+      [PRECIO] 14.0€
+      [FECHA]  2026-04-11
+   -> Enriqueciendo: El CICCA abre sus puertas al talento emergente de Canarias
+   -> Enriqueciendo: Javier Santaolalla. El Club de la Tusa. El misterio de Veláz
+      [TOMATICKET] fecha-info: '27/02/2026 a las 18:00'
+      [FECHA]  2026-02-27
+      [HORA]   18:00
+   -> Enriqueciendo: JUSTICIA PARA SOHEE. Cine Vértigo
+      [PRECIO] 0.0€
+      [FECHA]  2025-12-12
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Kike Pérez
+   -> Enriqueciendo: Free tour por Las Canteras en Las Palmas de Gran Canaria
+   -> Enriqueciendo: Aula de cine. "Los ángeles del pecado"
+   -> Enriqueciendo: TURANDOT
+      [TOMATICKET] fecha-info: '02/03/2026 a las 18:30'
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-02
+      [HORA]   18:30
+   -> Enriqueciendo: Natalia Lacunza en Gran Canaria
+      [FECHA]  2026-11-05
+   -> Enriqueciendo: LA REINA DE LAS NIEVES
+      [PRECIO] 0.0€
+      [FECHA]  2025-12-14
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-27
+      [HORA]   19:00
+   -> Enriqueciendo: Omayra Cazorla
+   -> Enriqueciendo: TALLER DE “CONCIENCIACIÓN SOBRE LA PÉRDIDA Y EL DESPERDICIO 
+   -> Enriqueciendo: Excursión a Teror, el Roque Nublo y la caldera de Bandama en
+      [TOMATICKET] fecha-info: 'Concierto 06/03/2026 a las 20:00'
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-06
+      [HORA]   20:00
+   -> Enriqueciendo: Guiu Cortés en Gran Canaria
+   -> Enriqueciendo: Javier Santaolalla. El Club de la Tusa. El fuego de Prometeo
+      [PRECIO] 28.0€
+      [FECHA]  2025-12-17
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [PRECIO] 5.0€
+      [FECHA]  2026-03-11
+      [HORA]   17:00
+   -> Enriqueciendo: Encuentro Bitácora: LA COCINA DEL LIDERAZGO
+   -> Enriqueciendo: Bach Concertante
+   -> Enriqueciendo: Valeria Castro en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 8.0€
+      [FECHA]  2025-12-30
+      [HORA]   12:30
+      [TOMATICKET] fecha-info: 'El Niño De La Hipoteca 08/03/2026 a las 12:30'
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-08
+      [HORA]   12:30
+   -> Enriqueciendo: MARY POPPINS EN LA BIBLIOTECA MÁGICA DE CUENTÓPOLIS
+   -> Enriqueciendo: Carles Sans De Tricicle en Gran Canaria
+   -> Enriqueciendo: José James with Célia Kameni: Marvin Gaye's I want you
+      [PRECIO] 98.0€
+      [FECHA]  2026-03-26
+      [HORA]   18:30
+   -> Enriqueciendo: Comando Canario Fest en Canarias en Vivo
+      [PRECIO] 38.0€
+      [FECHA]  2026-07-26
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Palmitos Park
+   -> Enriqueciendo: Hanna Schulte
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 35,00 €'
+      [TOMATICKET] fecha-info: 'Por fin me voy 12/03/2026 a las 20:00'
+      [PRECIO] 35.0€
+      [FECHA]  2026-03-12
+      [HORA]   20:00
+   -> Enriqueciendo: ORIGEN - Sala Scala Gran Canaria
+   -> Teatro Pérez Galdós: 20 eventos (precio:0 fecha:0 hora:0)
+      [PRECIO] 15.47€
+      [FECHA]  2026-05-30
+      [HORA]   21:00
+      [PRECIO] 8.0€
+      [FECHA]  2025-12-04
+      [HORA]   17:00
+   -> Enriqueciendo: SEÑORAS Y SEÑORAS
+   -> Enriqueciendo: Cata & Bebe bajo Luz Negra
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 46,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (06/02/2026 - 30/04/2026)'
+      [PRECIO] 46.0€
+      [FECHA]  2026-02-06
+      [HORA]   19:00
+   -> Enriqueciendo: SUPERSAURIO, EL MUSICAL de Meryem El Mehdati en Gr...
+   -> Enriqueciendo: Aperitivo I
+      [PRECIO] 13.0€
+      [FECHA]  2019-07-04
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Entradas Carroza Carnaval de Maspalomas 2026 en Gran Canaria
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 12,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (06/03/2026 - 07/03/2026)'
+      [PRECIO] 12.0€
+      [FECHA]  2026-03-06
+   -> Enriqueciendo: LA PATÉTICA de Miguel del Arco en Gran Canaria
+      [PRECIO] 40.0€
+      [FECHA]  2026-04-12
+      [HORA]   12:04
+   -> Enriqueciendo: STABAT MATER
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-21
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Bach Íntimo
+   -> Enriqueciendo: Entradas Carroza Carnaval de Las Palmas de Gran Canaria 2026
+      [PRECIO] 18.0€
+      [FECHA]  2026-04-10
+      [HORA]   20:00
+   -> Enriqueciendo: Cuando el cuerpo femenino se convierte en objeto: la mirada 
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 12,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (13/03/2026 - 14/03/2026)'
+      [PRECIO] 12.0€
+      [FECHA]  2026-03-13
+   -> Enriqueciendo: Excursiones de 1 día en Gran Canaria
+      [PRECIO] 12.37€
+      [FECHA]  2026-03-21
+      [HORA]   20:00
+   -> Enriqueciendo: Jam Session de Canarias en Vivo
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Fito & Fitipaldis - Aullidos Tour 25/26 en Las Palmas de Gra
+   -> Enriqueciendo: Aperitivo II
+      [FECHA]  2026-01-23
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 26 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2026)'
+      [PRECIO] 26.0€
+      [FECHA]  2026-02-23
+   -> Enriqueciendo: UN VIAJE A TU INTERIOR (NO ES TERAPIA, PERO TE HACE CLIC)
+   -> Enriqueciendo: HolidayWorld - Maspalomas Center - Wooland en Gran...
+      [PRECIO] 5.16€
+      [FECHA]  2026-03-18
+      [HORA]   20:00
+   -> Enriqueciendo: Aula de cine. "Un extraño en mi vida"
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-13
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: IDOLS. LA REVOLUCIÓN K-POP. LAS GUERRERAS DEL RITMO en Gran 
+   -> Enriqueciendo: Falla. Detrás del Paisaje
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 11,90 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (27/02/2026 - 31/12/2026)'
+      [PRECIO] 11.9€
+      [FECHA]  2026-02-27
+      [HORA]   10:00
+   -> Enriqueciendo: Aqualand Maspalomas en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-17
+      [HORA]   19:00
+   -> Enriqueciendo: Retratos con relieve
+      [PRECIO] 20.0€
+      [FECHA]  2026-07-18
+      [HORA]   16:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [PRECIO] 29.9€
+      [FECHA]  2026-04-18
+      [HORA]   19:00
+   -> Enriqueciendo: «DAVID DEMARÍA Concierto en Acústico”
+   -> Enriqueciendo: Dinosaurios Live en Gran Canaria
+   -> Enriqueciendo: Cañizares Flamenco Trío
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 12,50 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (18/02/2026 - 31/12/2026)'
+      [PRECIO] 12.5€
+      [FECHA]  2026-02-18
+   -> Enriqueciendo: Acuario Poema del Mar Gran Canaria
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-11
+      [HORA]   17:00
+   -> Enriqueciendo: Liga Endesa y BCL 25/26
+      [PRECIO] 12.0€
+      [FECHA]  2026-02-04
+      [HORA]   16:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Tour Navideño por Las Palmas de Gran Canaria
+   -> Enriqueciendo: Poesía marina
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 19,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (27/02/2026 - 12/01/2027)'
+      [PRECIO] 19.0€
+      [FECHA]  2026-02-27
+   -> Enriqueciendo: Bus Turístico CitySightseeing Las Palmas de Gran ...
+   -> Enriqueciendo: LA ROSE CLUB - 14.03.26
+      [PRECIO] 22.0€
+      [FECHA]  2025-05-29
+      [HORA]   20:00
+   -> Enriqueciendo: Las Noches con Cristito y la Madre Canaria
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 10,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2026)'
+      [PRECIO] 10.0€
+      [FECHA]  2026-02-23
+   -> Enriqueciendo: Entradas para Palmitos Park. En Gran Canaria
+   -> Enriqueciendo: Wolfgang Haffner Trio
+   -> Enriqueciendo: Valeria Castro en Gran Canaria
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-14
+      [HORA]   15:00
+   -> Enriqueciendo: Las Palmas de Gran Canaria Carnival 2026 – Float Parade Tick
+      [PRECIO] 15.0€
+      [FECHA]  2026-01-17
+      [HORA]   20:00
+   -> Enriqueciendo: DUENDES: EL MISTERIO DE LOS SUEÑOS PERDIDOS
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 37,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2026)'
+      [PRECIO] 37.0€
+      [FECHA]  2026-02-23
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para Palmitos Park. En Gran Canaria'
+   -> Enriqueciendo: Excursiones en Gran Canaria
+      [PRECIO] 38.0€
+      [FECHA]  2026-07-26
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA PATÉTICA de Miguel del Arco en Gran Canaria en Las Palmas
+   -> Enriqueciendo: Franz Halasz
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+   -> Enriqueciendo: Aula de cine. "El proceso de Juana de Arco"
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 26,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2026)'
+      [PRECIO] 26.0€
+      [FECHA]  2026-02-23
+   -> Enriqueciendo: Aula de cine. "Los ángeles del pecado" en Las Pal...
+      [PRECIO] 12.0€
+      [FECHA]  2026-03-13
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LAS AMISTADES PELIGROSAS en Gran Canaria en Las Palmas
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-10
+      [HORA]   19:00
+   -> Enriqueciendo: SU MAJESTAD LA REINA
+   -> Enriqueciendo: Mocedades - Los Panchos
+      [PRECIO] 8.0€
+      [HORA]   12:30
+   -> Enriqueciendo: El imaginario artístico de Peter Faalstich tiene forma de bo
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS'
+      [TOMATICKET] fecha-info: '27/02/2026 a las 19:00'
+      [FECHA]  2026-02-27
+      [HORA]   19:00
+   -> Enriqueciendo: Aula de cine. "Las damas del bosque de Bolonia" en...
+      [PRECIO] 12.0€
+      [FECHA]  2026-06-19
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA CASA DE BERNARDA ALBA de Federico García Lorca en Gran Ca
+      [PRECIO] 12.37€
+      [FECHA]  2026-03-28
+      [HORA]   20:00
+   -> Enriqueciendo: CARROZA MASPALOMAS EL MONO PRODUCCIONES
+   -> Enriqueciendo: Orquesta Maestros En Guitarra 2026
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS'
+      [TOMATICKET] fecha-info: '06/03/2026 a las 19:00'
+      [FECHA]  2026-03-06
+      [HORA]   19:00
+   -> Enriqueciendo: Ozuna en el Carnaval de Gran Canaria
+      [PRECIO] 2005.0€
+      [FECHA]  2026-10-08
+      [HORA]   19:30
+   -> CICCA: 21 eventos enriquecidos.
+      [PRECIO] 12.0€
+      [FECHA]  2026-03-20
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: CREAVIVA de Rafaela Carrasco en Gran Canaria en Las Palmas
+   -> Enriqueciendo: Jose Carlos Escobar - GRAN CANARIA (RIGA ART CAFÉ)
+   -> Enriqueciendo: Juan Dávila
+      [TOMATICKET] fecha-info: '28/02/2026'
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+   -> Enriqueciendo: Entradas Carroza Cabalgata Carnaval Las Palmas GC ...
+      [PRECIO] 12.0€
+      [FECHA]  2026-03-28
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [PRECIO] 12.0€
+      [FECHA]  2026-04-11
+      [HORA]   21:00
+   -> Enriqueciendo: Jorge Y...
+   -> Enriqueciendo: La Reina del Flow en Gran Canaria
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 80 €'
+      [TOMATICKET] fecha-info: '28/02/2026 a las 17:00'
+      [PRECIO] 80.0€
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas Carroza Cabalgata Carnaval Las Palmas GC 2026 en Las Palmas de Gran Canaria'
+   -> Enriqueciendo: Las Palmas de Gran Canaria Carnival 2026 – Float...
+   -> Enriqueciendo: TOON STORY
+      [PRECIO] 10.0€
+      [FECHA]  2026-03-14
+      [HORA]   20:30
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-10
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Aula de cine. "El extraño viaje"
+   -> Enriqueciendo: SUPERSAURIO, EL MUSICAL de Meryem El Mehdati en Gran Canaria
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 80 €'
+      [TOMATICKET] fecha-info: '28/02/2026 a las 17:00'
+      [PRECIO] 80.0€
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+   -> Enriqueciendo: Marc Anthony en el Carnaval de Gran Canaria
+   -> Enriqueciendo: La consagración de la primavera
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-12
+      [HORA]   19:00
+   -> Enriqueciendo: Big bang club
+      [PRECIO] 12.0€
+      [FECHA]  2026-03-06
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+   -> Enriqueciendo: TOOTSIE, la comedia musical en Gran Canaria en Las Palmas
+      [TOMATICKET] fecha-info: '27/02/2026'
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-27
+   -> Enriqueciendo: Espectaculo Luis Olmedo Palmas, Las
+   -> Enriqueciendo: BEBE
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-07
+      [HORA]   19:00
+   -> Enriqueciendo: Los Sarantontones en Canarias en Vivo - Concierto en Las Pal
+      [PRECIO] 46.0€
+      [FECHA]  2026-04-09
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 15 €'
+      [TOMATICKET] fecha-info: '28/02/2026'
+      [PRECIO] 15.0€
+      [FECHA]  2026-02-28
+      [HORA]   19:30
+   -> Enriqueciendo: Aula de cine. "Diario de un cura rural" en Las Pal...
+   -> Enriqueciendo: LA ISLA DEL TESORO de Robert L. Stevenson en Gran Canaria en
+   -> Enriqueciendo: José Mercé
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-20
+      [HORA]   22:00
+   -> Enriqueciendo: Concierto Lia Kali
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS'
+      [TOMATICKET] fecha-info: '13/03/2026 a las 19:00'
+      [FECHA]  2026-03-13
+      [HORA]   19:00
+   -> Enriqueciendo: LA ROSE CLUB - 14.03.26 en Las Palmas de Gran Cana...
+      [PRECIO] 8.0€
+      [FECHA]  2026-04-25
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: MESTISAY & LOS SABANDEÑOS en BALADA DE SABANDA en Gran Canar
+   -> Enriqueciendo: Alex Fernández
+   -> Enriqueciendo: ESCALANIFI VOL.1
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 25 €'
+      [TOMATICKET] fecha-info: '14/03/2026 a las 15:00'
+      [PRECIO] 25.0€
+      [FECHA]  2026-03-14
+      [HORA]   15:00
+   -> Enriqueciendo: Carlitos Brownie Band Palmas, Las
+      [PRECIO] 19.0€
+      [FECHA]  2026-05-01
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: FARRA DE Cía. Lucas Escobedo en Gran Canaria en Las Palmas
+      [PRECIO] 8.0€
+      [FECHA]  2026-03-06
+      [HORA]   20:30
+   -> Enriqueciendo: Entradas Carroza Cabalgata Carnaval Las Palmas GC 2026
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 10 €'
+      [TOMATICKET] fecha-info: '06/03/2026'
+      [PRECIO] 10.0€
+      [FECHA]  2026-03-06
+   -> Enriqueciendo: TALLER DE “CONCIENCIACIÓN SOBRE LA PÉRDIDA Y E...
+   -> Enriqueciendo: Mahler & Chichon (TOP 5)
+      [PRECIO] 8.0€
+      [FECHA]  2026-05-09
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA ÚLTIMA NOCHE CON MI HERMANO, de Alfredo Sanzol en Gran Ca
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'ENTRADAS CARROZA CABALGATA CARNAVAL LAS PALMAS GC 2026'
+   -> Enriqueciendo: Decadencia en Canarias en Vivo
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 5 €'
+      [TOMATICKET] fecha-info: '11/03/2026'
+      [PRECIO] 5.0€
+      [FECHA]  2026-03-11
+   -> Enriqueciendo: Concierto de Queof Limerick Tributo a The Cranberr...
+   -> Enriqueciendo: Mahler & Chichon
+      [PRECIO] 12.0€
+      [FECHA]  2026-05-16
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: PINEDA del BALLET FLAMENCO DE ANDALUCÍA en Gran Canaria en L
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 10.31 €'
+      [TOMATICKET] fecha-info: '06/03/2026'
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-06
+      [HORA]   10:31
+   -> Enriqueciendo: Candlelight: Tributo a The Beatles en Las Palmas d...
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-27
+      [HORA]   22:00
+   -> Enriqueciendo: Jam Session de Canarias en Vivo
+   -> Enriqueciendo: Chica Sobresalto
+      [PRECIO] 12.0€
+      [FECHA]  2026-05-29
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EL VIENTO ES SALVAJE, de Las Niñas de Cádiz en Gran Canaria 
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 16 €'
+      [TOMATICKET] fecha-info: '13/03/2026 a las 21:30'
+      [PRECIO] 16.0€
+      [FECHA]  2026-03-13
+      [HORA]   21:30
+   -> Enriqueciendo: Candlelight: Queen vs ABBA en Las Palmas de Gran C...
+      [PRECIO] 5.16€
+      [FECHA]  2026-03-11
+      [HORA]   20:00
+   -> Enriqueciendo: Cata & Bebe con Humor en El Monje
+   -> Enriqueciendo: Dani Martínez
+      [PRECIO] 12.0€
+      [FECHA]  2026-06-05
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA VIDA EXTRAORDINARIA de Mariano Tenconi Blanco en Gran Can
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 30 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (05/03/2026 - 07/08/2026)'
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-05
+      [HORA]   19:30
+   -> Enriqueciendo: Candlelight: Tributo a Adele en Las Palmas de Gran...
+      [PRECIO] 40.0€
+      [FECHA]  2026-04-09
+      [HORA]   19:30
+   -> Enriqueciendo: Entradas Carroza Cabalgata Carnaval Maspalomas 2026
+      [PRECIO] 12.0€
+      [FECHA]  2026-06-12
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Rembrandt Trio
+   -> Enriqueciendo: Un Mentes Expertas de Borja Vilaseca en LAS PALMAS DE GRAN C
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 30 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (12/03/2026 - 07/05/2026)'
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-12
+      [HORA]   21:30
+   -> Enriqueciendo: Candlelight: Tributo a Phil Collins en Las Palmas ...
+      [PRECIO] 120.0€
+      [FECHA]  2026-03-21
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'ENTRADAS CARROZA CABALGATA CARNAVAL MASPALOMAS 2026'
+   -> Enriqueciendo: Álvaro Suite en Canarias en Vivo - Concierto en Las Palmas
+      [PRECIO] 33.0€
+      [FECHA]  2026-03-25
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Free Tour Las Palmas de Gran Canaria
+   -> Enriqueciendo: Ainhoa Arteta
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 30 €'
+      [TOMATICKET] fecha-info: '10/03/2026 a las 19:30'
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-10
+      [HORA]   19:30
+   -> Enriqueciendo: Muerte por IA - The Jury Experience en Gran Canari...
+      [PRECIO] 15.47€
+      [FECHA]  2026-05-01
+      [HORA]   22:00
+   -> Enriqueciendo: Aula de cine. "Diario de un cura rural"
+      [PRECIO] 0.0€
+      [FECHA]  2026-01-12
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA CHOCHOCTORA en Gran Canaria
+   -> Enriqueciendo: El Kanka
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 25,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (14/02/2026 - 14/03/2026)'
+      [PRECIO] 25.0€
+      [FECHA]  2026-02-14
+   -> Enriqueciendo: Solo Combo - Healthy Poke Las Palmas (Go Fit) en L...
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-13
+      [HORA]   19:00
+   -> Enriqueciendo: Concierto de Tamaduba en Canarias en Vivo-Las Palmas
+      [PRECIO] 30.0€
+      [FECHA]  2026-04-25
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Coldplay vs. Imagine Dragons en Las Palmas de G
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 28 €'
+   -> Enriqueciendo: Café Quijano
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2026)'
+      [PRECIO] 28.0€
+      [FECHA]  2026-02-23
+      [HORA]   10:30
+   -> Enriqueciendo: Photoshooting session in the magical Maspalomas Du...
+      [PRECIO] 12.37€
+      [FECHA]  2026-06-20
+      [HORA]   21:00
+   -> Enriqueciendo: Cata y Bebe Top Secret
+      [PRECIO] 36.0€
+      [FECHA]  2026-01-21
+      [HORA]   21:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: La Oreja de Van Gogh en Gran Canaria
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 83 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (16/02/2026 - 01/07/2026)'
+      [PRECIO] 83.0€
+      [FECHA]  2026-02-16
+      [HORA]   08:00
+   -> Enriqueciendo: Spicy Chicken Duo - Healthy Poke Las Palmas (Go Fi...
+   -> Enriqueciendo: Ángel Martín
+      [PRECIO] 40.0€
+      [FECHA]  2026-04-24
+      [HORA]   19:30
+   -> Enriqueciendo: An Endless Path en Canarias en Vivo
+      [PRECIO] 0.0€
+      [FECHA]  2027-10-23
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 28 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (27/02/2026 - 31/12/2026)'
+      [PRECIO] 28.0€
+      [FECHA]  2026-02-27
+      [HORA]   10:30
+   -> Enriqueciendo: Hades66 en Gran Canaria
+   -> Enriqueciendo: Mediterranean Lovers - Healthy Poke Las Palmas (Go...
+   -> Enriqueciendo: Paisajes sonoros
+      [PRECIO] 10.31€
+      [FECHA]  2026-05-02
+      [HORA]   21:00
+   -> Enriqueciendo: Ignorancia Artificial
+      [PRECIO] 20.0€
+      [FECHA]  2026-04-03
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 28 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2026)'
+      [PRECIO] 28.0€
+      [FECHA]  2026-02-23
+      [HORA]   10:30
+   -> Enriqueciendo: The Jury Experience – Muerte por IA: ¿Quién Paga el precio? 
+   -> Enriqueciendo: Classic Salmon Duo - Healthy Poke Las Palmas (Go F...
+   -> Enriqueciendo: Cata y Bebe Top Secret
+   -> Enriqueciendo: Tremenda de Petite Lorena
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 28 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2026)'
+      [PRECIO] 28.0€
+      [FECHA]  2026-02-23
+      [HORA]   10:30
+      [PRECIO] 25.0€
+      [FECHA]  2026-01-30
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Silvia Pérez Cruz en Gran Canaria
+   -> Enriqueciendo: Kid Quest en Gran Canaria: Aventura de superhéroe...
+      [PRECIO] 40.0€
+      [FECHA]  2026-03-13
+      [HORA]   18:30
+   -> Enriqueciendo: Jam Session de Canarias en Vivo
+   -> Enriqueciendo: Iván "Melon" Lewis Trio
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-27
+      [HORA]   20:00
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 8 €'
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+      [TOMATICKET] fecha-info: 'Varias Fechas (16/02/2026 - 31/12/2027)'
+      [PRECIO] 8.0€
+      [FECHA]  2026-02-16
+      [HORA]   00:01
+   -> Enriqueciendo: Ballet of Lights - La Bella Durmiente en Gran Cana...
+   -> Enriqueciendo: Sting 3.0 en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 5.16€
+      [FECHA]  2026-03-04
+      [HORA]   20:00
+   -> Enriqueciendo: Aula de cine. "El mundo sigue"
+   -> Enriqueciendo: Luz Casal
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 39,50 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (10/02/2026 - 28/02/2026)'
+      [PRECIO] 39.5€
+      [FECHA]  2026-02-10
+      [PRECIO] 64.9€
+      [FECHA]  2026-07-09
+   -> Enriqueciendo: Paseo en camello por las dunas de Maspalomas en La...
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Aitana en Las Palmas de Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-19
+      [HORA]   19:00
+   -> Enriqueciendo: Cata y Bebe con Humor
+   -> Enriqueciendo: Las Noches de Cristito
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 19 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (27/02/2026 - 24/03/2026)'
+      [PRECIO] 19.0€
+      [FECHA]  2026-02-27
+      [HORA]   09:00
+   -> Enriqueciendo: Bus turístico por Las Palmas de Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-04
+      [HORA]   08:56
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Gran Canaria Sailing Catamaran Experience
+      [PRECIO] 40.0€
+      [FECHA]  2026-03-09
+      [HORA]   18:30
+   -> Enriqueciendo: Back To Amy en Canarias en Vivo
+   -> Enriqueciendo: ANIVER5ARIO
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 25 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 24/03/2026)'
+      [PRECIO] 25.0€
+      [FECHA]  2026-02-23
+      [HORA]   10:10
+   -> Enriqueciendo: Candlelight: Anillos y Dragones en Las Palmas de G...
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+      [PRECIO] 10.31€
+      [FECHA]  2026-04-10
+      [HORA]   22:00
+   -> Enriqueciendo: Mafalda Cardenal en Alboroto - Las Palmas de Gran Canaria
+   -> Enriqueciendo: Cata y Bebe Bajo Luz Negra
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 30,00 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (21/02/2026 - 16/04/2026)'
+      [PRECIO] 30.0€
+      [FECHA]  2026-02-21
+      [HORA]   21:30
+   -> Enriqueciendo: Fantasía romántica
+   -> Enriqueciendo: Las Palmas de Gran Canaria Murder Mystery 2: Crime...
+      [PRECIO] 22.0€
+      [FECHA]  2026-04-26
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Jose Carlos Escobar - GRAN CANARIA (RIGA ART CAFÉ) en Palmas
+      [PRECIO] 40.0€
+      [FECHA]  2026-03-28
+      [HORA]   19:30
+   -> Enriqueciendo: Aula de cine. En torno a la ópera. 17ª edición. Brigadoon 19
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 13 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 31/12/2027)'
+      [PRECIO] 13.0€
+      [FECHA]  2026-02-23
+   -> Enriqueciendo: Candlelight: Lo Mejor de Ennio Morricone en Las Pa...
+   -> Auditorio A. Kraus: 50 eventos (precio:0 fecha:0 hora:0)
+      [PRECIO] 12.0€
+      [FECHA]  2026-04-11
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: We call it Ballet: Espectáculo de Danza y Luces de La Bella 
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-06
+      [HORA]   19:00
+   -> Enriqueciendo: Aula de cine. "El buscavidas"
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 30 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 04/03/2026)'
+      [PRECIO] 30.0€
+      [FECHA]  2026-02-23
+      [HORA]   19:30
+   -> Enriqueciendo: Angry Birds Activity Park en Las Palmas de Gran Ca...
+      [PRECIO] 0.0€
+      [FECHA]  2026-01-10
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Free tour por Las Palmas de Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-08
+      [HORA]   19:00
+   -> Enriqueciendo: BLACK BANJO Live @ IMAGINARIO
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 13 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (23/02/2026 - 16/03/2026)'
+      [PRECIO] 13.0€
+      [FECHA]  2026-02-23
+      [HORA]   10:00
+   -> Enriqueciendo: Lucho RK + La Pantera en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-01-19
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Tributo a ABBA y Más en Las Palmas de Gran Cana
+      [PRECIO] 16.5€
+      [FECHA]  2026-03-14
+      [HORA]   21:00
+   -> Enriqueciendo: Aula de cine. "Pickpocket"
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS'
+      [TOMATICKET] fecha-info: '14/03/2026 a las 21:00'
+      [FECHA]  2026-03-14
+      [HORA]   21:00
+   -> Enriqueciendo: Fito y Fitipaldis en Gran Canaria
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-05
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Salida medio día - Las Palmas
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-27
+      [HORA]   19:00
+   -> Enriqueciendo: 20 aniversario de Searching for a hidden place en Canarias e
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS'
+      [TOMATICKET] fecha-info: '13/03/2026 a las 21:00'
+      [FECHA]  2026-03-13
+      [HORA]   21:00
+   -> Enriqueciendo: Origen 2026 en Gran Canaria
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+      [PRECIO] 12.37€
+      [FECHA]  2026-04-25
+      [HORA]   21:00
+   -> Enriqueciendo: Candlelight: La Banda Sonora de los 60 en Las Palmas de Gran
+   -> Enriqueciendo: Back to Rock
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 62 €'
+      [TOMATICKET] fecha-info: 'Varias Fechas (26/02/2026 - 27/12/2026)'
+      [PRECIO] 62.0€
+      [FECHA]  2026-02-26
+      [HORA]   18:00
+   -> Enriqueciendo: Bebe en Gran Canaria
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-13
+      [HORA]   21:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Submarino Amarillo
+   -> Enriqueciendo: Platanica en Canarias en Vivo
+      [TOMATICKET] BotonExterno: 'COMPRAR ENTRADAS - DESDE: 36,07 €'
+      [TOMATICKET] fecha-info: '01/03/2026 a las 20:00'
+      [PRECIO] 36.07€
+      [FECHA]  2026-03-01
+      [HORA]   20:00
+   -> Tomaticket: 57 eventos (precio:51 fecha:57 hora:38 img:57)
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-07
+      [HORA]   22:00
+   -> Enriqueciendo: BIG JOE STOLLE & LOS GUMBO BLUES BAND en Canarias en Vivo
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+   -> Enriqueciendo: Gran tour maravillas de Gran Canaria
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-14
+      [HORA]   22:00
+   -> Enriqueciendo: Jornadas de la Salud en Peri-Menopausia LPGC
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+   -> Enriqueciendo: Ballet of Lights: La Bella Durmiente en un espectáculo deslu
+      [PRECIO] 19.6€
+      [FECHA]  2026-04-24
+      [HORA]   18:00
+   -> Enriqueciendo: Aula de cine. En torno a la ópera. 17ª edición. "Doble vida"
+      [PRECIO] 30.5€
+      [FECHA]  2026-02-28
+      [HORA]   17:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Las Cuatro Estaciones de Vivaldi en Las Palmas 
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-05
+      [HORA]   19:00
+   -> Enriqueciendo: Saúl Romero - Estreno del nuevo show FANTASÍA
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-12
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Gran Canaria Dolphin Seafari Experience
+   -> Enriqueciendo: Jam Session de Canarias en Vivo
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+   -> Enriqueciendo: Sting en Las Palmas - Gran Canaria Arena
+      [PRECIO] 5.16€
+      [FECHA]  2026-03-04
+      [HORA]   20:00
+   -> Enriqueciendo: Collage y Vermut
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-09
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: GRANCA Live Fest 2026 en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 25.0€
+      [FECHA]  2026-03-07
+      [HORA]   11:30
+   -> Enriqueciendo: Lettering, el arte de dibujar con letras
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-02
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Lo mejor de Bridgerton en Las Palmas de Gran Ca
+      [PRECIO] 35.0€
+      [FECHA]  2026-03-06
+      [HORA]   17:30
+   -> Enriqueciendo: Dr. Karaoke en Canarias en Vivo-karaoke en Las Palmas
+      [PRECIO] 40.0€
+      [FECHA]  2026-05-08
+      [HORA]   21:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Raphael en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 5.16€
+      [FECHA]  2026-03-19
+      [HORA]   20:00
+   -> Enriqueciendo: II ENSAYO CON PÚBLICO
+      [PRECIO] 49.5€
+      [FECHA]  2026-12-07
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Amo-Breathwork/ Verbundenes Atmen en Las Palmas de Gran Cana
+      [PRECIO] 10.0€
+      [FECHA]  2026-05-09
+      [HORA]   20:00
+   -> Enriqueciendo: Aula de cine. "La vida por delante"
+      [PRECIO] 132.0€
+      [FECHA]  2026-03-01
+      [HORA]   16:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Carles Sans en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-05
+      [HORA]   19:00
+   -> Enriqueciendo: VICTORIA VIENE A CENAR
+      [PRECIO] 35.0€
+      [FECHA]  2026-03-12
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Float Parade tickets - Maspalomas Carnival 2026 en Gran Cana
+      [PRECIO] 12.37€
+      [FECHA]  2026-03-07
+      [HORA]   20:00
+   -> Enriqueciendo: RING OF CASH Live @ IMAGINARIO
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-21
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Tickets for the best events'
+   -> Enriqueciendo: Candlelight: Queen vs ABBA en Las Palmas de Gran Canaria
+      [PRECIO] 13.5€
+      [FECHA]  2026-05-23
+      [HORA]   21:30
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 30.0€
+      [FECHA]  2026-01-20
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Tributo a Hans Zimmer en Las Palmas de Gran Can
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 30.0€
+      [FECHA]  2025-08-29
+      [HORA]   21:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Anillos y Dragones en Las Palmas de Gran Canari
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 30.0€
+      [FECHA]  2026-01-14
+      [HORA]   21:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Lo Mejor de Ennio Morricone en Las Palmas de Gr
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 30.0€
+      [FECHA]  2026-01-21
+      [HORA]   21:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Float Parade Tickets-Las Palmas de Gran Canaria Carnival 202
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Lucho RK + La Pantera - Fasssilito Tour en LAS PALMAS DE GRA
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 44.0€
+      [FECHA]  2026-03-14
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+   -> Enriqueciendo: Candlelight: Tributo a Phil Collins en Las Palmas de Gran Ca
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 33.5€
+      [FECHA]  2026-03-10
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Diana Navarro en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Gran Canaria´s Women Band 10 ANIVERSARIO
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-01
+      [HORA]   18:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Georgina en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-07
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: MAGGIE REILLY en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-07
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Resilientes en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-08
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ANDREA MOTIS & LA PERINKÉ BIG BAND en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-13
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Andy Timmons en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-18
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: La Mare y Xerach en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-27
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+   -> Enriqueciendo: Cañizares Flamenco Trío en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-10
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Wolfgang Haffner Trio en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-11
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Miguel Ríos en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-19
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: THE BEST OF SOUL 2026 en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 50.0€
+      [FECHA]  2026-03-20
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Sergio Dalma en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-26
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Franz Halasz en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-11
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Mocedades - Los Panchos en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-12
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Orquesta Maestros En Guitarra 2026 en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-12
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+   -> Enriqueciendo: Juan Dávila en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-17
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: TOON STORY en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 39.0€
+      [FECHA]  2026-04-24
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: BEBE en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-01
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Alex Fernández en Gran Canaria
+   -> Enriqueciendo: Lago Taurito Parque Acuático
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-03
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Rembrandt Trio en Gran Canaria
+   -> Enriqueciendo: Aula de cine. "Un condenado a muerte se ha escapado".
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-09
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: El Kanka en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-20
+      [HORA]   19:00
+   -> Enriqueciendo: Concierto de Queen of Limerick Tributo a The Cranberries en 
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-16
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Chica Sobresalto en Gran Canaria
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-06
+      [HORA]   22:00
+   -> Enriqueciendo: Maspalomas Carnival 2026 – Float Parade Tickets
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-09
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Dani Martínez en Gran Canaria
+      [PRECIO] 120.0€
+      [FECHA]  2026-03-21
+      [HORA]   17:00
+   -> Enriqueciendo: El Festi de La Juntadera
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-09
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Café Quijano en Gran Canaria
+      [PRECIO] 15.47€
+      [FECHA]  2026-03-14
+      [HORA]   19:00
+   -> Enriqueciendo: Espectaculo Luis Olmedo
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-22
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Ángel Martín en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2026-02-28
+      [HORA]   19:30
+   -> Enriqueciendo: Iacopo Meille & Francesco Bottai Live @ IMAGINARIO
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-23
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Iván "Melon" Lewis Trio en Gran Canaria
+      [PRECIO] 15.5€
+      [FECHA]  2026-06-20
+      [HORA]   21:30
+   -> Enriqueciendo: CARROZA TAL CUAL
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-06
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Luz Casal en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+      [HORA]   16:00
+   -> Enriqueciendo: CARROZA AREHUCAS
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-07
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ANIVER5ARIO en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-28
+      [HORA]   16:00
+   -> Enriqueciendo: UB40 – 2026 EUROPEAN TOUR - Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-14
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EVA SORIANO en Gran Canaria
+   -> Enriqueciendo: ¿Alimentas tu salud o tu enfermedad?
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-11
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Pablo Alborán en Gran Canaria 2026
+      [PRECIO] 35.0€
+      [FECHA]  2026-02-28
+      [HORA]   10:00
+   -> Enriqueciendo: Francophonie 2026: Michal en concert
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-18
+      [HORA]   18:00
+   -> Enriqueciendo: ENTREMEDIAS
+      [PRECIO] 49.0€
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Luis Zahera en Gran Canaria
+      [PRECIO] 4.9€
+      [FECHA]  2026-03-20
+      [HORA]   19:00
+   -> Enriqueciendo: GEG Canarias 2026 /Hackeando la Educación Transforma tu Ense
+      [PRECIO] 0.0€
+      [FECHA]  2026-11-01
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Víctor Manuel en Gran Canaria
+      [PRECIO] 20.3€
+      [FECHA]  2026-03-20
+      [HORA]   16:00
+   -> Enriqueciendo: Aula de cine. "El espía que surgió del frío"
+      [PRECIO] 0.0€
+      [FECHA]  2026-11-08
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Poema del Mar - Acuario Gran Canaria: Entrada sin colas en L
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-15
+      [HORA]   19:00
+   -> Enriqueciendo: Programa "Los 7 Pilares para un Liderazgo de Alto Impacto" (
+      [PRECIO] 29.0€
+      [FECHA]  2026-02-25
+      [HORA]   09:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Angry Birds Activity Park en Las Palmas de Gran Canaria
+      [PRECIO] 2995.0€
+      [FECHA]  2026-12-31
+      [HORA]   18:00
+   -> Enriqueciendo: Soulfónica en Canarias en Vivo
+      [PRECIO] 13.0€
+      [FECHA]  2026-02-26
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Aguilera y Mení en Gran Canaria
+      [PRECIO] 10.31€
+      [FECHA]  2026-05-23
+      [HORA]   22:00
+      [PRECIO] 0.0€
+      [FECHA]  2026-12-05
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Pintura colectiva con bordado intuitivo
+   -> Enriqueciendo: JULIO IGLESIAS EXPERIENCE por Julio Iglesias Jr. en Gran Can
+      [PRECIO] 35.0€
+      [FECHA]  2026-03-20
+      [HORA]   17:00
+      [PRECIO] 0.0€
+      [FECHA]  2026-12-08
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: CAOTIKKA LANZAROTE
+   -> Enriqueciendo: Tremenda de Petite Lorena en Gran Canaria
+      [PRECIO] 30.0€
+      [FECHA]  2026-03-28
+      [HORA]   18:00
+   -> Enriqueciendo: Buen Clima 1312
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-06
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Bus turístico por Las Palmas de Gran Canaria
+      [PRECIO] 21.57€
+      [FECHA]  2026-03-07
+      [HORA]   18:00
+   -> Enriqueciendo: ADRI & ROD - CAJÓN DESASTRE 2.0
+      [PRECIO] 25.0€
+      [FECHA]  2026-02-25
+      [HORA]   10:10
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: El Rey Leoncio en Gran Canaria
+      [PRECIO] 13.0€
+      [FECHA]  2026-04-25
+      [HORA]   20:00
+   -> Enriqueciendo: GRAN CANARIA BIG BAND JAZZ CLUB EN CANARIAS EN VIVO - CONCIE
+      [PRECIO] 15.0€
+      [FECHA]  2026-03-20
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Kany García en Las Palmas de Gran Canaria
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-13
+      [HORA]   22:00
+   -> Enriqueciendo: Saul Romero - Estreno del nuevo Show FANTASÍA
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-26
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Isla Sound en Gran Canaria 2026
+      [PRECIO] 15.0€
+      [FECHA]  2026-03-15
+      [HORA]   19:00
+   -> EntradasCanarias: 131 eventos (precio:89 fecha:131 hora:131 img:131)
+      [PRECIO] 20.0€
+      [FECHA]  2026-08-01
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: CitySightseeing España Las Palmas de Gran Canarias
+      [PRECIO] 21.56€
+      [HORA]   21:56
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Alejandro Sanz en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-04
+      [HORA]   11:26
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Vuelo en parapente por Las Palmas de Gran Canaria
+      [PRECIO] 130.0€
+      [FECHA]  2025-11-07
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Free tour de los misterios y leyendas de Las Palmas de Gran 
+      [PRECIO] 0.0€
+      [FECHA]  2025-11-07
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Clase de Paddle Surf en Gran Canaria en Arguineguin
+      [PRECIO] 49.0€
+      [FECHA]  2025-11-07
+      [HORA]   09:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Ritual de Chocoloterapia para parejas: relajación y placer e
+      [PRECIO] 290.0€
+      [FECHA]  2025-11-07
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Techno Pop en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-11-14
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: UB40 en Las Palmas - Gran Canaria Arena 2026
+      [PRECIO] 49.0€
+      [FECHA]  2026-07-31
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Lia Kali en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-02
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Kike Pérez en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-27
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Omayra Cazorla en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-28
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Falla. Detrás del Paisaje en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-09
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: José Mercé en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-02
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Ainhoa Arteta en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-10
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Las Noches de Cristito en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-13
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Gran Canaria SUM Festival 2026
+      [PRECIO] 77.0€
+      [FECHA]  2026-10-02
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: GRANCA Live Fest 2026 - Entradas de día en LAS PALMAS DE GRA
+      [PRECIO] 71.5€
+      [FECHA]  2026-07-02
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Tu Otra Bonita + Kimera en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 19.8€
+      [FECHA]  2026-03-07
+      [HORA]   19:80
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Tam Tam Go + Northway Drive en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 19.8€
+      [FECHA]  2026-03-21
+      [HORA]   19:80
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: RESERVAS HUERTAS DEL REY en Gran Canaria
+      [PRECIO] 20.0€
+      [FECHA]  2026-01-02
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Alice Wonder + Cris Giannattasio en LAS PALMAS DE GRAN CANAR
+      [PRECIO] 19.8€
+      [FECHA]  2026-04-18
+      [HORA]   19:80
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Elefantes + Valle Narval en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 19.8€
+      [FECHA]  2026-05-16
+      [HORA]   19:80
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: GRANCA Live Fest 2026 - Abonos 2 días en LAS PALMAS DE GRAN 
+      [PRECIO] 104.5€
+      [FECHA]  2026-07-02
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Tour gastronómico por Gran Canaria en Maspalomas
+      [PRECIO] 59.0€
+      [FECHA]  2025-11-20
+      [HORA]   17:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Excursión por las costas de Gran Canaria en Maspalomas
+      [PRECIO] 26.0€
+      [FECHA]  2025-11-22
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Natalia Lacunza - Tour 2026 en LAS PALMAS DE GRAN CANARIA
+      [PRECIO] 21.0€
+      [FECHA]  2026-03-06
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: San Tosielo en Las Palmas de Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2026-04-24
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: David Otero en Gran Canaria - Talleres Palermo
+      [PRECIO] 25.0€
+      [FECHA]  2026-03-15
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LAS NOCHES CON CRISTITO Y LA MADRE CANARIA en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2025-12-26
+      [HORA]   15:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: NOZING en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: UNA NOCHE EN MAGDALÁ en Gran Canaria
+      [PRECIO] 5.0€
+      [FECHA]  2026-01-02
+      [HORA]   05:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: REVIVIRLA en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EN OTRA CLAVE - 5 MARZO en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-09
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EN OTRA CLAVE - 12 MARZO en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-09
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: UNA NOCHE EN MAGDALA en Gran Canaria
+      [PRECIO] 6.0€
+      [FECHA]  2026-01-26
+      [HORA]   06:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SABER QUE SE PUEDE - IRENE VILLA en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2025-12-05
+      [HORA]   15:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: INMADUROS en Gran Canaria
+      [PRECIO] 20.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: COLACERDO en Gran Canaria
+      [PRECIO] 5.0€
+      [FECHA]  2026-01-02
+      [HORA]   05:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA REINA DE LAS NIEVES en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2025-12-16
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA REINA DE LAS NIEVES en Gran Canaria
+      [PRECIO] 5.0€
+      [FECHA]  2026-01-16
+      [HORA]   05:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA VIDA REGULINCHI en Gran Canaria
+      [PRECIO] 16.0€
+      [FECHA]  2025-12-26
+      [HORA]   16:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SUSI CARAMELO en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2025-12-15
+      [HORA]   15:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: CHIRIGOTA DE ROTA - LOS MUERTING PLANNER en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2026-01-26
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: VELADAS. ESTUDIO GUIBLI TRIBUTO en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: CHIRIGOTA DE ROTA - LOS MUERTING PLANNER en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2026-01-09
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ¿NOS DAMOS UN VIAJE? en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-02
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: HUMOr - KIKE PÉREZ en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2026-01-08
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SUPERTHINGS. RIVALS OF KABOOM. LA SUPÉRFIESTA en Gran Canari
+      [PRECIO] 20.0€
+      [FECHA]  2025-12-16
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SHOW PATÉTICO en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2025-12-26
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SONRISAS Y LAGRIMAS EL MUSICAL (17:00 H.) en Gran Canaria
+      [PRECIO] 31.5€
+      [FECHA]  2026-01-26
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SONRISAS Y LAGRIMAS EL MUSICAL (20:30 H.) en Gran Canaria
+      [PRECIO] 31.5€
+      [FECHA]  2026-01-26
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SONRISAS Y LAGRIMAS EL MUSICAL (12:00 H.) en Gran Canaria
+      [PRECIO] 31.5€
+      [FECHA]  2026-01-26
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SÉ TORTUGA en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: MUERTA DE AMOR en Gran Canaria
+      [PRECIO] 20.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: MARIBEL Y LA EXTRAÑA FAMILIA en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-02
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: MEDIO TOTUFO en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: PALABRAS MAYORES en Gran Canaria
+      [PRECIO] 16.0€
+      [FECHA]  2025-12-26
+      [HORA]   16:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: 3 EN ALERTA en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-02
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA REBELIÓN DE LAS PARIAS en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EL VIENTO ES SALVAJE en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-02
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SILVIA CONGOST - OBJETIVO AMARTE en Gran Canaria
+      [PRECIO] 25.0€
+      [FECHA]  2025-12-16
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: DE VUELTA A CASA en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2026-01-19
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: QUIETO TODO EL MUNDO en Gran Canaria
+      [PRECIO] 22.0€
+      [FECHA]  2025-12-26
+      [HORA]   22:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EL BAR NUESTRO DE CADA DÍA en Gran Canaria
+      [PRECIO] 15.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: TANXUGUEIRAS en Gran Canaria
+      [PRECIO] 22.0€
+      [FECHA]  2026-01-14
+      [HORA]   22:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EVOLUCIONANDO - DARÍO LÓPEZ en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2025-12-16
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: QUIQUE GONZÁLEZ & TONI BRUNET en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2026-01-14
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: VAIANA. EL MUSICAL DEL MOMENTO en Gran Canaria
+      [PRECIO] 20.0€
+      [FECHA]  2025-12-10
+      [HORA]   14:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: TARZÁN EL MUSICAL (17:00 H.) en Gran Canaria
+      [PRECIO] 28.0€
+      [FECHA]  2026-01-26
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: TARZÁN EL MUSICAL (20:30 H.) en Gran Canaria
+      [PRECIO] 28.0€
+      [FECHA]  2026-01-26
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: TARZÁN EL MUSICAL (12:00 H.) en Gran Canaria
+      [PRECIO] 28.0€
+      [FECHA]  2026-01-26
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ENEMIGO en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-02
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: APOCALÍPTICAMENTE CORRECTO en Gran Canaria
+      [PRECIO] 25.0€
+      [FECHA]  2025-12-26
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: 20 AÑOS VIVIENDO DEL CUENTO en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-26
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LA MUJER ROTA en Gran Canaria
+      [PRECIO] 17.0€
+      [FECHA]  2025-12-16
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: CAMINO A LA MECA en Gran Canaria
+      [PRECIO] 17.0€
+      [FECHA]  2025-12-16
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EL ENIGMA DE NICK VALDEPEÑAS en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-02
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: IDOLS. LA REVOLUCIÓN K-POP. LAS GUERRERAS DEL RITMO (16:30 H
+      [PRECIO] 20.0€
+      [FECHA]  2025-11-24
+      [HORA]   09:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: IDOLS. LA REVOLUCIÓN K-POP. LAS GUERRERAS DEL RITMO (19:00 H
+      [PRECIO] 20.0€
+      [FECHA]  2025-12-03
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: DISPARATE. UN SHOW DE OMAYRA CAZORLA en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2026-01-16
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Aborá Femme en Gran Canaria
+      [PRECIO] 16.0€
+      [FECHA]  2026-04-17
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Adulto en Prácticas - Himar Armas en Gran Canaria
+      [PRECIO] 14.0€
+      [FECHA]  2026-04-11
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Disparate - Omayra Cazorla en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2026-07-24
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: David Demaría en Gran Canaria
+      [PRECIO] 22.0€
+      [FECHA]  2026-05-29
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Gerson Galván en Gran Canaria
+      [PRECIO] 25.0€
+      [FECHA]  2026-05-02
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: DISPARATE - OMAYRA CAZORLA en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2026-01-20
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: MOLAN LOS 2000 GRAN CANARIA en Las Palmas
+      [PRECIO] 24.2€
+      [FECHA]  2026-06-11
+      [HORA]   23:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Visita guiada por el barrio de Vegueta en Las Palmas de Gran
+      [PRECIO] 7.0€
+      [FECHA]  2026-01-27
+      [HORA]   07:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: The Jury Experience: Muerte por IA: ¿Quién Paga el precio? e
+      [PRECIO] 25.0€
+      [FECHA]  2026-03-29
+      [HORA]   17:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: El Último Presidente en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-08
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Gran Canaria SUM Festival 2026
+      [PRECIO] 0.0€
+      [FECHA]  2026-10-02
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Pirates of Las Palmas Outdoor Exploration Game en Las Palmas
+      [PRECIO] 8.99€
+      [FECHA]  2026-02-26
+      [HORA]   08:99
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Entrada al acuario Poema del Mar en Las Palmas de Gran Canar
+      [PRECIO] 13.5€
+      [FECHA]  2026-02-16
+      [HORA]   13:50
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Vive Fest al Sol en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-07-31
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ELSA PUNSET - LO QUE HEMOS CONQUISTADO Y LO QUE ESTÁ POR VEN
+      [PRECIO] 15.0€
+      [FECHA]  2026-01-28
+      [HORA]   15:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: REVELORA - 27 MARZO en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2026-01-28
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: REVELORA - 28 MARZO en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2026-01-28
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: CAMPOYADAS - JOSÉ CAMPOY en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2026-01-26
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LAS NOCHES CON CRISTITO Y LA MADRE CANARIA en Gran Canaria
+      [PRECIO] 18.0€
+      [FECHA]  2026-01-28
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: NOCHE DE CHICAS en Gran Canaria
+      [PRECIO] 20.0€
+      [FECHA]  2026-01-28
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: YO, TARZÁN en Gran Canaria
+      [PRECIO] 12.0€
+      [FECHA]  2026-01-28
+      [HORA]   12:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: LAS NIÑAS DE CÁDIZ - EL VIENTO ES SALVAJE en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2026-01-02
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: EN OTRA CLAVE - VECINDARIO en Gran Canaria
+      [PRECIO] 10.0€
+      [FECHA]  2025-12-18
+      [HORA]   10:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: UB40 en Las Palmas - Gran Canaria Arena 2026
+      [PRECIO] 49.0€
+      [FECHA]  2026-07-31
+      [HORA]   21:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Luck Ra y Valentino Merlo en Gran Canaria
+      [PRECIO] 34.9€
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Acis y Galatea en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-02
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Te Toca. Moving Concerts en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-15
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Bach Concertante en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-28
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Hanna Schulte en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-29
+      [HORA]   12:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Bach Íntimo en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-30
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Poliedro de amor en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-02-27
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ¡Soy Salvaje! en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-01
+      [HORA]   18:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Los cuernos de don Friolera en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-06
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Cartas a Néstor en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-07
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Señora Einstein en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-13
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Concentus Musicus Wien en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-20
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: OTELLO en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-24
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Javier Santaolalla. El Club de la Tusa. ¿Qué es el tiempo? e
+      [PRECIO] 0.0€
+      [FECHA]  2026-03-28
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ¿Dónde está Alicia? en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-10
+      [HORA]   19:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: SIMON BOCCANEGRA en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-21
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Empaque en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-04-30
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Música para Hitler en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-01
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: ANDREA CHÉNIER en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-19
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Sir Stephen Hough en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-22
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Javier Santaolalla. El Club de la Tusa. El misterio de Veláz
+      [PRECIO] 0.0€
+      [FECHA]  2026-05-23
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: TURANDOT en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-16
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Javier Santaolalla. El Club de la Tusa. El fuego de Prometeo
+      [PRECIO] 0.0€
+      [FECHA]  2026-06-17
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Hamlet en Gran Canaria
+      [PRECIO] 26.0€
+      [FECHA]  2026-04-11
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Karina en Gran Canaria
+      [PRECIO] 35.0€
+      [FECHA]  2026-05-22
+      [HORA]   20:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: GRAN CANARIA BIG BAND JAZZ CLUB EN CANARIAS EN VIVO - CONCIE
+      [PRECIO] 10.31€
+      [FECHA]  2026-03-13
+      [HORA]   22:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: UNIVERSITY SANTO 2026 en Gran Canaria
+      [PRECIO] 30.0€
+      [FECHA]  2026-04-04
+      [HORA]   23:58
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: José James y Celia Kameni en Gran Canaria
+      [PRECIO] 30.0€
+      [FECHA]  2026-07-17
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Estelle Perrault 5tet en Gran Canaria
+      [PRECIO] 0.0€
+      [FECHA]  2026-07-09
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Marco Mezquida Trio en Gran Canaria
+      [PRECIO] 20.0€
+      [FECHA]  2026-07-16
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Jacob Collier y la Orquesta Filarmónica de Gran Canaria diri
+      [PRECIO] 50.0€
+      [FECHA]  2026-07-21
+      [HORA]   20:00
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Candlelight: Mozart, Bach y más compositores de la música cl
+      [PRECIO] 30.5€
+      [FECHA]  2026-08-21
+      [HORA]   19:30
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Pablo Alborán en Gran Canaria
+      [PRECIO] 49.0€
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Enriqueciendo: Festival "Somos Latinos" en Las Palmas de Gran Canaria
+      [PRECIO] 44.9€
+      [FECHA]  2026-07-11
+      ⚠️ Título H1 ignorado por ser genérico: 'Entradas para los mejores eventos'
+   -> Entrées.es: 253 eventos (precio:246 fecha:242 hora:217 img:253)
+   🚨 ALERTA DevOps: Entradas.com extrajo 0 eventos. (¿Cambio de DOM o IP bloqueada?)
+   🚨 ALERTA DevOps: TeldeCultura extrajo 0 eventos. (¿Cambio de DOM o IP bloqueada?)
+💾 DB: 58 insertados, 500 actualizados.
+🗄️ Base de datos actualizada (Sincronización completada)
+
+============================================================
+🧹 LIMPIEZA DE DUPLICADOS (Cross-Fuente)
+============================================================
+   📊 Total eventos en DB: 649
+   📅 Grupos únicos de fecha: 468
+------------------------------------------------------------
+
+   🔗 Cluster detectado [Sin fecha Sin hora]:
+      ⭐ MAESTRO: [Auditorio A. Kraus] La Pasión según San Juan (TOP 5)
+         Descripción: 0 chars | URL: https://auditorioalfredokraus.es/evento/la-pasion-segun-san-juan-top-5
+      ❌ DUPLICADO: [Auditorio A. Kraus] La Pasión según San Juan
+         Descripción: 0 chars | URL: https://auditorioalfredokraus.es/evento/la-pasion-segun-san-juan
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [Sin fecha Sin hora]:
+      ⭐ MAESTRO: [Auditorio A. Kraus] Aperitivo I
+         Descripción: 0 chars | URL: https://auditorioalfredokraus.es/evento/aperitivo-i
+      ❌ DUPLICADO: [Auditorio A. Kraus] Aperitivo II
+         Descripción: 0 chars | URL: https://auditorioalfredokraus.es/evento/aperitivo-ii
+         Similitud: 95.65217391304348%
+
+   🔗 Cluster detectado [Sin fecha Sin hora]:
+      ⭐ MAESTRO: [Auditorio A. Kraus] Mahler & Chichon (TOP 5)
+         Descripción: 0 chars | URL: https://auditorioalfredokraus.es/evento/mahler-chichon-top-5
+      ❌ DUPLICADO: [Auditorio A. Kraus] Mahler & Chichon
+         Descripción: 0 chars | URL: https://auditorioalfredokraus.es/evento/mahler-chichon
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-04-04 23:58]:
+      ⭐ MAESTRO: [Tomaticket] UNIVERSITY SANTO 2026 en Gran Canaria
+         Descripción: 380 chars | URL: https://www.tomaticket.es/es-es/entradas-university-santo-gran-canaria
+      ❌ DUPLICADO: [Entrées.es] UNIVERSITY SANTO 2026 en Gran Canaria
+         Descripción: 647 chars | URL: https://entrees.es/evento/ext/university-santo-2026-en-gran-canaria-entradas
+         Similitud: 100.0%
+      📝 Descripción mejorada con datos de [Entrées.es]
+
+   🔗 Cluster detectado [2026-07-11 Sin hora]:
+      ⭐ MAESTRO: [Tomaticket] Festival "Somos Latinos" en Las Palmas de Gran Canaria
+         Descripción: 37 chars | URL: https://www.tomaticket.es/es-es/entradas-festival-somos-latinos-en-gran-canaria
+      ❌ DUPLICADO: [Entrées.es] Festival "Somos Latinos" en Las Palmas de Gran Canaria
+         Descripción: 611 chars | URL: https://entrees.es/evento/festival-somos-latinos-en-las-palmas-de-gran-canaria-entradas
+         Similitud: 100.0%
+      📝 Descripción mejorada con datos de [Entrées.es]
+
+   🔗 Cluster detectado [2026-03-12 20:00]:
+      ⭐ MAESTRO: [Tomaticket] Carles Sans De Tricicle en Gran Canaria
+         Descripción: 270 chars | URL: https://www.tomaticket.es/es-es/entradas-carles-sans-gran-canaria
+      ❌ DUPLICADO: [Entrées.es] Carles Sans en Gran Canaria
+         Descripción: 873 chars | URL: https://entrees.es/evento/ext/carles-sans-en-gran-canaria-entradas
+         Similitud: 100.0%
+      📝 Descripción mejorada con datos de [Entrées.es]
+
+   🔗 Cluster detectado [2026-02-23 Sin hora]:
+      ⭐ MAESTRO: [Tomaticket] Excursiones de 1 día en Gran Canaria
+         Descripción: 275 chars | URL: https://www.tomaticket.es/es-es/entradas-excursiones-de-1-dia-en-gran-canaria
+      ❌ DUPLICADO: [Tomaticket] Excursiones en Gran Canaria
+         Descripción: 202 chars | URL: https://www.tomaticket.es/es-es/entradas-excursiones-en-gran-canaria
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-02-27 19:00]:
+      ⭐ MAESTRO: [Tomaticket] Aula de cine. "Los ángeles del pecado" en Las Palmas de Gran Canaria
+         Descripción: 0 chars | URL: https://www.tomaticket.es/es-es/entradas-aula-de-cine-los-angeles-del-pecado-en-las-palmas-de-gran-canaria
+      ❌ DUPLICADO: [Tickety] Aula De Cine. "Los Ángeles Del Pecado"
+         Descripción: 842 chars | URL: https://tickety.es/event/aula-de-cine-los-angeles-del-pecado
+         Similitud: 100.0%
+      📝 Descripción mejorada con datos de [Tickety]
+
+   🔗 Cluster detectado [2026-03-06 19:00]:
+      ⭐ MAESTRO: [Tomaticket] Aula de cine. "Las damas del bosque de Bolonia" en Las Palmas de Gran Canaria
+         Descripción: 0 chars | URL: https://www.tomaticket.es/es-es/entradas-aula-de-cine-las-damas-del-bosque-de-bolonia-en-las-palmas-de-gran-canaria
+      ❌ DUPLICADO: [Tickety] Aula De Cine. "Las Damas Del Bosque De Bolonia"
+         Descripción: 588 chars | URL: https://tickety.es/event/aula-de-cine-las-damas-del-bosque-de-bolonia
+         Similitud: 100.0%
+      📝 Descripción mejorada con datos de [Tickety]
+
+   🔗 Cluster detectado [2026-02-28 17:00]:
+      ⭐ MAESTRO: [Tomaticket] Las Palmas de Gran Canaria Carnival 2026 – Float Parade Tickets
+         Descripción: 139 chars | URL: https://www.tomaticket.es/es-es/entradas-las-palmas-de-gran-canaria-carnival-2026-float-parade-tickets
+      ❌ DUPLICADO: [Tickety] Las Palmas De Gran Canaria Carnival 2026 – Float Parade Tickets
+         Descripción: 2151 chars | URL: https://tickety.es/event/las-palmas-de-gran-canaria-carnival-2026-float-parade-tickets
+         Similitud: 100.0%
+      ❌ DUPLICADO: [Entrées.es] Las Palmas de Gran Canaria Carnival 2026 – Float Parade Tickets en Palmas, Las
+         Descripción: 2046 chars | URL: https://entrees.es/evento/ext/las-palmas-de-gran-canaria-carnival-2026--float-parade-tickets-en-palmas-las-entradas
+         Similitud: 100.0%
+      ❌ DUPLICADO: [Entrées.es] Float Parade Tickets-Las Palmas de Gran Canaria Carnival 2026
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/float-parade-tickets-las-palmas-de-gran-canaria-carnival-2026-entradas
+         Similitud: 91.93548387096774%
+      📝 Descripción mejorada con datos de [Tickety]
+
+   🔗 Cluster detectado [2026-02-28 19:30]:
+      ⭐ MAESTRO: [Tomaticket] Espectaculo Luis Olmedo Palmas, Las
+         Descripción: 205 chars | URL: https://www.tomaticket.es/es-es/entradas-espectaculo-luis-olmedo-palmas-las
+      ❌ DUPLICADO: [Tickety] Espectaculo Luis Olmedo
+         Descripción: 583 chars | URL: https://tickety.es/event/espectaculo-luis-olmedo
+         Similitud: 100.0%
+      📝 Descripción mejorada con datos de [Tickety]
+
+   🔗 Cluster detectado [2026-03-05 19:30]:
+      ⭐ MAESTRO: [Tomaticket] Candlelight: Queen vs ABBA en Las Palmas de Gran Canaria
+         Descripción: 433 chars | URL: https://www.tomaticket.es/es-es/entradas-candlelight-queen-vs-abba-en-las-palmas-de-gran-canaria
+      ❌ DUPLICADO: [Entrées.es] Candlelight: Tributo a ABBA y Más en Las Palmas de Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/candlelight-tributo-a-abba-y-mas-en-las-palmas-de-gran-canaria-entradas
+         Similitud: 91.2621359223301%
+
+   🔗 Cluster detectado [2026-03-10 19:30]:
+      ⭐ MAESTRO: [Tomaticket] Candlelight: Tributo a Phil Collins en Las Palmas de Gran Canaria
+         Descripción: 327 chars | URL: https://www.tomaticket.es/es-es/entradas-candlelight-tributo-a-phil-collins-en-las-palmas-de-gran-canaria
+      ❌ DUPLICADO: [Entrées.es] Candlelight: Tributo a Phil Collins en Las Palmas de Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/candlelight-tributo-a-phil-collins-en-las-palmas-de-gran-canaria---entradas
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-03-13 21:00]:
+      ⭐ MAESTRO: [Tomaticket] Fito y Fitipaldis en Gran Canaria
+         Descripción: 359 chars | URL: https://www.tomaticket.es/es-es/entradas-fito-y-fitipaldis-gran-canaria
+      ❌ DUPLICADO: [Entrées.es] Fito y Fitipaldis en Gran Canaria - Plaza de la Música
+         Descripción: 494 chars | URL: https://entrees.es/evento/ext/fito-y-fitipaldis-en-gran-canaria-plaza-de-la-musica-entradas
+         Similitud: 100.0%
+      📝 Descripción mejorada con datos de [Entrées.es]
+
+   🔗 Cluster detectado [Sin fecha Sin hora]:
+      ⭐ MAESTRO: [Entrées.es] Pablo Alborán en Gran Canaria 2026
+         Descripción: 543 chars | URL: https://entrees.es/evento/ext/pablo-alboran-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] Pablo Alborán en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/pablo-alboran-gran-canaria-entradas
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-07-26 21:00]:
+      ⭐ MAESTRO: [Entrées.es] Valeria Castro en LAS PALMAS DE GRAN CANARIA
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/valeria-castro-en-las-palmas-de-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] Valeria Castro en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/valeria-castro-en-gran-canaria-entradas
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-01-26 12:00]:
+      ⭐ MAESTRO: [Entrées.es] SONRISAS Y LAGRIMAS EL MUSICAL (17:00 H.) en Gran Canaria
+         Descripción: 288 chars | URL: https://entrees.es/evento/ext/sonrisas-y-lagrimas-el-musical-1700-h-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] SONRISAS Y LAGRIMAS EL MUSICAL (12:00 H.) en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/sonrisas-y-lagrimas-el-musical-1200-h-en-gran-canaria-entradas
+         Similitud: 98.24561403508773%
+
+   🔗 Cluster detectado [2026-01-26 12:00]:
+      ⭐ MAESTRO: [Entrées.es] TARZÁN EL MUSICAL (20:30 H.) en Gran Canaria
+         Descripción: 257 chars | URL: https://entrees.es/evento/ext/tarzan-el-musical-2030-h-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] TARZÁN EL MUSICAL (12:00 H.) en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/tarzan-el-musical-1200-h-en-gran-canaria-entradas
+         Similitud: 95.45454545454545%
+
+   🔗 Cluster detectado [2026-01-28 12:00]:
+      ⭐ MAESTRO: [Entrées.es] REVELORA - 27 MARZO en Gran Canaria
+         Descripción: 665 chars | URL: https://entrees.es/evento/ext/revelora-27-marzo-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] REVELORA - 28 MARZO en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/revelora-28-marzo-en-gran-canaria-entradas
+         Similitud: 97.14285714285714%
+
+   🔗 Cluster detectado [2026-03-20 22:00]:
+      ⭐ MAESTRO: [EntradasCanarias] Sarantontones en Canarias en Vivo
+         Descripción: 715 chars | URL: https://ventas.entradascanarias.com/events/sarantontones-en-canarias-en-vivo
+      ❌ DUPLICADO: [EntradasCanarias] Los Sarantontones en Canarias en Vivo - Concierto en Las Palmas
+         Descripción: 715 chars | URL: https://ventas.entradascanarias.com/events/sarantontones-en-canarias-en-vivo
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-01-09 10:00]:
+      ⭐ MAESTRO: [Entrées.es] EN OTRA CLAVE - 5 MARZO en Gran Canaria
+         Descripción: 975 chars | URL: https://entrees.es/evento/ext/en-otra-clave-5-marzo-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] EN OTRA CLAVE - 12 MARZO en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/en-otra-clave-12-marzo-en-gran-canaria-entradas
+         Similitud: 97.14285714285714%
+
+   🔗 Cluster detectado [2026-01-02 10:00]:
+      ⭐ MAESTRO: [Entrées.es] EL VIENTO ES SALVAJE en Gran Canaria
+         Descripción: 1000 chars | URL: https://entrees.es/evento/ext/el-viento-es-salvaje-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] LAS NIÑAS DE CÁDIZ - EL VIENTO ES SALVAJE en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/las-ninas-de-cadiz-el-viento-es-salvaje-en-gran-canaria-entradas
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-01-26 17:00]:
+      ⭐ MAESTRO: [Entrées.es] SONRISAS Y LAGRIMAS EL MUSICAL (17:00 H.) en Gran Canaria
+         Descripción: 1479 chars | URL: https://entrees.es/evento/ext/sonrisas-y-lagrimas-el-musical-1700-h-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] TARZÁN EL MUSICAL (17:00 H.) en Gran Canaria
+         Descripción: 1122 chars | URL: https://entrees.es/evento/ext/tarzan-el-musical-1700-h-en-gran-canaria-entradas
+         Similitud: 91.35802469135803%
+
+   🔗 Cluster detectado [2026-01-26 20:30]:
+      ⭐ MAESTRO: [Entrées.es] SONRISAS Y LAGRIMAS EL MUSICAL (20:30 H.) en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/sonrisas-y-lagrimas-el-musical-2030-h-en-gran-canaria-entradas
+      ❌ DUPLICADO: [Entrées.es] TARZÁN EL MUSICAL (20:30 H.) en Gran Canaria
+         Descripción: 0 chars | URL: https://entrees.es/evento/ext/tarzan-el-musical-2030-h-en-gran-canaria-entradas
+         Similitud: 91.35802469135803%
+
+   🔗 Cluster detectado [2026-03-14 21:00]:
+      ⭐ MAESTRO: [Tomaticket] BLACK BANJO Live @ IMAGINARIO en LAS PALMAS DE GRAN CANARIA
+         Descripción: 0 chars | URL: https://www.tomaticket.es/es-es/entradas-black-banjo-live-imaginario-en-las-palmas-de-gran-canaria
+      ❌ DUPLICADO: [EntradasCanarias] BLACK BANJO Live @ IMAGINARIO
+         Descripción: 0 chars | URL: https://ventas.entradascanarias.com/events/black-banjo-live-imaginario-las-palmas-de-gran-canaria
+         Similitud: 100.0%
+
+   🔗 Cluster detectado [2026-02-23 10:30]:
+      ⭐ MAESTRO: [Tomaticket] Mediterranean Lovers - Healthy Poke Las Palmas (Go Fit) en Las Palmas de Gran Canaria
+         Descripción: 270 chars | URL: https://www.tomaticket.es/es-es/entradas-mediterranean-lovers-healthy-poke-las-palmas-go-fit-en-las-palmas-de-gran-canaria
+      ❌ DUPLICADO: [Tomaticket] Solo Combo - Healthy Poke Las Palmas (Go Fit) en Las Palmas de Gran Canaria
+         Descripción: 130 chars | URL: https://www.tomaticket.es/es-es/entradas-solo-combo-healthy-poke-las-palmas-go-fit-en-las-palmas-de-gran-canaria
+         Similitud: 90.5982905982906%
+      ❌ DUPLICADO: [Tomaticket] Classic Salmon Duo - Healthy Poke Las Palmas (Go Fit) en Las Palmas de Gran Canaria
+         Descripción: 0 chars | URL: https://www.tomaticket.es/es-es/entradas-classic-salmon-duo-healthy-poke-las-palmas-go-fit-en-las-palmas-de-gran-canaria
+         Similitud: 84.8%
+
+------------------------------------------------------------
+   🗑️ Eliminando 29 duplicados de la DB...
+   ✅ Limpieza aplicada exitosamente.
+
+   📊 RESUMEN DE LIMPIEZA:
+      Grupos de fecha analizados: 59
+      Duplicados eliminados:      29
+      Maestros enriquecidos:      8
+============================================================
+
+🏷️ Actualizando estado a 'past' para eventos anteriores a 2026-02-27...
+   ✨ No hay eventos para actualizar. Todo al día.
+
+============================================================
+🔍 AUDITORÍA DE PRECISIÓN (Detective v2)
+============================================================
+   📊 Eventos a auditar: 620
+      💰 Precio corregido: 'El imaginario artístico de Peter Faalsti' 2005.0 → NULL (parser error)
+      📍 'Festival "Somos Latinos" en Las Palmas de Gra': 'Gran Canaria' → 'Estadio de Gran Canaria'
+      📍 'GRANCA Live Fest 2026': 'Gran Canaria' → 'Estadio de Gran Canaria'
+      📍 'Hades66 en Gran Canaria': 'Gran Canaria' → 'HolidayWorld Maspalomas'
+      📍 'Luck Ra y Valentino Merlo en Gran Canaria': 'Gran Canaria' → 'Gran Canaria Arena'
+      📍 'Saúl Romero en Gran Canaria': 'Gran Canaria' → 'INFECAR'
+      📍 'JUSTICIA PARA SOHEE. Cine Vértigo': 'Gran Canaria' → 'CICCA'
+      📍 'ORIGEN - Sala Scala Gran Canaria': 'Gran Canaria' → 'Sala Scala'
+      📍 'SUPERSAURIO, EL MUSICAL de Meryem El Mehdati ': 'Gran Canaria' → 'Teatro Cuyás'
+      📍 'LA PATÉTICA de Miguel del Arco en Gran Canari': 'Gran Canaria' → 'Teatro Cuyás'
+      📍 'Excursiones de 1 día en Gran Canaria': 'Gran Canaria' → 'Plaza Hurtado de Mendoza'
+      📍 'Aqualand Maspalomas en Gran Canaria': 'Gran Canaria' → 'Aqualand Maspalomas'
+      📍 'Entradas para Palmitos Park. En Gran Canaria': 'Gran Canaria' → 'Palmitos Park'
+      📍 'HolidayWorld - Maspalomas Center - Wooland en': 'Gran Canaria' → 'HolidayWorld Maspalomas'
+      📍 'Aula de cine. "Los ángeles del pecado" en Las': 'Gran Canaria' → 'Campus del Obelisco'
+      📍 'Aula de cine. "Las damas del bosque de Boloni': 'Gran Canaria' → 'Campus del Obelisco'
+      📍 'Las Palmas de Gran Canaria Carnival 2026 – Fl': 'Gran Canaria' → 'Calle Doctor Juan Domínguez Pérez 1'
+      📍 'Espectaculo Luis Olmedo Palmas, Las': 'Gran Canaria' → 'calle san bernardo'
+      📍 'Concierto de Queof Limerick Tributo a The Cra': 'Gran Canaria' → 'Canarias en Vivo'
+      📍 'Candlelight: Tributo a The Beatles en Las Pal': 'Gran Canaria' → 'Gabinete Literario'
+      📍 'Candlelight: Queen vs ABBA en Las Palmas de G': 'Gran Canaria' → 'Gabinete Literario'
+      📍 'Candlelight: Tributo a Adele en Las Palmas de': 'Gran Canaria' → 'Gabinete Literario'
+      📍 'Candlelight: Tributo a Phil Collins en Las Pa': 'Gran Canaria' → 'Gabinete Literario'
+      📍 'Muerte por IA - The Jury Experience en Gran C': 'Gran Canaria' → 'CICCA'
+      📍 'Ballet of Lights - La Bella Durmiente en Gran': 'Gran Canaria' → 'CICCA'
+      📍 'Paseo en camello por las dunas de Maspalomas ': 'Gran Canaria' → 'Paseo en camello por las dunas de Maspalomas actúa en Gran Canaria'
+      📍 'Bus turístico por Las Palmas de Gran Canaria': 'Gran Canaria' → 'Parque Santa Catalina'
+      📍 'Candlelight: Anillos y Dragones en Las Palmas': 'Gran Canaria' → 'Gabinete Literario'
+      📍 'Candlelight: Lo Mejor de Ennio Morricone en L': 'Gran Canaria' → 'Gabinete Literario'
+      📍 'Lucho RK + La Pantera en Gran Canaria': 'Gran Canaria' → 'Estadio de Gran Canaria'
+      📍 'Origen 2026 en Gran Canaria': 'Gran Canaria' → 'Sala Scala'
+      📍 'Bebe en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Encuentro Bitácora: CONVIÉRTETE EN EL LÍDER D': 'Gran Canaria' → 'Calle Juan de Quesada'
+      📍 'Aula Cultural De Ciencia & Gastronomía. "Come': 'Gran Canaria' → 'Campus del Obelisco'
+      💰 Precio corregido: 'Aula Cultural De Ciencia & Gastronomía. ' 2003.0 → NULL (parser error)
+      📍 'Entradas Carroza Cabalgata Carnaval Las Palma': 'Gran Canaria' → 'Calle Doctor Juan Domínguez Pérez 1'
+      📍 'Concierto De Evergreen En Canarias En Vivo': 'Gran Canaria' → 'Canarias en Vivo'
+      📍 'Concierto De Queen Of Limerick Tributo A The ': 'Gran Canaria' → 'Canarias en Vivo'
+      📍 'Aqualand Maspalomas': 'Gran Canaria' → 'Aqualand Maspalomas'
+      📍 'Palmitos Park': 'Gran Canaria' → 'Palmitos Park'
+      📍 'Silvia Pérez Cruz en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Sting en Las Palmas - Gran Canaria Arena': 'Gran Canaria' → 'Gran Canaria Arena'
+      📍 'Diana Navarro en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Georgina en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Andy Timmons en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Franz Halasz en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Juan Dávila en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'BEBE en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Dani Martínez en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Luis Zahera en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'JULIO IGLESIAS EXPERIENCE por Julio Iglesias ': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'UB40 en Las Palmas - Gran Canaria Arena 2026': 'Gran Canaria' → 'Gran Canaria Arena'
+      📍 'José Mercé en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Ainhoa Arteta en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Gerson Galván en Gran Canaria': 'Gran Canaria' → 'CICCA'
+      📍 'Luck Ra y Valentino Merlo en Gran Canaria': 'Gran Canaria' → 'Gran Canaria Arena'
+      📍 'Los cuernos de don Friolera en Gran Canaria': 'Gran Canaria' → 'Teatro Pérez Galdós'
+      📍 '¿Dónde está Alicia? en Gran Canaria': 'Gran Canaria' → 'Teatro Pérez Galdós'
+      📍 'GRAN CANARIA BIG BAND JAZZ CLUB EN CANARIAS E': 'Gran Canaria' → 'Canarias en Vivo'
+      💰 Precio corregido: 'Programa "Los 7 Pilares para un Liderazg' 2995.0 → NULL (parser error)
+      📍 'José James y Celia Kameni en Gran Canaria': 'Gran Canaria' → 'Teatro Pérez Galdós'
+      📍 'Free Tour Leyendas y Misterios de Las Palmas ': 'Gran Canaria' → 'Teatro Pérez Galdós'
+      📍 'Free tour por Las Canteras en Las Palmas de G': 'Gran Canaria' → 'paseo marítimo'
+      📍 'Excursión a Teror, el Roque Nublo y la calder': 'Gran Canaria' → 'plaza y descubre la cara más natural y auténtica de Gran Canaria!'
+      📍 'Free Tour Las Palmas de Gran Canaria': 'Gran Canaria' → 'Casa de Colón'
+      📍 'Free tour por Las Palmas de Gran Canaria': 'Gran Canaria' → 'Casa de Colón'
+      📍 'Vuelo en parapente por Las Palmas de Gran Can': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Free tour de los misterios y leyendas de Las ': 'Gran Canaria' → 'paseo nocturno por Vegueta que no olvidarás'
+      📍 'Tour gastronómico por Gran Canaria en Maspalo': 'Gran Canaria' → 'plaza y prepárate para un día de lo más sabroso!'
+      📍 'Excursión por las costas de Gran Canaria en M': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'LA MUJER ROTA en Gran Canaria': 'Gran Canaria' → 'calle y los gritos de sus vecinos le impiden dormir'
+      📍 'Visita guiada por el barrio de Vegueta en Las': 'Gran Canaria' → 'calle Herrería para arrancar nuestra visita guiada por el barrio d'
+      📍 'Entrada al acuario Poema del Mar en Las Palma': 'Gran Canaria' → 'paseo de la Playa de las Canteras'
+      📍 'Estelle Perrault 5tet en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Marco Mezquida Trio en Gran Canaria': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      📍 'Jacob Collier y la Orquesta Filarmónica de Gr': 'Gran Canaria' → 'Auditorio Alfredo Kraus'
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=713)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=714)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=715)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=716)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=717)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=718)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=719)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=720)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=721)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=722)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=723)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=724)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=725)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=726)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=727)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=728)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=729)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=730)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=731)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=732)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=733)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=734)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=735)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=736)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=737)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=738)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=739)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=740)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=741)
+      🗑️ Basura: 'Lago Taurito Parque Acuático' (id=742)
+
+   🔎 Deep Scraping 271 eventos con lugar genérico...
+      🔎 Deep Scrape [tomaticket]: 'Auditorio San Juan de Telde'
+      🎯 Deep: 'La Reina del Flow en Gran Canaria': 'Gran Canaria' → 'Auditorio San Juan de Telde'
+      🔎 Deep Scrape [tomaticket]: 'OASIS - Barranco del Águila S/N'
+      🎯 Deep: 'UNIVERSITY SANTO 2026 en Gran Canaria': 'Gran Canaria' → 'OASIS - Barranco del Águila S/N'
+      🔎 Deep Scrape [tomaticket]: 'Parking Anexo Al CC. Los Alisios Junto a Leroy'
+      🎯 Deep: 'Dinosaurios Live en Gran Canaria': 'Gran Canaria' → 'Parking Anexo Al CC. Los Alisios Junto a Leroy'
+      🔎 Deep Scrape [tomaticket]: 'Carnaval de Gran Canaria'
+      🎯 Deep: 'Emily Estefan en los Carnavales de Gran ': 'Gran Canaria' → 'Carnaval de Gran Canaria'
+      🔎 Deep Scrape [tomaticket]: 'Sala Alboroto'
+      🎯 Deep: 'Natalia Lacunza en Gran Canaria': 'Gran Canaria' → 'Sala Alboroto'
+      🔎 Deep Scrape [tomaticket]: 'Talleres Palermo'
+      🎯 Deep: 'Guiu Cortés en Gran Canaria': 'Gran Canaria' → 'Talleres Palermo'
+      🔎 Deep Scrape [tomaticket]: 'INFECAR'
+      🎯 Deep: 'Carles Sans De Tricicle en Gran Canaria': 'Gran Canaria' → 'INFECAR'
+      🔎 Deep Scrape [tomaticket]: 'CitySightseeing Las Palmas de Gran Canaria'
+      🎯 Deep: 'Bus Turístico CitySightseeing Las Palmas': 'Gran Canaria' → 'CitySightseeing Las Palmas de Gran Canaria'
+      🔎 Deep Scrape [tomaticket]: 'Carnaval de Gran Canaria'
+      🎯 Deep: 'Ozuna en el Carnaval de Gran Canaria': 'Gran Canaria' → 'Carnaval de Gran Canaria'
+      🔎 Deep Scrape [tomaticket]: 'Cabalgata de Las Palmas de Gran Canaria 2026'
+      🎯 Deep: 'Entradas Carroza Cabalgata Carnaval Las ': 'Gran Canaria' → 'Cabalgata de Las Palmas de Gran Canaria 2026'
+      🔎 Deep Scrape [tomaticket]: 'Carnaval de Gran Canaria'
+      🎯 Deep: 'Marc Anthony en el Carnaval de Gran Cana': 'Gran Canaria' → 'Carnaval de Gran Canaria'
+      🔎 Deep Scrape [tomaticket]: 'Salón de Actos del edificio de Humanidades. Campus del Obelisco.'
+      🎯 Deep: 'Aula de cine. "Diario de un cura rural" ': 'Gran Canaria' → 'Salón de Actos del edificio de Humanidades. Campus del Obelisco.'
+      🔎 Deep Scrape [tomaticket]: 'Tienda Nankurunaisa, c.c Las Ramblas, Las Palmas de Gran Canaria'
+      🎯 Deep: 'LA ROSE CLUB - 14.03.26 en Las Palmas de': 'Gran Canaria' → 'Tienda Nankurunaisa, c.c Las Ramblas, Las Palmas de Gran Canaria'
+      🔎 Deep Scrape [tomaticket]: 'Aula de cocina del HUB GastroFood ULPGC'
+      🎯 Deep: 'TALLER DE “CONCIENCIACIÓN SOBRE LA PÉRDI': 'Gran Canaria' → 'Aula de cocina del HUB GastroFood ULPGC'
+      🔎 Deep Scrape [tomaticket]: 'Bodega Los Lirios'
+      🎯 Deep: 'Carlitos Brownie Band Palmas, Las': 'Gran Canaria' → 'Bodega Los Lirios'
+      🔎 Deep Scrape [tomaticket]: 'Dunas de Maspalomas'
+      🎯 Deep: 'Photoshooting session in the magical Mas': 'Gran Canaria' → 'Dunas de Maspalomas'
+      🔎 Deep Scrape [tomaticket]: 'Healthy Poke - C. Secretario Padilla'
+      🎯 Deep: 'Spicy Chicken Duo - Healthy Poke Las Pal': 'Gran Canaria' → 'Healthy Poke - C. Secretario Padilla'
+      🔎 Deep Scrape [tomaticket]: 'Parque San Telmo - Calle Triana'
+      🎯 Deep: 'Kid Quest en Gran Canaria: Aventura de s': 'Gran Canaria' → 'Parque San Telmo - Calle Triana'
+      🔎 Deep Scrape [tomaticket]: 'Angry Birds Activity Park Gran Canaria'
+      🎯 Deep: 'Angry Birds Activity Park en Las Palmas ': 'Gran Canaria' → 'Angry Birds Activity Park Gran Canaria'
+      🔎 Deep Scrape [tomaticket]: 'Plaza de la Música'
+      🎯 Deep: 'Fito y Fitipaldis en Gran Canaria': 'Gran Canaria' → 'Plaza de la Música'
+      🔎 Deep Scrape [tomaticket]: 'Acuario Poema del Mar'
+      🎯 Deep: 'Acuario Poema del Mar Gran Canaria': 'Gran Canaria' → 'Acuario Poema del Mar'
+      🔎 Deep Scrape [tomaticket]: 'Pl. de San Agustín'
+      🎯 Deep: 'Las Palmas de Gran Canaria Murder Myster': 'Gran Canaria' → 'Pl. de San Agustín'
+      🔎 Deep Scrape [tomaticket]: 'Healthy Poke - C. Secretario Padilla'
+      🎯 Deep: 'Mediterranean Lovers - Healthy Poke Las ': 'Gran Canaria' → 'Healthy Poke - C. Secretario Padilla'
+
+   📊 AUDITORÍA COMPLETADA:
+      Total auditados:    620
+      Lugares corregidos: 96
+        (de los cuales Deep Scrape: 23)
+      Basura eliminada:   30
+      Precios corregidos: 3
+============================================================
+
+⏩ Saltando Clasificación y Enriquecimiento IA (Modo Test)
+
+🌍 GEOLOCALIZACIÓN DE EVENTOS...
+----------------------------------------
+   📌 495 eventos sin coordenadas.
+      📍 Nominatim: 'Talleres Palermo' → (28.1317, -15.4402)
+      📍 Nominatim: 'Plaza Hurtado de Mendoza' → (28.1023, -15.4155)
+      📍 Nominatim: 'Palmitos Park' → (27.8340, -15.6174)
+      📍 Nominatim: 'Calle Doctor Juan Domínguez Pérez 1' → (28.1623, -15.4095)
+      📍 Nominatim: 'calle san bernardo' → (28.1053, -15.4180)
+      📍 Nominatim: 'Calle Juan de Quesada' → (28.0985, -15.4219)
+      📍 Nominatim: 'Plaza de La Garita' → (28.0092, -15.3786)
+      📍 Nominatim: 'Spar Natural' → (27.7581, -15.6812)
+      📍 Nominatim: 'Colegio San Ignacio de Loyola' → (28.0988, -15.4124)
+      📍 Nominatim: 'Finca' → (28.0579, -15.4744)
+      📍 Nominatim: 'Acuario Poema del Mar' → (28.1446, -15.4282)
+      📍 Nominatim: 'Pl. de San Agustín' → (28.1000, -15.4128)
+      📍 Nominatim: 'paseo marítimo' → (28.0129, -15.3815)
+      📍 Nominatim: 'Holiday World' → (27.7602, -15.5939)
+      📍 Nominatim: 'GC Arena' → (28.1056, -15.4166)
+
+   📊 Geolocalización completada:
+      Procesados:  495
+      Diccionario: 44
+      Nominatim:   15
+      Fallback:    34
+
+📊 Generando Excel Final...
+   📊 QA Títulos Genéricos detectados: 4 (0.7%)
+   🧹 Sanitización: 590 → 370 eventos (-220 eliminados)
+
+✅ EXCEL GENERADO: agenda_cultural_LIMPIA.xlsx
+   📅 Eventos confirmados: 291
+   ⚠️ Eventos sin fecha (Borradores): 79

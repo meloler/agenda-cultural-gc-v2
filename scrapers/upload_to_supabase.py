@@ -22,6 +22,7 @@ COLUMN_MAP = {
     "Imagen": "imagen_url",
     "Descripción": "descripcion",
     "Ver en Mapa": "_ver_mapa",
+    "Fuentes Combinadas": "merged_from_sources",
 }
 
 # Validar que las columnas requeridas existen
@@ -84,7 +85,12 @@ for r in records:
     except Exception as e:
         print(f"   ❌ Error parseando registro {r.get('nombre')}: {e}")
 
-records = valid_records
+def none_if_nan(v):
+    if isinstance(v, float) and math.isnan(v):
+        return None
+    return v
+
+records = [{k: none_if_nan(v) for k, v in r.items()} for r in valid_records]
 
 # Imprimir como JSON para uso posterior
 output = json.dumps(records, ensure_ascii=False, default=str, allow_nan=False)

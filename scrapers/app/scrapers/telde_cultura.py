@@ -114,36 +114,27 @@ async def scrape_telde_cultura(page: Page) -> list[Evento]:
         # Extraer tarjetas con JS
         items = await page.evaluate("""
             () => {
+                const cards = document.querySelectorAll('.card.bloque-evento, .em-event-item, article, div[class*=\"event-card\"]');
                 const results = [];
-                const links = document.querySelectorAll('a[href*=\"/event/\"], a[href*=\"/evento/\"]');
                 const seen = new Set();
                 
-                for (const link of links) {
+                for (const card of cards) {
+                    const link = card.querySelector('a[href*=\"/event/\"], a[href*=\"/evento/\"], a[href*=\"/events/\"]');
+                    if (!link) continue;
+                    
                     let url = link.href.split(\"?\")[0];
-                    if (url.endsWith(\"/\")) {
-                        url = url.slice(0, -1);
-                    }
-                    
+                    if (url.endsWith(\"/\")) url = url.slice(0, -1);
                     if (!url || seen.has(url)) continue;
-                    // Ignore category or archive links if they match the pattern
-                    if (url.includes(\"/category/\") || url.includes(\"/tag/\")) continue;
-                    
                     seen.add(url);
                     
-                    const container = link.closest(\"article, div[class*='event']\") || link.parentElement;
-                    const text = container ? container.textContent : link.textContent;
-                    
-                    // Nombre
-                    const heading = container ? container.querySelector(\"h1, h2, h3, h4\") : null;
+                    const text = card.textContent;
+                    const heading = card.querySelector(\"h1, h2, h3, h4, .em-item-title\");
                     let nombre = heading ? heading.textContent.trim() : link.textContent.trim();
                     if (!nombre || nombre.length < 4) continue;
                     
-                    // Imagen
                     let imgSrc = null;
-                    if (container) {
-                        const img = container.querySelector(\"img\");
-                        imgSrc = img ? (img.src || img.dataset.src) : null;
-                    }
+                    const img = card.querySelector(\"img\");
+                    imgSrc = img ? (img.src || img.dataset.src) : null;
                     
                     results.push({
                         nombre: nombre,
@@ -157,6 +148,40 @@ async def scrape_telde_cultura(page: Page) -> list[Evento]:
         """)
 
         print(f"   -> {len(items)} tarjetas detectadas en TeldeCultura")
+
+        # Fallback si el diseño web cambió drásticamente (0 tarjetas detectadas con el selector preciso)
+        if len(items) == 0:
+            print(f"   ⚠️ Fallback TeldeCultura: Buscando enlaces huérfanos vía regex en el DOM...")
+            items = await page.evaluate("""
+                () => {
+                    const fallback_results = [];
+                    const all_links = document.querySelectorAll('a[href*=\"teldecultura.org/events/\"], a[href*=\"teldecultura.org/event/\"]');
+                    const seen_fb = new Set();
+                    for (const link of all_links) {
+                        let url = link.href.split(\"?\")[0];
+                        if (url.endsWith(\"/\")) url = url.slice(0, -1);
+                        if (!url || seen_fb.has(url)) continue;
+                        if (url.includes(\"/category/\") || url.includes(\"/tag/\")) continue;
+                        seen_fb.add(url);
+                        
+                        let nombre = link.textContent.trim();
+                        if (!nombre || nombre.length < 4) {
+                            // Extraer nombre del slug de la URL
+                            const parts = url.split('/');
+                            nombre = parts[parts.length - 1].replace(/-/g, ' ').toUpperCase();
+                        }
+                        
+                        fallback_results.push({
+                            nombre: nombre,
+                            url: url,
+                            fullText: link.parentElement ? link.parentElement.textContent : \"\",
+                            img: null
+                        });
+                    }
+                    return fallback_results;
+                }
+            """)
+            print(f"   -> {len(items)} tarjetas recuperadas vía Fallback en TeldeCultura")
 
         hoy = datetime.now().strftime("%Y-%m-%d")
         cursos_filtrados = 0

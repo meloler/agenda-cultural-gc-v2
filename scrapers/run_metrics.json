@@ -1,0 +1,13 @@
+{
+    "timestamp": "2026-02-28T12:04:36.239956",
+    "elapsed_seconds": 45.2,
+    "total_eventos": 70,
+    "totales_confirmados": 70,
+    "totales_borradores": 0,
+    "pct_hora_vacia_en_conf": 14.29,
+    "pct_precio_vacio_en_conf": 28.57,
+    "distribucion_fuentes": {
+        "TomaTicket": 50,
+        "Entr\u00e9es.es": 20
+    }
+}

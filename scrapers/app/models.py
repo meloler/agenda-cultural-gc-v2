@@ -9,9 +9,10 @@ v3 — Scraping de Precisión: eliminada columna 'precio' (texto "Ver web").
      precio_num es la fuente de verdad numérica.
 """
 
-from typing import Optional
+from typing import Optional, Dict, List, Any
+from datetime import datetime, timezone
 
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Text, JSON, DateTime
 from sqlmodel import Field, SQLModel
 
 
@@ -47,6 +48,25 @@ class Evento(SQLModel, table=True):
     hora: Optional[str] = None
     estado: str = Field(default="upcoming", index=True)
     enriquecido: bool = Field(default=False)
+    
+    # === CONCEPTUALIZACIÓN EVENT / OCCURRENCE ===
+    # Cada fila en esta tabla actúa como EventOccurrence (sesión única).
+    # Este event_group_id agrupará lógicamente múltiples sesiones bajo un Evento Canónico master
+    # sin tener que romper el pipeline flat actual con JOINs complejos.
+    event_group_id: Optional[str] = Field(default=None, index=True)
+    
+    # === METADATOS DE CALIDAD Y CONFIANZA ===
+    # Ejemplo: {"fecha": 1.0, "hora": 0.8, "precio": 0.5, "lugar": 1.0}
+    field_confidence: Dict[str, float] = Field(default_factory=dict, sa_column=Column(JSON, nullable=True))
+    
+    # Prioridad de la fuente (EntradasCanarias=10, Ticketmaster=20, TomaTicket=30, Scrapers=50)
+    source_priority: int = Field(default=50)
+    
+    # Etiquetas analíticas: "ai_description_generated", "improbable_hour_stripped", "fallback_location"
+    quality_flags: List[str] = Field(default_factory=list, sa_column=Column(JSON, nullable=True))
+    
+    # Trazabilidad de vivo/muerto en el crawler
+    last_seen_at: Optional[datetime] = Field(default=None, sa_column=Column(DateTime(timezone=True), nullable=True))
 
     @property
     def es_borrador(self) -> bool:

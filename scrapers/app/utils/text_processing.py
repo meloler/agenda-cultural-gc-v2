@@ -4,6 +4,7 @@ Extraído de main.py por Data_Refinery_Agent.
 """
 
 import re
+import pandas as pd
 from urllib.parse import unquote
 
 
@@ -63,3 +64,49 @@ def categorizar_pro(nombre: str, organiza: str) -> str:
     if any(x in n for x in ['humor', 'monologo', 'comedia']):
         return 'Humor'
     return 'Otros'
+
+
+def normalizar_titulo_export(t: str) -> str:
+    if pd.isna(t) or not t: return ""
+    t = str(t).strip()
+    # Quitar sufijos geográficos redundantes (" en Gran Canaria", " | Las Palmas de Gran Canaria")
+    pattern = r'(?i)\s*[-|/,]*\s*(?:en\s+)?(?:las palmas de gran canaria|las palmas|gran canaria|islas canarias|canarias|telde|infecar)\b\s*$'
+    t = re.sub(pattern, '', t)
+    # Limpiar separadores colgantes por si acaso
+    t = re.sub(r'(?i)\s+[-|/,]\s*$', '', t)
+    return t.strip()
+
+
+def limpiar_lugar(lugar: str) -> str | None:
+    l = (lugar or "").strip()
+    if not l: return None
+    # Lista masiva de frases narrativas para evitar escapes
+    leak_tokens = ["paseo nocturno", "prepárate", "descubre", "que no olvidarás", "la cara más natural", "calle y los", "plaza y", "disfruta", "sumérgete", "vive la experiencia", "te esperamos", "no te pierdas", "aventura", "te invitamos", "https://", "conoce al autor", "abierto al público", "te imaginas", "asombroso", "fantástico", "reservando", "incluye", "taquilla", "entrada libre"]
+    if len(l) > 150: return None  # Don't kill legit 70-150 char places
+    if any(tok in l.lower() for tok in leak_tokens): return None
+    
+    # Resolver Alias
+    import unicodedata
+    low = l.lower()
+    norm = unicodedata.normalize("NFKD", low).encode('ASCII', 'ignore').decode('ASCII')
+    
+    if "kraus" in norm or "auditorio alfredo" in norm:
+        return "Auditorio Alfredo Kraus"
+    if "galdos" in norm and "perez" in norm:
+        return "Teatro Pérez Galdós"
+    if "guiniguada" in norm:
+        return "Teatro Guiniguada"
+    if "cicca" in norm:
+        return "Fundación CICCA"
+    if "cuyas" in norm:
+        return "Teatro Cuyás"
+    if "victor jara" in norm:
+        return "Teatro Víctor Jara"
+    if "gran canaria arena" in norm or "gc arena" in norm:
+        return "Gran Canaria Arena"
+    if "infecar" in norm:
+        return "INFECAR"
+    if "estadio de gran canaria" in norm:
+        return "Estadio de Gran Canaria"
+        
+    return l or None

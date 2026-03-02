@@ -53,7 +53,10 @@ async def scrape_cultura_canaria(page: Page, url_base: str, recinto: str) -> lis
                     url_full = item.get("url")
                     if not url_full:
                         slug = item.get("slug")
-                        if slug:
+                        id_evento = item.get("id")
+                        if slug and id_evento:
+                            url_full = f"{url_base}/evento/{slug}/{id_evento}"
+                        elif slug:
                             url_full = f"{url_base}/evento/{slug}"
                     
                     # A veces la URL viene relativa

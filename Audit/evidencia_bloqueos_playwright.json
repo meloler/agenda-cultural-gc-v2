@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://entrees.es/busqueda/gran-canaria",
+    "title": "Just a moment...",
+    "blocked_markers": {
+      "just_a_moment": false,
+      "security_verification": true,
+      "browsing_paused": false,
+      "identity_verified": false,
+      "cloudflare": true
+    },
+    "anchor_count": 2,
+    "preview": "entrees.es\nperforming security verification\n\nthis website uses a security service to protect against malicious bots. this page is displayed while the website verifies you are not a bot.\n\nray id: 9d44f9783d49f7ae\nperformance and security by cloudflare\nprivacy"
+  },
+  {
+    "url": "https://www.ticketmaster.es/search?q=gran%20canaria",
+    "title": "",
+    "blocked_markers": {
+      "just_a_moment": false,
+      "security_verification": false,
+      "browsing_paused": true,
+      "identity_verified": false,
+      "cloudflare": false
+    },
+    "anchor_count": 2,
+    "preview": "your browsing activity has been paused\nwe've detected unusual behavior on either your network or your browser.\n\nto resolve this:\n\nsign in to your account if you haven't already\nchange your wi-fi or cellular network\nswitch devices or move to a different location if possible\n46.225.64.147\n08aec683-6b78-4549-a411-c97b15dbe4c0\nwe and our partners process data to provide:\n\nuse precise geolocation data. actively scan device characteristics for identifi"
+  },
+  {
+    "url": "https://www.entradas.com/search/?affiliate=EES&searchterm=Gran+canaria",
+    "error": "Page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.entradas.com/search/?affiliate=EES&searchterm=Gran+canaria"
+  }
+]

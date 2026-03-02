@@ -1,0 +1,24 @@
+{
+  "total_eventos": 360,
+  "confirmados": 281,
+  "borradores": 79,
+  "metrics": {
+    "missing_fecha_pct": 0.0,
+    "missing_hora_pct": 0.0,
+    "missing_precio_pct": 0.0,
+    "missing_img_pct": 0.0,
+    "dupes_same_source": 0,
+    "dupes_cross_pct": 0.0,
+    "titulos_basura": 0,
+    "lugares_contaminados": 0,
+    "precios_imposibles": 0,
+    "nan_en_export": 29,
+    "horas_sentinel": 11,
+    "borradores_pct": 21.94
+  },
+  "passed": false,
+  "failures": [
+    "horas_sentinel > 0",
+    "borradores > 15%"
+  ]
+}

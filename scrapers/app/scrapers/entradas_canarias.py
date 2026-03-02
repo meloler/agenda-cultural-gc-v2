@@ -142,18 +142,21 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                     date_str = sess.get("date", "")
                     fecha_iso_val = None
                     hora_val = None
+                    sess_id = sess.get("id", "")
                     if date_str:
+                        from dateutil.parser import isoparse
+                        from zoneinfo import ZoneInfo
                         try:
-                            if "T" in date_str:
-                                fecha_iso_val = date_str.split("T")[0]
-                                hora_val = date_str.split("T")[1][:5]
-                            else:
-                                fecha_iso_val = date_str[:10]
+                            dt = isoparse(date_str)
+                            if dt.tzinfo is not None:
+                                dt = dt.astimezone(ZoneInfo("Atlantic/Canary"))
+                            fecha_iso_val = dt.date().isoformat()
+                            hora_val = dt.strftime("%H:%M")
                         except Exception:
                             pass
 
-                    # Para deduplicar internamente (masterId + fecha o slug + fecha + venue)
-                    dup_key = f"{master_id}_{fecha_iso_val}" if master_id and fecha_iso_val else f"{slug}_{fecha_iso_val}_{venue}"
+                    # Para deduplicar internamente (masterId + fecha + hora o slug + fecha + hora + venue)
+                    dup_key = f"{master_id}_{fecha_iso_val}_{hora_val}" if master_id and fecha_iso_val else f"{slug}_{fecha_iso_val}_{hora_val}_{venue}"
                     if dup_key in seen_keys:
                         continue
                     seen_keys.add(dup_key)
@@ -167,6 +170,7 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                         "fecha_raw": date_str or "Sin fecha",
                         "fecha_iso": fecha_iso_val,
                         "hora_api": hora_val,
+                        "source_id": f"EC|{master_id or slug}|{sess_id}",
                     })
             except Exception:
                 continue
@@ -218,23 +222,26 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                 try:
                     detalle = await enriquecer_evento(page, raw["url_full"], raw["nombre"], seen_texts)
                     imagen_final = _validar_imagen(detalle["imagen_url"]) or raw["img_card"]
-                    fecha_iso = detalle["fecha_iso"] or raw["fecha_iso"]
-                    fecha_raw = detalle.get("fecha_raw") or raw["fecha_raw"]
-                    precio = detalle["precio_num"]
-                    hora = detalle["hora"] or raw.get("hora_api")
+                    
+                    # Las sesiones API son más fiables por cada pase horario que la página individual (que puede tener múltiples pasados)
+                    fecha_iso = raw["fecha_iso"] or detalle["fecha_iso"]
+                    fecha_raw = raw["fecha_raw"] or detalle.get("fecha_raw")
+                    hora = raw.get("hora_api") or detalle["hora"]
+                    
+                    precio = detalle["precio_num"] if detalle["precio_num"] is not None else raw.get("precio_api")
                     descripcion = detalle["descripcion"]
                 except Exception:
                     imagen_final = raw["img_card"]
                     fecha_iso = raw["fecha_iso"]
                     fecha_raw = raw["fecha_raw"]
-                    precio = None
+                    precio = raw.get("precio_api")
                     hora = raw.get("hora_api")
                     descripcion = None
             else:
                 imagen_final = raw["img_card"]
                 fecha_iso = raw["fecha_iso"]
                 fecha_raw = raw["fecha_raw"]
-                precio = None
+                precio = raw.get("precio_api")
                 hora = raw.get("hora_api")
                 descripcion = None
 
@@ -251,6 +258,7 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                     imagen_url=imagen_final,
                     descripcion=descripcion,
                     estilo=categorizar_pro(raw["nombre"], "EntradasCanarias"),
+                    source_id=raw.get("source_id"),
                 )
             )
 

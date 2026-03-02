@@ -6,6 +6,7 @@ Regla: eventos sin fecha_iso son 'Borrador' y no aparecen en el Excel limpio.
 """
 
 import asyncio
+import time
 from datetime import datetime, date
 import pandas as pd
 from dotenv import load_dotenv
@@ -14,6 +15,7 @@ from sqlmodel import select as sql_select
 
 # Módulos de la aplicación
 from app.models import Evento
+from app.utils.observability import generar_reporte_observabilidad
 from app.auditor import auditar_eventos
 from app.classifier import categorizar_eventos
 from app.cleaner import ejecutar_limpieza_db
@@ -140,6 +142,7 @@ def generar_enlace_mapa_seguro(row):
 
 async def main():
     """Punto de entrada principal."""
+    start_time = time.time()
     load_dotenv()
 
     print("=" * 60)
@@ -204,27 +207,25 @@ async def main():
 
     # 1️⃣ Títulos basura: len < 3 (ej: "Dr.", "2", "A") y patrones irregulares
     import re
-    def es_titulo_basura(t) -> bool:
-        t = (str(t) if pd.notna(t) else "").strip()
+    def es_titulo_basura(t: str) -> bool:
+        t = (t or "").strip()
         low = t.lower()
         if low in {"ext", "nan", "none", "null", ""}: return True
-        if len(t) <= 4: return True
+        if len(t) < 2: return True  # titles like "BEBE" or "UB40", "O" are allowed
         if len(t) >= 110: return True
         if re.search(r"\b\d{3}\b.*\b\d{3}\b", t): return True
         if t.endswith("..."): return True
         return False
 
-    df = df[~df["nombre"].apply(es_titulo_basura)]
+    # En vez de eliminarlos, los mandamos a 'Borradores' (staging) para no publicarlos
+    df.loc[df["nombre"].apply(es_titulo_basura), "fecha_iso"] = None
 
-    # 1.5️⃣ Sanitización de lugar
-    def limpiar_lugar(lugar) -> str | None:
-        l = (str(lugar) if pd.notna(lugar) else "").strip()
-        if not l: return None
-        leak_tokens = ["paseo nocturno", "prepárate", "descubre", "que no olvidarás", "la cara más natural", "calle y los"]
-        if len(l) > 70: return None
-        if any(tok in l.lower() for tok in leak_tokens): return None
-        return l or None
+    # 1.2️⃣ Canonical Title Normalizer (User-Facing)
+    from app.utils.text_processing import normalizar_titulo_export, limpiar_lugar
 
+    df["nombre"] = df["nombre"].apply(normalizar_titulo_export)
+
+    # 1.5️⃣ Sanitización y Alias Resolution de lugar
     df["lugar"] = df["lugar"].apply(limpiar_lugar)
 
     # 2️⃣ Precios absurdos: > 300€ se consideran error de año (2025/2026)
@@ -232,11 +233,13 @@ async def main():
     df["precio_num"] = pd.to_numeric(df["precio_num"], errors='coerce')
     df.loc[df["precio_num"] > 300, "precio_num"] = None
 
-    # 2.2️⃣ QA Gate: Hora vacía
-    pct_hora_vacia = df["hora"].isna().mean() * 100
-    if len(df) > 0 and pct_hora_vacia > 25.0:
-        print(f"\n🔥 ALERTA P0 DevOps FULL STOP: Demasiados eventos sin hora ({pct_hora_vacia:.1f}% > 25%). Abortando exportación.\n")
-        return
+    # 2.2️⃣ QA Gate: Hora vacía (solo en eventos confirmados)
+    df_conf = df[df["fecha_iso"].notna()]
+    if len(df_conf) > 0:
+        vacias = df_conf["hora"].isna() | (df_conf["hora"].astype(str).str.strip() == "") | (df_conf["hora"].astype(str).str.lower().isin(["nan", "none", "<na>"]))
+        pct_hora_vacia = vacias.mean() * 100
+        if pct_hora_vacia > 7.0:
+            raise RuntimeError(f"QA FAIL: hora vacía en confirmados {pct_hora_vacia:.1f}% > 7%")
 
     # 2.5️⃣ QA Gate: Títulos genéricos (P0)
     df["_es_generico_titulo"] = df["nombre"].apply(lambda x: es_titulo_generico(str(x)))
@@ -249,8 +252,8 @@ async def main():
             print(f"\n🔥 ALERTA P0 DevOps FULL STOP: Demasiados títulos genéricos ({generic_ratio:.1f}% > 5%). Abortando exportación para no corromper Excel/DB.\n")
             return
             
-    # Limpiamos preventivamente los que hayan pasado (si <= 5%)
-    df = df[~df["_es_generico_titulo"]]
+    # En vez de eliminarlos, los mandamos a 'Borradores'
+    df.loc[df["_es_generico_titulo"], "fecha_iso"] = None
 
     # 2.8️⃣ Política temporal: Recortar pasados (agenda es futura)
     today_iso = date.today().isoformat()
@@ -269,10 +272,10 @@ async def main():
         ascending=[True, True, False] # False (Específico) primero, luego Desc más larga
     )
     
-    # Clave fuerte para evitar fusionar eventos distintos el mismo día
-    df = df.drop_duplicates(subset=["_titulo_norm", "fecha_iso", "_lugar_norm", "_hora_norm"], keep="first")
-
-    # 3.5️⃣ Deduplicación de consolidación multi-fuente (canonical+fecha)
+    # 3.1️⃣ Dedupe SAME-SOURCE estricto (misma fuente, misma URL/sesión, misma fecha/hora)
+    df = df.drop_duplicates(subset=["organiza", "url_venta", "fecha_iso", "_hora_norm"], keep="first")
+    
+    # 3.5️⃣ Dedupe CROSS-SOURCE con scoring y provenance
     PREF = {"Ticketmaster": 100, "EntradasCanarias": 90, "Tickety": 80, "Tomaticket": 70, "CICCA": 65, "Teatro Guiniguada": 65, "Entrées.es": 40}
 
     def quality_score(r):
@@ -282,10 +285,36 @@ async def main():
         s += 10 if pd.notna(r["lugar"]) and str(r["lugar"]).strip() else 0
         return s
 
-    df["_canon"] = df["nombre"].apply(lambda x: _normalizar(str(x)))
+    def normalizar_titulo(t: str) -> str:
+        if pd.isna(t) or not t: return ""
+        import unicodedata
+        t = str(t).lower().strip()
+        t = unicodedata.normalize("NFKD", t)
+        t = "".join(c for c in t if not unicodedata.combining(c))
+        stopwords = [
+            "en gran canaria", "en las palmas", "en las palmas de gran canaria",
+            "entradas para", "entradas", "tickets for", "tickets",
+            "2025", "2026", "25/26", "tour", "gira", "concierto"
+        ]
+        for w in stopwords:
+            t = t.replace(w, "")
+        t = re.sub(r'[^a-z0-9\s]', '', t)
+        return re.sub(r'\s+', ' ', t).strip()
+
+    df["_canon"] = df["nombre"].apply(normalizar_titulo)
     df["_score"] = df.apply(quality_score, axis=1)
+    
+    # Setup cross-source deduplication key (Canonical Title + Date + Time + Normalized Place)
+    dup_key_cols = ["_canon", "fecha_iso", "_hora_norm", "_lugar_norm"]
+    
+    # Aggregate sources for traceability
+    grouped_sources = df.groupby(dup_key_cols)["organiza"].apply(lambda x: " + ".join(sorted(set(x)))).reset_index(name="merged_from_sources")
+    
     df = df.sort_values(["_canon", "fecha_iso", "_score"], ascending=[True, True, False])
-    df = df.drop_duplicates(subset=["_canon", "fecha_iso"], keep="first")
+    df = df.drop_duplicates(subset=dup_key_cols, keep="first")
+    
+    # Unir la trazabilidad
+    df = df.merge(grouped_sources, on=dup_key_cols, how="left")
 
     df = df.drop(columns=["_titulo_norm", "_lugar_norm", "_hora_norm", "_es_generico_lugar", "_len_desc", "_es_generico_titulo", "_canon", "_score"])
 
@@ -300,7 +329,22 @@ async def main():
     # 4️⃣ Generación de Mapa Seguro
     df["ver_mapa"] = df.apply(generar_enlace_mapa_seguro, axis=1)
 
-    # === Exportación ===
+    # === Exportación UX (P2) ===
+    # 1. Precio desconocido -> "Consultar" (en DB quedará Null transparentemente por script de upload)
+    df["precio_num"] = df["precio_num"].fillna("Consultar")
+    # 2. Hora desconocida -> "Hora por confirmar"
+    df["hora"] = df["hora"].replace(["", "nan", "None", "<NA>", "NaN"], pd.NA).fillna("Hora por confirmar")
+    # 3. Lugar por defecto -> "Recinto por confirmar" (mejor que "Sin especificar")
+    df["lugar"] = df["lugar"].replace(["Sin especificar", None, "", "nan", "NaN"], "Recinto por confirmar")
+    # 4. Imagen inválida: Limpieza extrema (rechazar data URIs o paths rotos)
+    def clean_img_ux(url):
+        u = str(url).strip()
+        if not u.startswith("http") or len(u) < 15:
+            return None
+        return u
+    df["imagen_url"] = df["imagen_url"].apply(clean_img_ux)
+
+    # === Split Confirmados vs Borradores ===
     df_confirmados = df[df["fecha_iso"].notna()].copy()
     df_borradores = df[df["fecha_iso"].isna()].copy()
 
@@ -318,6 +362,7 @@ async def main():
         "imagen_url": "Imagen",
         "descripcion": "Descripción",
         "ver_mapa": "Ver en Mapa",
+        "merged_from_sources": "Fuentes Combinadas",
     }
 
     # Excel Final Limpio
@@ -333,6 +378,10 @@ async def main():
         df_borr_export = df_borradores[list(columnas_excel.keys())].rename(columns=columnas_excel)
         df_borr_export.to_excel(filename_borradores, index=False)
         print(f"   ⚠️ Eventos sin fecha (Borradores): {len(df_borradores)}")
+
+    # 10. Reporte Final de Observabilidad (KPIs & Regression Logs)
+    elapsed_time = time.time() - start_time
+    generar_reporte_observabilidad(df_confirmados, df_borradores, elapsed_time)
 
 
 def actualizar_estado_eventos():

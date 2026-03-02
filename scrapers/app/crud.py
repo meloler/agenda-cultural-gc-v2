@@ -4,6 +4,7 @@ v3 — Scraping de Precisión: sin columna 'precio', usa precio_num/hora directo
 """
 
 import hashlib
+from datetime import datetime, timezone
 from sqlmodel import Session, select
 
 from app.database import get_session
@@ -55,9 +56,17 @@ def guardar_eventos_db(eventos: list[Evento]) -> dict[str, int]:
                 existente.url_venta = evento.url_venta
                 # Resetear flag para re-enriquecer con IA si los datos cambiaron
                 existente.enriquecido = False
+                existente.last_seen_at = datetime.now(timezone.utc)
+                
+                # Actualizar también group id y flags si las pasa el scraper
+                if evento.event_group_id: existente.event_group_id = evento.event_group_id
+                if evento.quality_flags: existente.quality_flags = evento.quality_flags
+                if evento.field_confidence: existente.field_confidence = evento.field_confidence
+                
                 session.add(existente)
                 actualizados += 1
             else:
+                evento.last_seen_at = datetime.now(timezone.utc)
                 nuevo = Evento(
                     nombre=evento.nombre,
                     lugar=evento.lugar,
@@ -75,6 +84,11 @@ def guardar_eventos_db(eventos: list[Evento]) -> dict[str, int]:
                     hora=evento.hora,
                     hash_id=evento.hash_id,
                     enriquecido=False,
+                    event_group_id=evento.event_group_id,
+                    field_confidence=evento.field_confidence,
+                    source_priority=evento.source_priority,
+                    quality_flags=evento.quality_flags,
+                    last_seen_at=evento.last_seen_at,
                 )
                 session.add(nuevo)
                 insertados += 1

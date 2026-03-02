@@ -60,24 +60,37 @@ async def scrape_entradas_com(page: Page) -> list[Evento]:
         }
         await page.context.set_extra_http_headers(headers)
 
-        try:
-            await page.goto(
-                "https://www.entradas.com/search/?affiliate=EES&searchterm=Gran+canaria",
-                wait_until="load", # Cambiado de domcontentloaded a load
-                timeout=30000,
-            )
-        except Exception as e:
-            if "ERR_HTTP2_PROTOCOL_ERROR" in str(e):
-                print("   ⚠️ Reintentando Entradas.com por error de protocolo HTTP2...")
-                await asyncio.sleep(2)
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
                 await page.goto(
                     "https://www.entradas.com/search/?affiliate=EES&searchterm=Gran+canaria",
-                    wait_until="commit",
+                    wait_until="load",
                     timeout=30000,
                 )
-                await page.wait_for_timeout(5000)
-            else:
-                raise e
+                break
+            except Exception as e:
+                err_msg = str(e)
+                print(f"   ⚠️ Error cargando Entradas.com (intento {attempt+1}/{max_retries}): {err_msg.split(':')[0]}")
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                    if "ERR_HTTP2_PROTOCOL_ERROR" in err_msg:
+                        try:
+                            print("      [Estrategia Fallback] Descargando HTML vía API_request puro...")
+                            resp = await page.request.get(
+                                "https://www.entradas.com/search/?affiliate=EES&searchterm=Gran+canaria",
+                                timeout=30000,
+                                headers=headers
+                            )
+                            if resp.ok:
+                                html = await resp.text()
+                                await page.set_content(html, wait_until="load", timeout=15000)
+                                break
+                        except Exception as inner_e:
+                            print(f"      [Fallback falló]: {inner_e}")
+                else:
+                    print(f"   ❌ Cancelando Entradas.com tras {max_retries} intentos.")
+                    return []
 
         # Esperar a que carguen los resultados
         try:

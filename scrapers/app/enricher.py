@@ -31,14 +31,14 @@ Para cada evento recibirás: id, nombre, descripcion_raw, lugar_actual, precio_n
 
 Debes devolver SOLO un JSON array. Cada elemento debe tener:
 - "id": (int) el id del evento
-- "descripcion_limpia": (string) Un resumen editorial de exactamente 3 párrafos cortos (máx 500 chars total).
+- "descripcion_limpia": (string|null) Un resumen editorial de exactamente 3 párrafos cortos (máx 500 chars total).
   - Párrafo 1: Qué es el evento y por qué es especial.
   - Párrafo 2: Detalles prácticos (lugar, artistas, programa).
   - Párrafo 3: Llamada a la acción o dato curioso.
   - Si la descripción original es buena, resúmela manteniendo lo esencial.
   - Si tiene "paja" (condiciones legales, textos genéricos de compra), ignórala y redacta algo coherente.
-  - Si no hay descripción, genera una breve y atractiva basada en el nombre del evento.
-  - Marca con "[Generado por IA]" al final SOLO si has inventado la descripción sin datos reales.
+  - CRÍTICO: Si no hay descripción_raw en absoluto para basarte, NO INVENTES NADA. Devuelve null. No alucines artistas ni tramas.
+  - CRÍTICO: Si la descripción ha sido redactada fuertemente por ti basándote en un contexto muy pobre, DEBES incluir obligatoriamente la etiqueta explícita "[Descripción generada por IA]" al comienzo o final del texto, sin mezclarla con factuales no etiquetados.
   - Escribe siempre en español.
 - "precio_num": (float|null) Solo si encuentras un precio en la descripción que NO esté ya en precio_num_actual. Ejemplos: "Desde 25€" → 25.0, "Gratuito" → 0.0, sin precio → null.
 - "hora": (string|null) Solo si encuentras una hora en la descripción que NO esté ya en hora_actual. Formato HH:MM (24h). Si no la ves → null.

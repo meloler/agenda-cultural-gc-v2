@@ -16,82 +16,32 @@ Selectores validados por inspección directa del DOM (2026-02-18):
 
 import json
 import re
+import asyncio
+import time
+import logging
 from urllib.parse import urlparse
-
 from playwright.async_api import Page
+from app.utils.text_processing import categorizar_pro, inferir_nombre, limpiar_texto
+from app.utils.parsers import (
+    _parsear_precio, _parsear_fecha, _parsear_hora, _validar_imagen,
+    es_paja, es_titulo_generico,
+    RE_PRECIO, RE_DESDE, RE_RANGO, RE_FECHA_ISO, RE_FECHA_DMY_SLASH, 
+    RE_FECHA_DMY_TEXT, RE_HORA, RE_A_LAS, RE_HORA_SHORT, MESES
+)
 
-from app.utils.text_processing import limpiar_texto
-
-# ─────────────────────────────────────────────────────────────────────
-# Blacklist de paja
-# ─────────────────────────────────────────────────────────────────────
-BLACKLIST = [
-    "condiciones de compra", "condiciones generales",
-    "política de privacidad", "aviso legal",
-    "cambios o devoluciones", "cambios ni devoluciones",
-    "cookies", "copyright", "newsletter", "suscríbete",
-    "términos y condiciones", "protección de datos",
-    "ley orgánica", "responsabilidad del organizador",
-    "footer", "síguenos en", "todos los derechos",
-    "barra libre", "mayores de 18",
-]
-
-GENERIC_TITLES = [
-    "entradas para los mejores eventos", "entradas para", 
-    "tickets for the best events", "tickets for",
-    "compra tus entradas", "anuncio genérico", "entradas",
-    "abono", "bono", "agenda gc", "inicio -", "entrees", "tomaticket", "tickety"
-]
-
-def es_titulo_generico(titulo: str) -> bool:
-    """Detecta si un título es propaganda genérica del portal en lugar de un evento."""
-    if not titulo:
-        return True
-    t = titulo.lower().strip()
-    if len(t) < 3:
-        return True
-    return any(g in t for g in GENERIC_TITLES)
+# es_titulo_generico and es_paja moved to app.utils.parsers
 
 
 # ─────────────────────────────────────────────────────────────────────
 # Regex patterns compilados
 # ─────────────────────────────────────────────────────────────────────
-RE_PRECIO = re.compile(
-    r'(\d+[.,]?\d*)\s*€|€\s*(\d+[.,]?\d*)|(\d+[.,]?\d*)\s*euros',
-    re.IGNORECASE,
-)
-RE_DESDE = re.compile(r'desde[:\s]+(\d+[.,]?\d*)', re.IGNORECASE)
-RE_RANGO = re.compile(r'(\d+[.,]?\d*)\s*[-–—]\s*(\d+[.,]?\d*)\s*€', re.IGNORECASE)
-RE_HORA = re.compile(
-    r'(?:^|[\s,;(T])(\d{1,2})[:.hH](\d{2})(?:\s*(?:h|hrs?|horas?))?(?:\b|$)',
-    re.IGNORECASE,
-)
-RE_FECHA_ISO = re.compile(r'(\d{4})-(\d{2})-(\d{2})')
-RE_FECHA_DMY_SLASH = re.compile(r'(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})')
-RE_FECHA_DMY_TEXT = re.compile(
-    r'(\d{1,2})\s*(?:de\s+)?(?:del?\s+)?'
-    r'(enero|febrero|marzo|abril|mayo|junio|julio|agosto|'
-    r'septiembre|octubre|noviembre|diciembre)'
-    r'(?:\s+(?:de\s+)?(\d{4}))?',
-    re.IGNORECASE,
-)
-RE_A_LAS = re.compile(r'a\s+las?\s+(\d{1,2})[:.hH](\d{2})', re.IGNORECASE)
-
-MESES = {
-    'enero': '01', 'febrero': '02', 'marzo': '03', 'abril': '04',
-    'mayo': '05', 'junio': '06', 'julio': '07', 'agosto': '08',
-    'septiembre': '09', 'octubre': '10', 'noviembre': '11', 'diciembre': '12',
-}
+# Regex and MESES moved to app.utils.parsers
 
 
 # ─────────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────────
-def es_paja(texto: str) -> bool:
-    """Devuelve True si el texto parece boilerplate legal/footer/promo."""
-    texto_lower = texto.lower()
-    hits = sum(1 for kw in BLACKLIST if kw in texto_lower)
-    return hits >= 2
+# es_paja moved to app.utils.parsers
 
 
 def _detectar_dominio(url: str) -> str:
@@ -121,121 +71,14 @@ def _detectar_dominio(url: str) -> str:
         return "entradas_com"
     if "teldecultura" in domain:
         return "teldecultura"
+    if "teatroperezgaldos" in domain:
+        return "teatro_galdos"
+    if "auditorioalfredokraus" in domain:
+        return "auditorio"
     return "generico"
 
 
-def _parsear_precio(texto: str) -> float | None:
-    """Extrae el precio numérico más bajo de un texto."""
-    if not texto:
-        return None
-    texto = texto.replace(",", ".")
-    # "Gratis", "Gratuito"
-    if any(kw in texto.lower() for kw in ["gratis", "gratuito", "entrada libre", "free"]):
-        return 0.0
-
-    precios: list[float] = []
-    # "Desde 25€"
-    for m in RE_DESDE.finditer(texto):
-        try:
-            precios.append(float(m.group(1)))
-        except ValueError:
-            pass
-    # "15-30€" (rangos)
-    for m in RE_RANGO.finditer(texto):
-        try:
-            precios.append(float(m.group(1)))
-            precios.append(float(m.group(2)))
-        except ValueError:
-            pass
-    for m in RE_PRECIO.finditer(texto):
-        val = m.group(1) or m.group(2) or m.group(3)
-        if val:
-            try:
-                precios.append(float(val))
-            except ValueError:
-                pass
-    return min(precios) if precios else None
-
-
-def _parsear_fecha(texto: str) -> str | None:
-    """Extrae fecha ISO (YYYY-MM-DD) de un texto."""
-    if not texto:
-        return None
-    # ISO directo: 2026-02-14
-    m = RE_FECHA_ISO.search(texto)
-    if m:
-        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-    # dd/mm/yyyy o dd/mm/yy o dd-mm-yyyy
-    m = RE_FECHA_DMY_SLASH.search(texto)
-    if m:
-        dia, mes, anio = m.group(1).zfill(2), m.group(2).zfill(2), m.group(3)
-        if len(anio) == 2:
-            anio = "20" + anio # asume 20xx
-        return f"{anio}-{mes}-{dia}"
-    # "14 de febrero 2026"
-    m = RE_FECHA_DMY_TEXT.search(texto)
-    if m:
-        dia = m.group(1).zfill(2)
-        mes = MESES.get(m.group(2).lower())
-        if mes:
-            anio = m.group(3) or "2026"
-            return f"{anio}-{mes}-{dia}"
-    return None
-
-
-def _parsear_hora(texto: str) -> str | None:
-    """Extrae hora HH:MM de un texto."""
-    if not texto:
-        return None
-        
-    hora_final = None
-    # "a las 19:30"
-    m = RE_A_LAS.search(texto)
-    if m:
-        h, mins = int(m.group(1)), m.group(2)
-        if 0 <= h <= 23:
-            hora_final = f"{h:02d}:{mins}"
-            
-    if not hora_final:
-        # "19:30h", "20.00", "T20:00:00"
-        m = RE_HORA.search(texto)
-        if m:
-            h, mins = int(m.group(1)), m.group(2)
-            if 0 <= h <= 23:
-                hora_final = f"{h:02d}:{mins}"
-
-    if hora_final == "22:33":
-        return None  # Entrées sentinel hour for unpublished/generic
-        
-    if hora_final == "00:00" and "T00:00" in texto:
-        return None  # Default ISO hour without real time meaning
-        
-    # Descartar extraña hora 12:00 genérica frecuente de Entrées si proviene de un default JSON (aunque difícil de asegurar, 12:00 al mediodía sí puede ser válido. Nos fijamos en "T12:00:00" o similar).
-    if hora_final == "12:00" and ("T12:00:00" in texto or "T00:00:00" in texto):
-        return None
-        
-    if hora_final == "10:31" and "10:31" in texto: 
-        # A veces Ticketmaster/otros meten 10.31€ como precio y se toma como hora.
-        # Mejor ignorar horas locas sacadas de céntimos.
-        # Wait, just to be safe.
-        pass
-
-    return hora_final
-
-
-def _validar_imagen(url: str | None) -> str | None:
-    """Filtra URLs de imagen inválidas."""
-    if not url:
-        return None
-    url_upper = url.upper()
-    # Filtrar eNULL, NULL, placeholder, etc.
-    if any(x in url_upper for x in ["NULL", "PLACEHOLDER", "NOIMAGE", "DEFAULT"]):
-        return None
-    if not url.startswith("http"):
-        return None
-    if len(url) < 20:
-        return None
-    return url
+# Parser functions moved to app.utils.parsers
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -306,7 +149,7 @@ async def _extraer_tomaticket(page: Page, result: dict) -> dict:
                 continue
 
     # FECHA + HORA: p.fecha-info ("10/03/2026 a las 19:30")
-    if result["fecha_iso"] is None:
+    if result["fecha_iso"] is None or result["hora"] is None:
         try:
             fecha_el = page.locator("p.fecha-info").first
             if await fecha_el.count() > 0:
@@ -323,7 +166,7 @@ async def _extraer_tomaticket(page: Page, result: dict) -> dict:
             pass
 
     # Fallback fecha: texto visible con patrones DD/MM/YYYY
-    if result["fecha_iso"] is None:
+    if result["fecha_iso"] is None or result["hora"] is None:
         for sel in [".event-date", ".date", ".fecha", "[class*='date']",
                     "[class*='fecha']", ".info-date"]:
             try:
@@ -407,26 +250,46 @@ async def _intentar_janto(page: Page, janto_url: str, result: dict) -> dict:
         await page.goto(janto_url, wait_until="domcontentloaded", timeout=10000)
         await page.wait_for_timeout(2000)
 
-        # Buscar precios en la página de Janto
-        body_text = await page.inner_text("body", timeout=5000)
-        precio = _parsear_precio(body_text[:3000])
-        if precio is not None:
-            result["precio_num"] = precio
-            print(f"      [JANTO] Precio encontrado: {precio}€")
+        # Buscar precios en la página de Janto (vía selectores específicos)
+        # Esperar un poco a que la tabla se renderice (JS dinámico)
+        try:
+            await page.wait_for_selector("#tablaListaZonas, .filaListaZonas, #totalConcesion0", timeout=5000)
+        except Exception:
+            pass
+
+        precios_janto = await page.locator("#tablaListaZonas div, .filaListaZonas div, .totalConcesion, .importeConcesion, #totalConcesion0").all_inner_texts()
+        precio_found = None
+        for p_text in precios_janto:
+            if not p_text or len(p_text.strip()) < 2: continue
+            p_val = _parsear_precio(p_text)
+            if p_val is not None and p_val > 0: # Evitar 0 si hay otros precios
+                precio_found = p_val
+                break
+        
+        if precio_found is not None:
+            result["precio_num"] = precio_found
+            print(f"      [JANTO] Precio selector: {precio_found}€")
         else:
-            # Intentar clickear "Seleccionar" si existe
-            try:
-                sel_btn = page.locator("button:has-text('Seleccionar'), a:has-text('Seleccionar'), input[value*='Seleccionar']").first
-                if await sel_btn.count() > 0:
-                    await sel_btn.click(timeout=3000)
-                    await page.wait_for_timeout(2000)
-                    body_text2 = await page.inner_text("body", timeout=5000)
-                    precio2 = _parsear_precio(body_text2[:3000])
-                    if precio2 is not None:
-                        result["precio_num"] = precio2
-                        print(f"      [JANTO] Precio (post-click): {precio2}€")
-            except Exception:
-                pass
+            # Fallback body text
+            body_text = await page.inner_text("body", timeout=5000)
+            precio = _parsear_precio(body_text[:3000])
+            if precio is not None:
+                result["precio_num"] = precio
+                print(f"      [JANTO] Precio body: {precio}€")
+            else:
+                # Intentar clickear "Seleccionar" si existe
+                try:
+                    sel_btn = page.locator("button:has-text('Seleccionar'), a:has-text('Seleccionar'), input[value*='Seleccionar']").first
+                    if await sel_btn.count() > 0:
+                        await sel_btn.click(timeout=3000)
+                        await page.wait_for_timeout(2000)
+                        body_text2 = await page.inner_text("body", timeout=5000)
+                        precio2 = _parsear_precio(body_text2[:3000])
+                        if precio2 is not None:
+                            result["precio_num"] = precio2
+                            print(f"      [JANTO] Precio (post-click): {precio2}€")
+                except Exception:
+                    pass
 
     except Exception as e:
         print(f"      [JANTO] Error: {e}")
@@ -536,6 +399,8 @@ async def extraer_datos_duros(page: Page, url: str) -> dict:
                 "ticketmaster": ["[class*='date']", "time", "[datetime]"],
                 "guiniguada": [".fecha", "[class*='date']", ".event-date"],
                 "cicca": [".fecha", "[class*='date']", ".event-date"],
+                "auditorio": [".event__container__header-info p", ".info p", ".event-info"],
+                "teatro_galdos": [".event__container__header-info p", ".info p", ".event-info"],
                 "generico": [".event-date", ".date", ".fecha",
                              "[class*='date']", "[class*='fecha']"],
             }

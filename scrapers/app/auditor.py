@@ -94,15 +94,7 @@ DOMINIO_A_RECINTO: dict[str, str] = {
     "grancanariaarena.com":     "Gran Canaria Arena",
 }
 
-# Regex para detectar direcciones específicas en la descripción
-RE_DIRECCION = re.compile(
-    r'(?:en\s+(?:el|la|los|las)\s+)?'
-    r'((?:Calle|C/|Avda\.?|Avenida|Plaza|Paseo|Campus|Salón de actos|Edificio)\s+[^.,:;\n]{3,60})',
-    re.IGNORECASE,
-)
-
-# Regex para nombres que son solo basura (números, caracteres sueltos)
-RE_NOMBRE_BASURA = re.compile(r'^[\d\s\-.,;:]+$')
+from app.utils.parsers import RE_DIRECCION, RE_NOMBRE_BASURA
 
 
 # ─────────────────────────────────────────────────────────────────────
