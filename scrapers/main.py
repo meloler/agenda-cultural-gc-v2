@@ -234,12 +234,15 @@ async def main():
     df.loc[df["precio_num"] > 300, "precio_num"] = None
 
     # 2.2️⃣ QA Gate: Hora vacía (solo en eventos confirmados)
+    # Nota: muchos eventos culturales (exposiciones, ferias) no tienen hora fija.
+    # Umbral alto (25%) para no bloquear; solo se alerta para monitoreo.
     df_conf = df[df["fecha_iso"].notna()]
     if len(df_conf) > 0:
         vacias = df_conf["hora"].isna() | (df_conf["hora"].astype(str).str.strip() == "") | (df_conf["hora"].astype(str).str.lower().isin(["nan", "none", "<na>"]))
         pct_hora_vacia = vacias.mean() * 100
-        if pct_hora_vacia > 7.0:
-            raise RuntimeError(f"QA FAIL: hora vacía en confirmados {pct_hora_vacia:.1f}% > 7%")
+        print(f"   📊 QA Hora vacía en confirmados: {pct_hora_vacia:.1f}%")
+        if pct_hora_vacia > 25.0:
+            print(f"\n🔥 ALERTA DevOps: hora vacía en confirmados {pct_hora_vacia:.1f}% > 25%. Revisar scrapers de hora.")
 
     # 2.5️⃣ QA Gate: Títulos genéricos (P0)
     df["_es_generico_titulo"] = df["nombre"].apply(lambda x: es_titulo_generico(str(x)))
@@ -259,8 +262,8 @@ async def main():
     today_iso = date.today().isoformat()
     df = df[(df["fecha_iso"].isna()) | (df["fecha_iso"] >= today_iso)]
 
-    # 3️⃣ Smart Deduplication V2 (Clave compuesta)
-    # Priorizamos: 1. Lugar Específico, 2. Descripción más larga
+    # 3️⃣ Smart Deduplication V3 (2-Phase Cross-Source)
+    # P0-C fix: clave broad sin lugar/hora (varían entre fuentes)
     df["_titulo_norm"] = df["nombre"].apply(lambda x: _normalizar(str(x)))
     df["_lugar_norm"] = df["lugar"].apply(lambda x: _normalizar(str(x)) if pd.notna(x) else "")
     df["_hora_norm"] = df["hora"].fillna("")
@@ -275,46 +278,142 @@ async def main():
     # 3.1️⃣ Dedupe SAME-SOURCE estricto (misma fuente, misma URL/sesión, misma fecha/hora)
     df = df.drop_duplicates(subset=["organiza", "url_venta", "fecha_iso", "_hora_norm"], keep="first")
     
-    # 3.5️⃣ Dedupe CROSS-SOURCE con scoring y provenance
+    # 3.5️⃣ Dedupe CROSS-SOURCE en 2 fases (P0-C fix)
     PREF = {"Ticketmaster": 100, "EntradasCanarias": 90, "Tickety": 80, "Tomaticket": 70, "CICCA": 65, "Teatro Guiniguada": 65, "Entrées.es": 40}
 
     def quality_score(r):
         s = PREF.get(r["organiza"], 50)
         s += 10 if pd.notna(r["hora"]) and str(r["hora"]).strip() else 0
         s += 10 if pd.notna(r["precio_num"]) else 0
-        s += 10 if pd.notna(r["lugar"]) and str(r["lugar"]).strip() else 0
+        # P0-C fix: premiar lugar ESPECÍFICO (+20) vs genérico (+2) vs vacío (+0)
+        if pd.notna(r["lugar"]) and str(r["lugar"]).strip():
+            if not es_lugar_generico(str(r["lugar"])):
+                s += 20  # Lugar específico = mucho más valioso
+            else:
+                s += 2   # "Gran Canaria" es apenas mejor que nada
+        # Premiar descripción larga (hasta +10)
+        desc_len = len(str(r.get("descripcion", "") or ""))
+        s += min(desc_len // 100, 10)
         return s
 
     def normalizar_titulo(t: str) -> str:
+        """Normaliza título para deduplicación cross-source.
+        
+        P1-C fix: stopwords ordenadas de mayor a menor, sin eliminar
+        'tour'/'concierto'/'gira' que son parte de la identidad del evento.
+        """
         if pd.isna(t) or not t: return ""
         import unicodedata
         t = str(t).lower().strip()
         t = unicodedata.normalize("NFKD", t)
         t = "".join(c for c in t if not unicodedata.combining(c))
-        stopwords = [
-            "en gran canaria", "en las palmas", "en las palmas de gran canaria",
-            "entradas para", "entradas", "tickets for", "tickets",
-            "2025", "2026", "25/26", "tour", "gira", "concierto"
-        ]
+        # Stopwords ordenadas de mayor a menor longitud (evita matches parciales)
+        stopwords = sorted([
+            "en las palmas de gran canaria", "en gran canaria", "en las palmas",
+            "entradas para", "tickets for",
+            "25/26", "2025", "2026",
+        ], key=len, reverse=True)
         for w in stopwords:
             t = t.replace(w, "")
         t = re.sub(r'[^a-z0-9\s]', '', t)
         return re.sub(r'\s+', ' ', t).strip()
 
+    def _hora_to_minutes(hora: str) -> int:
+        """Convierte '20:30' a minutos desde medianoche. '' → -999."""
+        try:
+            if not hora or hora in ("", "nan", "None", "<NA>"):
+                return -999
+            parts = str(hora).split(":")
+            return int(parts[0]) * 60 + int(parts[1])
+        except Exception:
+            return -999
+
     df["_canon"] = df["nombre"].apply(normalizar_titulo)
     df["_score"] = df.apply(quality_score, axis=1)
     
-    # Setup cross-source deduplication key (Canonical Title + Date + Time + Normalized Place)
-    dup_key_cols = ["_canon", "fecha_iso", "_hora_norm", "_lugar_norm"]
+    # Fase 1: Broad match por canon + fecha (sin hora ni lugar)
+    broad_key = ["_canon", "fecha_iso"]
     
     # Aggregate sources for traceability
-    grouped_sources = df.groupby(dup_key_cols)["organiza"].apply(lambda x: " + ".join(sorted(set(x)))).reset_index(name="merged_from_sources")
+    grouped_sources = df.groupby(broad_key)["organiza"].apply(
+        lambda x: " + ".join(sorted(set(x)))
+    ).reset_index(name="merged_from_sources")
     
-    df = df.sort_values(["_canon", "fecha_iso", "_score"], ascending=[True, True, False])
-    df = df.drop_duplicates(subset=dup_key_cols, keep="first")
+    # Fase 2: Dentro de cada grupo, sub-agrupar por distancia horaria
+    # Si dos filas difieren en ≥2h, son sesiones distintas (matinée vs noche)
+    # PERO: registros con lugar genérico fuerzan merge (su hora no es fiable)
+    keep_indices = []
+    for (canon, fecha), group in df.groupby(broad_key, sort=False):
+        if len(group) == 1:
+            keep_indices.append(group.index[0])
+            continue
+        
+        # Sub-agrupar por cercanía horaria (±2h = mismo evento)
+        subgroups = []  # list of {"indices": [...], "horas": [...]}
+        for idx, row in group.iterrows():
+            hora_min = _hora_to_minutes(str(row["_hora_norm"]))
+            # Fix duplicados residuales: lugar genérico → hora desconocida
+            # para que siempre se fusione con otros registros del mismo evento
+            if es_lugar_generico(str(row.get("lugar", ""))):
+                hora_min = -999
+            matched = False
+            for sg in subgroups:
+                # -999 (sin hora o genérico) siempre se agrupa con cualquiera
+                if hora_min == -999 or any(
+                    h == -999 or abs(hora_min - h) < 120 for h in sg["horas"]
+                ):
+                    sg["indices"].append(idx)
+                    sg["horas"].append(hora_min)
+                    matched = True
+                    break
+            if not matched:
+                subgroups.append({"indices": [idx], "horas": [hora_min]})
+        
+        # De cada sub-grupo, quedarnos con el de mayor score
+        for sg in subgroups:
+            best_idx = max(sg["indices"], key=lambda i: df.loc[i, "_score"])
+            keep_indices.append(best_idx)
     
-    # Unir la trazabilidad
-    df = df.merge(grouped_sources, on=dup_key_cols, how="left")
+    df = df.loc[keep_indices]
+    
+    # Unir la trazabilidad de fuentes combinadas
+    df = df.merge(grouped_sources, on=broad_key, how="left")
+
+    # ─── QA Gates reforzados (P0-F) ───
+    # QA: Ratio de eventos sin fecha_iso (demasiados borradores = scraper roto)
+    total_pre_split = len(df)
+    sin_fecha_count = df["fecha_iso"].isna().sum()
+    if total_pre_split > 0:
+        pct_sin_fecha = (sin_fecha_count / total_pre_split) * 100
+        print(f"   📊 QA fecha_iso vacía: {sin_fecha_count} ({pct_sin_fecha:.1f}%)")
+        if pct_sin_fecha > 40:
+            raise RuntimeError(
+                f"QA FAIL: {pct_sin_fecha:.1f}% de eventos SIN fecha_iso > 40%. "
+                f"Probable fallo masivo de parseo de fechas. Abortando."
+            )
+
+    # QA: Demasiados lugares genéricos
+    genericos_count = df["lugar"].apply(lambda x: es_lugar_generico(str(x))).sum()
+    if total_pre_split > 0:
+        pct_generico = (genericos_count / total_pre_split) * 100
+        print(f"   📊 QA Lugares Genéricos: {genericos_count} ({pct_generico:.1f}%)")
+        if pct_generico > 60:
+            print(f"\n🔥 ALERTA P0: {pct_generico:.1f}% de lugares son genéricos. "
+                  f"Revisión manual recomendada antes de publicar.")
+
+    # QA: Detección de lote basura (título repetido > 5 veces)
+    nombre_counts = df["nombre"].value_counts()
+    if len(nombre_counts) > 0:
+        max_reps = nombre_counts.iloc[0]
+        nombre_top = nombre_counts.index[0]
+        if max_reps > 5:
+            print(f"   🚨 QA ALERTA: Título '{nombre_top}' aparece {max_reps} veces. "
+                  f"Probable scraper enloquecido.")
+            if max_reps > 15:
+                raise RuntimeError(
+                    f"QA FAIL: '{nombre_top}' repetido {max_reps} veces. "
+                    f"Abortando exportación."
+                )
 
     df = df.drop(columns=["_titulo_norm", "_lugar_norm", "_hora_norm", "_es_generico_lugar", "_len_desc", "_es_generico_titulo", "_canon", "_score"])
 

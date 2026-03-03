@@ -17,7 +17,7 @@ RE_RANGO = re.compile(r'(\d+[.,]?\d*)\s*(?:-|al|y)\s*(\d+[.,]?\d*)\s*(?:€|EUR|
 
 RE_FECHA_ISO = re.compile(r'(\d{4})-(\d{2})-(\d{2})')
 RE_FECHA_DMY_SLASH = re.compile(r'(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})')
-RE_FECHA_DMY_TEXT = re.compile(r'(\d{1,2})\s+de\s+(\w+)\s+(20\d{2})?', re.I)
+RE_FECHA_DMY_TEXT = re.compile(r'(\d{1,2})\s+de\s+(\w+)(?:\s+(?:de\s+)?(20\d{2}))?', re.I)
 
 RE_HORA = re.compile(
     r'(?:^|[\s,;(T])([012]?\d)[:.hH]([0-5]\d)(?:\s*(?:h|hrs?|horas?))?(?!\s*(?:€|euros|%|[$]))(?:\b|$)',
@@ -68,37 +68,109 @@ def _parsear_precio(texto: str) -> float | None:
         
     return None
 
+
+# ─────────────────────────────────────────────────────────────────────
+# Helpers de fecha (P0-A fix)
+# ─────────────────────────────────────────────────────────────────────
+def _anio_inferido(mes: str, dia: str) -> str:
+    """Infiere el año más probable cuando el texto de la página no lo indica.
+
+    Regla: si la fecha (mes-dia) ya pasó hace más de 30 días, asumimos
+    que es del año siguiente.  Si no, asumimos el año corriente.
+    """
+    hoy = datetime.date.today()
+    try:
+        candidata = datetime.date(hoy.year, int(mes), int(dia))
+    except ValueError:
+        return str(hoy.year)
+    if candidata < hoy - datetime.timedelta(days=30):
+        return str(hoy.year + 1)
+    return str(hoy.year)
+
+
+def _fecha_valida(fecha_iso: str) -> bool:
+    """Verifica que una fecha ISO sea parseable y razonable (2024-2030)."""
+    try:
+        dt = datetime.datetime.strptime(fecha_iso, "%Y-%m-%d")
+        return 2024 <= dt.year <= 2030
+    except ValueError:
+        return False
+
+
 def _parsear_fecha(texto: str) -> str | None:
-    if not texto: return None
-    # ISO: 2026-02-14
+    """Parsea una fecha desde texto con validación estricta de rango.
+
+    Capas (en orden de prioridad):
+      1. ISO:  2026-02-14
+      2. DMY Slash:  14/02/2026  (con validación anti-teléfono)
+      3. Rango textual:  1 al 10 de Mayo 2026
+      4. Texto estándar:  14 de febrero de 2026
+    """
+    if not texto:
+        return None
+
+    # 1) ISO: 2026-02-14
     m = RE_FECHA_ISO.search(texto)
-    if m: return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-    # DMY: 14/02/2026
+    if m:
+        fecha = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+        if _fecha_valida(fecha):
+            return fecha
+
+    # 2) DMY Slash: 14/02/2026 — con validación de rangos (anti-teléfono, anti-basura)
     m = RE_FECHA_DMY_SLASH.search(texto)
     if m:
-        dia, mes, anio = m.group(1).zfill(2), m.group(2).zfill(2), m.group(3)
-        if len(anio) == 2: anio = "20" + anio
-        return f"{anio}-{mes}-{dia}"
-    # Range Text: 1 al 10 de Mayo
-    m = re.search(r'(\d{1,2})\s+(?:al|y|de|a)\s+(\d{1,2})\s+de\s+(\w+)\s+(20\d{2})?', texto, re.I)
+        dia_raw, mes_raw, anio_raw = m.group(1), m.group(2), m.group(3)
+        dia = dia_raw.zfill(2)
+        mes = mes_raw.zfill(2)
+        anio = anio_raw
+        if len(anio) == 2:
+            anio = "20" + anio
+        # Validar rangos crudos ANTES de construir la fecha
+        try:
+            if 1 <= int(dia_raw) <= 31 and 1 <= int(mes_raw) <= 12 and 2024 <= int(anio) <= 2030:
+                fecha = f"{anio}-{mes}-{dia}"
+                if _fecha_valida(fecha):
+                    return fecha
+        except ValueError:
+            pass
+
+    # 3) Rango textual: "1 al 10 de Mayo 2026"
+    m = re.search(
+        r'(\d{1,2})\s+(?:al|y|de|a)\s+(\d{1,2})\s+de\s+(\w+)\s+(20\d{2})?',
+        texto, re.I,
+    )
     if m:
         dia = m.group(1).zfill(2)
         mes = MESES.get(m.group(3).lower())
         if mes:
-            anio = m.group(4) or "2026"
-            return f"{anio}-{mes}-{dia}"
-    # Standard Text: 14 de febrero
-    m = re.search(r'(\d{1,2})\s*(?:de\s+)?(\w+)\s*(?:de\s+)?(20\d{2})?', texto, re.I)
+            anio = m.group(4) or _anio_inferido(mes, dia)
+            fecha = f"{anio}-{mes}-{dia}"
+            if _fecha_valida(fecha):
+                return fecha
+
+    # 4) Texto estándar: "14 de febrero de 2026" / "14 febrero"
+    m = RE_FECHA_DMY_TEXT.search(texto)
     if m:
         dia = m.group(1).zfill(2)
         mes_name = m.group(2).lower()
         mes = MESES.get(mes_name) or (MESES.get(mes_name[:3]) if len(mes_name) > 3 else None)
         if mes:
-            anio = m.group(3) or "2026"
-            return f"{anio}-{mes}-{dia}"
+            anio = m.group(3) or _anio_inferido(mes, dia)
+            fecha = f"{anio}-{mes}-{dia}"
+            if _fecha_valida(fecha):
+                return fecha
+
     return None
 
+
 def _parsear_hora(texto: str) -> str | None:
+    """Parsea una hora desde texto.
+
+    P0-B fix: blacklist reducida — ya NO descarta 12:00, 00:00, 22:33
+    que son horas legítimas (matinés, nochevieja, sesiones nocturnas).
+    Solo se descartan horas de madrugada (05-08h) que casi nunca son
+    eventos culturales y suelen ser residuos de timestamps del servidor.
+    """
     if not texto: return None
     hora_final = None
     m = RE_A_LAS.search(texto)
@@ -120,10 +192,12 @@ def _parsear_hora(texto: str) -> str | None:
                 hora_final = f"{h:02d}:00"
 
     if not hora_final: return None
-    
-    # Improbables
-    improbables = {"10:31", "12:04", "05:00", "06:00", "07:00", "08:00", "12:00", "22:33", "00:00"}
-    if hora_final in improbables: return None
+
+    # P0-B fix: blacklist mínima — solo horas de madrugada servicial
+    # que suelen ser timestamps del servidor, no horas de evento.
+    improbables_madrugada = {"05:00", "06:00", "07:00"}
+    if hora_final in improbables_madrugada:
+        return None
     return hora_final
 
 def _validar_imagen(url: str) -> str | None:
@@ -154,8 +228,17 @@ GENERIC_TITLES = [
     "entradas para los mejores eventos", "entradas para", 
     "tickets for the best events", "tickets for",
     "compra tus entradas", "anuncio genérico", "entradas",
-    "abono", "bono", "agenda gc", "inicio -", "entrees", "tomaticket", "tickety"
+    "abono", "bono", "agenda gc", "inicio -", "entrees", "tomaticket", "tickety",
+    "comprar entradas", "eventos en gran canaria", "inicio - entradascanarias",
 ]
+
+# Palabras sueltas que son categorías, no títulos de eventos
+_CATEGORIA_WORDS = {
+    "música", "musica", "teatro", "cine", "danza", "deporte",
+    "cultura", "humor", "arte", "concierto", "festival",
+    "espectáculo", "espectaculo", "evento", "eventos",
+    "exposición", "exposicion", "charla", "conferencia",
+}
 
 def es_titulo_generico(titulo: str) -> bool:
     """Detecta si un título es propaganda genérica del portal en lugar de un evento."""
@@ -163,6 +246,9 @@ def es_titulo_generico(titulo: str) -> bool:
         return True
     t = titulo.lower().strip()
     if len(t) < 3:
+        return True
+    # Una sola palabra que es una categoría → genérico
+    if t in _CATEGORIA_WORDS:
         return True
     return any(g in t for g in GENERIC_TITLES)
 

@@ -23,7 +23,7 @@ async def scrape_tickety(page: Page) -> list[Evento]:
             try:
                 await page.goto(
                     "https://tickety.es/search/gran%20canaria",
-                    wait_until="networkidle",
+                    wait_until="domcontentloaded",  # P1-B: networkidle cuelga en SPAs
                     timeout=20000,
                 )
                 loaded = True
@@ -89,7 +89,7 @@ async def scrape_tickety(page: Page) -> list[Evento]:
             eventos.append(
                 Evento(
                     nombre=nombre_final,
-                    lugar="Gran Canaria",
+                    lugar=detalle.get("lugar_deep") or "Gran Canaria",  # P0-E: venue del deep scrape
                     fecha_raw=detalle.get("fecha_raw") or "Sin fecha",
                     fecha_iso=detalle["fecha_iso"],
                     precio_num=detalle["precio_num"],

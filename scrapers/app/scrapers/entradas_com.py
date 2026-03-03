@@ -198,7 +198,7 @@ async def scrape_entradas_com(page: Page) -> list[Evento]:
             eventos.append(
                 Evento(
                     nombre=detalle.get("nombre_deep") or raw["nombre"],
-                    lugar="Las Palmas de Gran Canaria",
+                    lugar=detalle.get("lugar_deep") or "Las Palmas de Gran Canaria",  # P0-E: venue del deep scrape
                     fecha_raw=detalle.get("fecha_raw") or "Sin fecha",
                     fecha_iso=detalle["fecha_iso"],
                     precio_num=precio,

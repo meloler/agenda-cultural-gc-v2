@@ -133,7 +133,7 @@ async def scrape_tomaticket(page: Page) -> list[Evento]:
             eventos.append(
                 Evento(
                     nombre=detalle.get("nombre_deep") or raw["nombre"],
-                    lugar="Gran Canaria",
+                    lugar=detalle.get("lugar_deep") or "Gran Canaria",  # P0-E: venue del deep scrape
                     fecha_raw=limpiar_texto(fecha_raw or raw.get("fecha_card") or "Sin fecha"),
                     fecha_iso=fecha_iso,
                     precio_num=detalle["precio_num"],

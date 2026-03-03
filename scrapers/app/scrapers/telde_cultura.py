@@ -230,7 +230,9 @@ async def scrape_telde_cultura(page: Page) -> list[Evento]:
                 else:
                     continue  # Evento completamente pasado
 
-            fecha_raw_text = texto[:100] if texto else "Sin fecha"
+            # P1-E: fecha_raw almacena la subcadena real de fecha, no texto genérico
+            m_raw = re.search(r'\d{2}\.\d{2}\.\d{4}(?:\s*-\s*\d{2}\.\d{2}\.\d{4})?', texto)
+            fecha_raw_text = m_raw.group(0) if m_raw else "Sin fecha"
 
             # Parsear hora
             hora = _parsear_hora_telde(texto)

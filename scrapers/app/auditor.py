@@ -208,11 +208,11 @@ def _identificar_fuente(url: str) -> str | None:
     return None
 
 
-async def _deep_scrape_venue(url: str) -> str | None:
-    """Visita la URL del evento con Playwright y extrae el nombre del venue.
-
-    Solo se activa para URLs de Tomaticket y Tickety.
-    Lee selectores CSS confirmados; si encuentra texto válido, lo retorna.
+async def _deep_scrape_venue_with_page(page, url: str) -> str | None:
+    """Deep scrape usando una page ya existente (sin crear browser nuevo).
+    
+    P0-D fix: reutiliza page del batch para evitar abrir/cerrar browser
+    por cada evento.
     """
     fuente = _identificar_fuente(url)
     if not fuente:
@@ -223,38 +223,21 @@ async def _deep_scrape_venue(url: str) -> str | None:
         return None
 
     try:
-        from playwright.async_api import async_playwright
+        await page.goto(url, timeout=12000, wait_until="domcontentloaded")
+        await page.wait_for_timeout(1500)
 
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-
+        for selector in selectores:
             try:
-                await page.goto(url, timeout=15000, wait_until="domcontentloaded")
-                await page.wait_for_timeout(2000)  # Esperar JS dinámico
-
-                for selector in selectores:
-                    try:
-                        el = page.locator(selector).first
-                        if await el.count() > 0:
-                            texto = (await el.text_content() or "").strip()
-                            # Validar que no sea genérico
-                            if texto and len(texto) > 2 and not es_lugar_generico(texto):
-                                print(f"      🔎 Deep Scrape [{fuente}]: '{texto}'")
-                                await browser.close()
-                                return texto
-                    except Exception:
-                        continue
-
-            except Exception as e:
-                print(f"      ⚠️ Deep Scrape error ({url[:50]}): {e}")
-            finally:
-                await browser.close()
-
-    except ImportError:
-        print("      ⚠️ Playwright no disponible para Deep Scrape")
+                el = page.locator(selector).first
+                if await el.count() > 0:
+                    texto = (await el.text_content() or "").strip()
+                    if texto and len(texto) > 2 and not es_lugar_generico(texto):
+                        print(f"      🔎 Deep Scrape [{fuente}]: '{texto}'")
+                        return texto
+            except Exception:
+                continue
     except Exception as e:
-        print(f"      ⚠️ Deep Scrape fallo general: {e}")
+        print(f"      ⚠️ Deep Scrape error ({url[:50]}): {e}")
 
     return None
 
@@ -359,27 +342,42 @@ async def _auditar_eventos_async() -> dict[str, int]:
                 session.add(evento)
                 stats["precios_corregidos"] += 1
 
-        # ── Paso 4: Deep Scrape para los que aún son genéricos ──
+        # ── Paso 4: Deep Scrape BATCH para los que aún son genéricos (P0-D fix) ──
         if pendientes_deep:
-            print(f"\n   🔎 Deep Scraping {len(pendientes_deep)} eventos con lugar genérico...")
+            # Filtrar solo los que tienen fuente soportada
+            deep_candidates = [
+                ev for ev in pendientes_deep
+                if _identificar_fuente(ev.url_venta)
+            ]
 
-            for evento in pendientes_deep:
-                url = evento.url_venta
-                fuente = _identificar_fuente(url)
-                if not fuente:
-                    continue  # Solo deep-scrapeamos Tomaticket/Tickety
+            if deep_candidates:
+                print(f"\n   🔎 Deep Scraping {len(deep_candidates)} eventos con lugar genérico (batch)...")
 
-                venue = await _deep_scrape_venue(url)
-                if venue:
-                    lugar_anterior = evento.lugar
-                    evento.lugar = venue
-                    evento.latitud = None
-                    evento.longitud = None
-                    session.add(evento)
-                    stats["deep_scrape_hits"] += 1
-                    stats["lugares_corregidos"] += 1
-                    print(f"      🎯 Deep: '{evento.nombre[:40]}': "
-                          f"'{lugar_anterior}' → '{venue}'")
+                try:
+                    from playwright.async_api import async_playwright
+
+                    async with async_playwright() as p:
+                        browser = await p.chromium.launch(headless=True)
+                        page = await browser.new_page()
+
+                        for evento in deep_candidates:
+                            venue = await _deep_scrape_venue_with_page(page, evento.url_venta)
+                            if venue:
+                                lugar_anterior = evento.lugar
+                                evento.lugar = venue
+                                evento.latitud = None
+                                evento.longitud = None
+                                session.add(evento)
+                                stats["deep_scrape_hits"] += 1
+                                stats["lugares_corregidos"] += 1
+                                print(f"      🎯 Deep: '{evento.nombre[:40]}': "
+                                      f"'{lugar_anterior}' → '{venue}'")
+
+                        await browser.close()
+                except ImportError:
+                    print("      ⚠️ Playwright no disponible para Deep Scrape")
+                except Exception as e:
+                    print(f"      ⚠️ Deep Scrape batch error: {e}")
 
         # Eliminar basura en bloque
         if eliminados_ids:

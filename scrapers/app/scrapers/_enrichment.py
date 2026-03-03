@@ -71,10 +71,6 @@ def _detectar_dominio(url: str) -> str:
         return "entradas_com"
     if "teldecultura" in domain:
         return "teldecultura"
-    if "teatroperezgaldos" in domain:
-        return "teatro_galdos"
-    if "auditorioalfredokraus" in domain:
-        return "auditorio"
     return "generico"
 
 
@@ -312,7 +308,7 @@ async def extraer_datos_duros(page: Page, url: str) -> dict:
         {"precio_num": float|None, "fecha_iso": str|None,
          "hora": str|None, "fecha_raw": str|None}
     """
-    result = {"precio_num": None, "fecha_iso": None, "hora": None, "fecha_raw": None}
+    result = {"precio_num": None, "fecha_iso": None, "hora": None, "fecha_raw": None, "venue_name": None}
     dominio = _detectar_dominio(url)
 
     # === CAPA 1: JSON-LD ===
@@ -336,6 +332,18 @@ async def extraer_datos_duros(page: Page, url: str) -> dict:
             result["fecha_raw"] = str(start)
             result["fecha_iso"] = _parsear_fecha(start)
             result["hora"] = _parsear_hora(start)
+
+        # P0-E: Venue desde JSON-LD location.name
+        location = ld.get("location")
+        if location:
+            if isinstance(location, list):
+                location = location[0] if location else None
+            if isinstance(location, dict):
+                venue = location.get("name") or location.get("@name")
+                if venue and isinstance(venue, str) and len(venue.strip()) > 2:
+                    result["venue_name"] = venue.strip()
+            elif isinstance(location, str) and len(location.strip()) > 2:
+                result["venue_name"] = location.strip()
 
         # Imagen del JSON-LD (validar)
         ld_image = ld.get("image")
@@ -421,6 +429,51 @@ async def extraer_datos_duros(page: Page, url: str) -> dict:
                 except Exception:
                     continue
 
+    # === CAPA 2.5: Venue por selectores CSS (P1 — si JSON-LD no lo tenía) ===
+    if result["venue_name"] is None:
+        venue_selectors = {
+            "tomaticket": [
+                ".info-evento .lugar", ".venue", ".venue-name",
+                "[class*='venue']", "[class*='lugar']", "p.lugar",
+                ".event-info .location", ".info-ficha .lugar",
+            ],
+            "tickety": [
+                ".event-venue", ".venue", ".location",
+                "[class*='venue']", "[class*='location']",
+                ".event-detail .venue-name",
+            ],
+            "entradascanarias": [
+                ".venue-name", ".venue", "[class*='venue']",
+                ".event-location", ".location-name",
+            ],
+            "entradas_com": [
+                ".venue", ".event-location", "[class*='venue']",
+                "[class*='location']", ".lugar",
+            ],
+            "generico": [
+                ".venue", ".venue-name", ".location",
+                "[class*='venue']", "[class*='location']",
+                "[itemprop='location']", "[class*='lugar']",
+            ],
+        }
+        sels = venue_selectors.get(dominio, venue_selectors["generico"])
+        for sel in sels:
+            try:
+                loc = page.locator(sel).first
+                if await loc.count() > 0:
+                    venue_text = (await loc.inner_text(timeout=2000)).strip()
+                    # Validar: >2 chars, no es genérico, no es un precio/fecha
+                    if (venue_text and len(venue_text) > 2
+                            and len(venue_text) < 120
+                            and not re.search(r'^\d+[.,]\d+\s*€', venue_text)
+                            and not re.search(r'^\d{2}[/.-]\d{2}', venue_text)):
+                        from app.geocoder import es_lugar_generico
+                        if not es_lugar_generico(venue_text):
+                            result["venue_name"] = venue_text
+                            break
+            except Exception:
+                continue
+
     # === CAPA 3: Regex sobre contenido visible ===
     try:
         body_text = await page.inner_text("body", timeout=3000)
@@ -502,6 +555,7 @@ async def enriquecer_evento(
         "hora": None,
         "fecha_raw": None,
         "nombre_deep": None,
+        "lugar_deep": None,  # P0-E: venue extraído del deep scrape
     }
 
     # Guardar la URL original para poder volver (en caso de Janto navigation)
@@ -522,6 +576,7 @@ async def enriquecer_evento(
         detalle["fecha_iso"] = datos["fecha_iso"]
         detalle["hora"] = datos["hora"]
         detalle["fecha_raw"] = datos["fecha_raw"]
+        detalle["lugar_deep"] = datos.get("venue_name")  # P0-E
 
         if datos["precio_num"] is not None:
             print(f"      [PRECIO] {datos['precio_num']}€")

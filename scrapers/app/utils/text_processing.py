@@ -33,7 +33,10 @@ def inferir_nombre(url: str) -> str:
 
 
 def normalizar_fecha(fecha_texto: str) -> str | None:
-    """Convierte texto de fecha a formato ISO (YYYY-MM-DD)."""
+    """Convierte texto de fecha a formato ISO (YYYY-MM-DD).
+    
+    P0-A fix: año inferido dinámicamente (no hardcodeado).
+    """
     meses = {
         'enero': '01', 'febrero': '02', 'marzo': '03', 'abril': '04',
         'mayo': '05', 'junio': '06', 'julio': '07', 'agosto': '08',
@@ -45,8 +48,18 @@ def normalizar_fecha(fecha_texto: str) -> str | None:
         match = re.search(r'(\d{1,2})\s+(?:de\s+)?([a-zA-Z]+)', fecha_texto.lower())
         if match:
             dia = match.group(1).zfill(2)
-            mes = meses.get(match.group(2)[:3], '01')
-            return f"2026-{mes}-{dia}"
+            mes = meses.get(match.group(2)[:3], None)
+            if not mes:
+                return None
+            # Inferir año dinámicamente
+            from datetime import date, timedelta
+            hoy = date.today()
+            try:
+                candidata = date(hoy.year, int(mes), int(dia))
+            except ValueError:
+                return None
+            anio = hoy.year + 1 if candidata < hoy - timedelta(days=30) else hoy.year
+            return f"{anio}-{mes}-{dia}"
         return None
     except Exception:
         return None

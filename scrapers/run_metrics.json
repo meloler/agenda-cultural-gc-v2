@@ -1,13 +1,21 @@
 {
-    "timestamp": "2026-02-28T12:04:36.239956",
-    "elapsed_seconds": 45.2,
-    "total_eventos": 70,
-    "totales_confirmados": 70,
+    "timestamp": "2026-03-03T22:08:48.730884",
+    "elapsed_seconds": 8403.04,
+    "total_eventos": 288,
+    "totales_confirmados": 288,
     "totales_borradores": 0,
-    "pct_hora_vacia_en_conf": 14.29,
-    "pct_precio_vacio_en_conf": 28.57,
+    "pct_hora_vacia_en_conf": 4.51,
+    "pct_precio_vacio_en_conf": 20.49,
     "distribucion_fuentes": {
-        "TomaTicket": 50,
-        "Entr\u00e9es.es": 20
+        "EntradasCanarias": 91,
+        "Entr\u00e9es.es": 71,
+        "Auditorio A. Kraus": 49,
+        "Tomaticket": 28,
+        "Teatro P\u00e9rez Gald\u00f3s": 19,
+        "CICCA": 14,
+        "Teatro Guiniguada": 12,
+        "Ticketmaster": 2,
+        "Tickety": 1,
+        "TeldeCultura": 1
     }
 }

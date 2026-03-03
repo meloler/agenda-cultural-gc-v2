@@ -71,13 +71,24 @@ MESES_MAP = {
 
 
 def _parsear_fecha_badge(dia: str, mes_abrev: str) -> str | None:
-    """Convierte día + mes abreviado en fecha ISO."""
+    """Convierte día + mes abreviado en fecha ISO.
+    
+    P0-A fix: año inferido dinámicamente.
+    """
     try:
         mes = MESES_MAP.get(mes_abrev.lower()[:3])
         if not mes:
             return None
         dia_num = dia.strip().zfill(2)
-        return f"2026-{mes}-{dia_num}"
+        # Inferir año dinámicamente
+        from datetime import date, timedelta
+        hoy = date.today()
+        try:
+            candidata = date(hoy.year, int(mes), int(dia_num))
+        except ValueError:
+            return None
+        anio = hoy.year + 1 if candidata < hoy - timedelta(days=30) else hoy.year
+        return f"{anio}-{mes}-{dia_num}"
     except Exception:
         return None
 
@@ -196,7 +207,24 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                     continue
                     
                 lugar = limpiar_texto(venue) or "Gran Canaria"
-                
+                # P0-E (H-02): parsear eventDate del slider igual que sessions del current
+                fecha_iso_val = None
+                hora_val = None
+                if date_str:
+                    try:
+                        from dateutil.parser import isoparse
+                        from zoneinfo import ZoneInfo
+                        dt = isoparse(date_str)
+                        if dt.tzinfo is not None:
+                            dt = dt.astimezone(ZoneInfo("Atlantic/Canary"))
+                        fecha_iso_val = dt.date().isoformat()
+                        hora_val = dt.strftime("%H:%M")
+                    except Exception:
+                        # Fallback a nuestro parser genérico
+                        from app.utils.parsers import _parsear_fecha, _parsear_hora
+                        fecha_iso_val = _parsear_fecha(date_str)
+                        hora_val = _parsear_hora(date_str)
+
                 eventos_raw.append({
                     "nombre": limpiar_texto(nombre),
                     "url_full": url_full,
@@ -204,7 +232,8 @@ async def scrape_entradas_canarias(page: Page) -> list[Evento]:
                     "lugar": lugar,
                     "precio_api": None,
                     "fecha_raw": date_str or "Sin fecha",
-                    "fecha_iso": None,
+                    "fecha_iso": fecha_iso_val,
+                    "hora_api": hora_val,
                 })
             except Exception:
                 continue
