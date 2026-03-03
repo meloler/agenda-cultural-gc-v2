@@ -47,6 +47,9 @@ def subir_a_supabase():
                 "descripcion": clean(row['Descripción']),
                 "enriquecido": False
             }
+            # Limpiar etiquetas de IA de la descripción
+            if ev["descripcion"] and isinstance(ev["descripcion"], str):
+                ev["descripcion"] = ev["descripcion"].replace("[Descripción generada por IA]", "").replace("[Generado por IA]", "").strip()
             # Sanitizar fecha a string YYYY-MM-DD
             if ev["fecha_iso"] is not None:
                 ev["fecha_iso"] = str(ev["fecha_iso"])[:10]

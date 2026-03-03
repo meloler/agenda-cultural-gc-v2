@@ -197,9 +197,12 @@ async def enriquecer_eventos() -> dict[str, int]:
                 # Aplicar descripción limpia
                 desc_limpia = enriquecimiento.get("descripcion_limpia")
                 if desc_limpia and len(desc_limpia) > 20:
+                    is_ai = "[Generado por IA]" in desc_limpia or "[Descripción generada por IA]" in desc_limpia
+                    tag = "🤖" if is_ai else "📝"
+                    # Limpiar etiquetas de IA del texto final
+                    desc_limpia = desc_limpia.replace("[Descripción generada por IA]", "").replace("[Generado por IA]", "").strip()
                     evento.descripcion = desc_limpia
                     stats["enriquecidos"] += 1
-                    tag = "📝" if "[Generado por IA]" not in desc_limpia else "🤖"
                     print(f"      {tag} {evento.nombre[:55]} → {len(desc_limpia)} chars")
 
                 # Lugar corregido: solo si el actual es genérico y la IA propone algo
