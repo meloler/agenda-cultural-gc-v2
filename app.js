@@ -34,6 +34,7 @@ const state = {
   weekOffset: 0,
   mapInstance: null,
   eventId: null,
+  showArchive: false,
 };
 
 // ── Category config ───────────────────────────────────────────────
@@ -110,15 +111,22 @@ function formatPrice(p) {
 // SUPABASE DATA LAYER — replaces all API calls
 // ══════════════════════════════════════════════════════════════════
 
-async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inicio, fecha_fin, sort, search } = {}) {
+async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inicio, fecha_fin, sort, search, archive = false } = {}) {
   const today = toISO(new Date());
-  const effectiveInicio = fecha_inicio || today;
 
   let query = sb
     .from('evento')
-    .select('id, nombre, imagen_url, estilo, fecha_iso, hora, precio_num, lugar', { count: 'exact' })
-    .not('fecha_iso', 'is', null)
-    .gte('fecha_iso', effectiveInicio);
+    .select('id, nombre, imagen_url, estilo, fecha_iso, hora, precio_num, lugar, estado', { count: 'exact' })
+    .not('fecha_iso', 'is', null);
+
+  if (archive) {
+    // Archivo: solo eventos pasados, ordenados del más reciente al más antiguo
+    query = query.lt('fecha_iso', today);
+  } else {
+    // Normal: solo eventos futuros
+    const effectiveInicio = fecha_inicio || today;
+    query = query.gte('fecha_iso', effectiveInicio);
+  }
 
   // Full Text Search applied directly in the DB
   if (search && search.trim()) {
@@ -134,6 +142,8 @@ async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inici
     query = query.order('precio_num', { ascending: true, nullsFirst: false }).order('fecha_iso', { ascending: true });
   } else if (sort === 'precio_desc') {
     query = query.order('precio_num', { ascending: false, nullsFirst: false }).order('fecha_iso', { ascending: true });
+  } else if (sort === 'fecha_desc' || archive) {
+    query = query.order('fecha_iso', { ascending: false });
   } else {
     query = query.order('fecha_iso', { ascending: true });
   }
@@ -215,10 +225,16 @@ async function fetchAllEvents() {
 
 function buildQuery() {
   const q = { page: state.page, size: PAGE_SIZE, sort: state.sort, search: state.search };
+  if (state.showArchive) {
+    q.archive = true;
+    q.sort = 'fecha_desc';
+  }
   if (state.categoria) q.categoria = state.categoria;
-  const dr = dateRange(state.dateFilter);
-  if (dr.fecha_inicio) q.fecha_inicio = dr.fecha_inicio;
-  if (dr.fecha_fin) q.fecha_fin = dr.fecha_fin;
+  if (!state.showArchive) {
+    const dr = dateRange(state.dateFilter);
+    if (dr.fecha_inicio) q.fecha_inicio = dr.fecha_inicio;
+    if (dr.fecha_fin) q.fecha_fin = dr.fecha_fin;
+  }
   return q;
 }
 
@@ -304,6 +320,7 @@ function renderGridView() {
           <button class="pill" data-date="tomorrow">Mañana</button>
           <button class="pill" data-date="weekend">Finde</button>
           <button class="pill" data-date="month">Este mes</button>
+          <button class="pill pill-archive" data-date="archive">📁 Archivo</button>
         </div>
         <div class="filter-divider"></div>
         <button class="mobile-filter-btn" id="mobile-filter-btn" aria-expanded="false">
@@ -367,11 +384,15 @@ function cardHTML(ev) {
     ? `<img src="${ev.imagen_url}" alt="${ev.nombre}" loading="lazy" class="card-img" data-emoji="${emoji}">`
     : `<div class="card-image-placeholder">${emoji}</div>`;
 
+  const isPast = ev.estado === 'past' || (ev.fecha_iso && ev.fecha_iso < toISO(new Date()));
+  const pastBanner = isPast ? '<div class="card-past-banner">Evento finalizado</div>' : '';
+
   return `
-    <article class="card" data-id="${ev.id}" tabindex="0" role="button" aria-label="${ev.nombre}">
+    <article class="card${isPast ? ' card-past' : ''}" data-id="${ev.id}" tabindex="0" role="button" aria-label="${ev.nombre}">
       <div class="card-image-wrap">
         ${imgHTML}
         <span class="card-badge ${badgeClass(ev.estilo)}">${ev.estilo}</span>
+        ${pastBanner}
       </div>
       <div class="card-body">
         <h2 class="card-title">${ev.nombre}</h2>
@@ -488,7 +509,13 @@ async function loadCategorias() {
 }
 
 function setDate(filter, btn) {
-  state.dateFilter = filter;
+  if (filter === 'archive') {
+    state.showArchive = true;
+    state.dateFilter = 'archive';
+  } else {
+    state.showArchive = false;
+    state.dateFilter = filter;
+  }
   state.page = 1;
   document.querySelectorAll('#date-filters .pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
