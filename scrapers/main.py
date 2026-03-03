@@ -12,6 +12,7 @@ import pandas as pd
 from dotenv import load_dotenv
 from playwright.async_api import async_playwright
 from sqlmodel import select as sql_select
+from rapidfuzz import fuzz
 
 # Módulos de la aplicación
 from app.models import Evento
@@ -331,19 +332,46 @@ async def main():
     df["_canon"] = df["nombre"].apply(normalizar_titulo)
     df["_score"] = df.apply(quality_score, axis=1)
     
-    # Fase 1: Broad match por canon + fecha (sin hora ni lugar)
-    broad_key = ["_canon", "fecha_iso"]
+    # ─── Fase 1: Fuzzy clustering por fecha + título similar (≥82%) ───
+    FUZZY_THRESHOLD = 82  # ratio mínimo para considerar mismo evento
+    
+    def _fuzzy_cluster(canons: list[str]) -> list[int]:
+        """Asigna un cluster_id a cada canon. Canons con ratio ≥ threshold van al mismo cluster."""
+        clusters = []  # list of (cluster_id, representative_canon)
+        assignments = []
+        for canon in canons:
+            matched = False
+            for cid, rep in clusters:
+                if fuzz.ratio(canon, rep) >= FUZZY_THRESHOLD:
+                    assignments.append(cid)
+                    matched = True
+                    break
+            if not matched:
+                new_id = len(clusters)
+                clusters.append((new_id, canon))
+                assignments.append(new_id)
+        return assignments
+    
+    # Agrupar por fecha, luego fuzzy-cluster dentro de cada fecha
+    df["_fuzzy_group"] = -1
+    global_group = 0
+    for fecha, fecha_group in df.groupby("fecha_iso", sort=False):
+        canons = fecha_group["_canon"].tolist()
+        local_clusters = _fuzzy_cluster(canons)
+        for idx, local_cid in zip(fecha_group.index, local_clusters):
+            df.loc[idx, "_fuzzy_group"] = global_group + local_cid
+        global_group += max(local_clusters, default=-1) + 1
     
     # Aggregate sources for traceability
-    grouped_sources = df.groupby(broad_key)["organiza"].apply(
+    grouped_sources = df.groupby("_fuzzy_group")["organiza"].apply(
         lambda x: " + ".join(sorted(set(x)))
     ).reset_index(name="merged_from_sources")
     
-    # Fase 2: Dentro de cada grupo, sub-agrupar por distancia horaria
+    # Fase 2: Dentro de cada fuzzy-group, sub-agrupar por distancia horaria
     # Si dos filas difieren en ≥2h, son sesiones distintas (matinée vs noche)
     # PERO: registros con lugar genérico fuerzan merge (su hora no es fiable)
     keep_indices = []
-    for (canon, fecha), group in df.groupby(broad_key, sort=False):
+    for fuzzy_gid, group in df.groupby("_fuzzy_group", sort=False):
         if len(group) == 1:
             keep_indices.append(group.index[0])
             continue
@@ -377,7 +405,7 @@ async def main():
     df = df.loc[keep_indices]
     
     # Unir la trazabilidad de fuentes combinadas
-    df = df.merge(grouped_sources, on=broad_key, how="left")
+    df = df.merge(grouped_sources, on="_fuzzy_group", how="left")
 
     # ─── QA Gates reforzados (P0-F) ───
     # QA: Ratio de eventos sin fecha_iso (demasiados borradores = scraper roto)
