@@ -308,6 +308,8 @@ async def main():
         t = str(t).lower().strip()
         t = unicodedata.normalize("NFKD", t)
         t = "".join(c for c in t if not unicodedata.combining(c))
+        # Normalizar '&' → 'y' para evitar falsos negativos (Fito & → Fito y)
+        t = t.replace("&", "y")
         # Stopwords ordenadas de mayor a menor longitud (evita matches parciales)
         stopwords = sorted([
             "en las palmas de gran canaria", "en gran canaria", "en las palmas",
@@ -336,13 +338,19 @@ async def main():
     FUZZY_THRESHOLD = 82  # ratio mínimo para considerar mismo evento
     
     def _fuzzy_cluster(canons: list[str]) -> list[int]:
-        """Asigna un cluster_id a cada canon. Canons con ratio ≥ threshold van al mismo cluster."""
+        """Asigna un cluster_id a cada canon.
+        
+        Usa max(ratio, token_set_ratio) para detectar casos donde un título
+        es subconjunto de otro (ej: 'Carles Sans' vs 'Carles Sans - Por Fin Me Voy').
+        """
         clusters = []  # list of (cluster_id, representative_canon)
         assignments = []
         for canon in canons:
             matched = False
             for cid, rep in clusters:
-                if fuzz.ratio(canon, rep) >= FUZZY_THRESHOLD:
+                # token_set_ratio detecta subconjuntos de tokens
+                score = max(fuzz.ratio(canon, rep), fuzz.token_set_ratio(canon, rep))
+                if score >= FUZZY_THRESHOLD:
                     assignments.append(cid)
                     matched = True
                     break
@@ -369,11 +377,24 @@ async def main():
     
     # Fase 2: Dentro de cada fuzzy-group, sub-agrupar por distancia horaria
     # Si dos filas difieren en ≥2h, son sesiones distintas (matinée vs noche)
+    # PERO: si comparten el MISMO lugar concreto → fusionar siempre (misma función)
     # PERO: registros con lugar genérico fuerzan merge (su hora no es fiable)
     keep_indices = []
     for fuzzy_gid, group in df.groupby("_fuzzy_group", sort=False):
         if len(group) == 1:
             keep_indices.append(group.index[0])
+            continue
+        
+        # Detectar si todos los registros del grupo comparten un lugar concreto
+        lugares = group["lugar"].apply(lambda x: str(x).strip().lower() if pd.notna(x) else "").tolist()
+        lugares_concretos = [l for l in lugares if l and not es_lugar_generico(l)]
+        # Si hay ≥2 registros con el mismo lugar concreto, fusionar todo el grupo
+        mismo_lugar = (len(lugares_concretos) >= 2 and len(set(lugares_concretos)) == 1)
+        
+        if mismo_lugar:
+            # Mismo evento, distintas funciones → quedarnos con el mejor
+            best_idx = max(group.index, key=lambda i: df.loc[i, "_score"])
+            keep_indices.append(best_idx)
             continue
         
         # Sub-agrupar por cercanía horaria (±2h = mismo evento)
