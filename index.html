@@ -48,7 +48,8 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
     rel="stylesheet" />
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -61,7 +62,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=5" />
 
   <!-- JSON-LD Structured Data (base) -->
   <script type="application/ld+json">
@@ -153,15 +154,54 @@
         </button>
       </div>
 
-      <!-- Mobile menu toggle -->
-      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menú">
+      <!-- Mobile menu toggle (Hidden in new Stitch design, using bottom nav instead) -->
+      <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menú" style="display: none;">
         <span></span><span></span><span></span>
       </button>
     </div>
   </header>
 
-  <!-- MOBILE NAV DRAWER -->
-  <div class="mobile-nav-drawer hidden" id="mobile-nav-drawer">
+  <!-- NEW STITCH DESIGN: MOBILE BOTTOM NAV -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegación Móvil">
+    <a href="/" class="nav-link active" data-view="grid" aria-label="Eventos">
+      <span class="material-icon">
+        <svg fill="currentColor" viewBox="0 0 24 24">
+          <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
+        </svg>
+      </span>
+      <span>Eventos</span>
+    </a>
+    <a href="/semana" class="nav-link" data-view="week" aria-label="Esta semana">
+      <span class="material-icon">
+        <svg fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM5 20V9h14v11H5z" />
+        </svg>
+      </span>
+      <span>Semana</span>
+    </a>
+    <a href="/calendario" class="nav-link" data-view="calendar" aria-label="Calendario">
+      <span class="material-icon">
+        <svg fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
+        </svg>
+      </span>
+      <span>Calendario</span>
+    </a>
+    <a href="/mapa" class="nav-link" data-view="map" aria-label="Mapa">
+      <span class="material-icon">
+        <svg fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z" />
+        </svg>
+      </span>
+      <span>Mapa</span>
+    </a>
+  </nav>
+
+  <!-- OLD MOBILE NAV DRAWER (Hidden/Removed functionality but kept in DOM to prevent JS errors) -->
+  <div class="mobile-nav-drawer hidden" id="mobile-nav-drawer" style="display:none !important;">
     <nav class="mobile-nav-links">
       <a href="/" data-view="grid">🗂 Todos los eventos</a>
       <a href="/semana" data-view="week">📅 Esta semana</a>
@@ -214,7 +254,7 @@
   <div class="toast hidden" id="toast"></div>
 
   <script src="env.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=5"></script>
 </body>
 
 </html>

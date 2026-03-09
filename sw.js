@@ -3,7 +3,7 @@
    Network-First strategy to ensure users always get the latest version
    ================================================================ */
 
-const CACHE_NAME = 'agenda-gc-v5';
+const CACHE_NAME = 'agenda-gc-v6';
 const STATIC_ASSETS = [
     '/',
     '/index.html',

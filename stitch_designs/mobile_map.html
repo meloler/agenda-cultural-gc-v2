@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mapa Cultural - Gran Canaria</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f26c0d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                        "surface-dark": "#342418",
+                        "surface-darker": "#1a120c",
+                        "text-main": "#FFFFFF",
+                        "text-muted": "#cba990",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "2xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for horizontal swipe */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden h-screen flex flex-col">
+<!-- Main Container -->
+<div class="relative flex h-full w-full flex-col overflow-hidden">
+<!-- Header (Floating Overlay) -->
+<header class="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-4 pointer-events-none">
+<!-- Search Bar -->
+<div class="pointer-events-auto flex-1 max-w-sm">
+<div class="flex items-center bg-surface-dark/90 backdrop-blur-md rounded-full px-4 h-12 shadow-lg border border-surface-darker/50">
+<span class="material-symbols-outlined text-text-muted mr-2">search</span>
+<input class="bg-transparent border-none text-text-main placeholder-text-muted focus:ring-0 w-full text-sm" placeholder="Buscar eventos..." type="text"/>
+</div>
+</div>
+<!-- Profile/Menu Button -->
+<button class="pointer-events-auto ml-3 flex items-center justify-center size-12 rounded-full bg-surface-dark/90 backdrop-blur-md text-text-main shadow-lg border border-surface-darker/50">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<!-- Map Layer -->
+<div class="absolute inset-0 z-0 bg-surface-darker w-full h-full">
+<!-- Static Map Representation -->
+<div class="w-full h-full bg-cover bg-center opacity-80" data-alt="Dark schematic map of Gran Canaria streets" data-location="Gran Canaria" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0XpKTWwfEF7KEmNJbQOB-FFbyQxbQO74E9mVaFvODBvHQbHxl9x9oh80CZ6MBMbqJT9Br8VQMfylh6oLeK-gXlsW0zFOz5IYkQd6fITrZK4Ggf70nzhtqzihmNtRuj7pkWctFdZ-I-64jxcKChVcB9N33SHQwc3meCfbgpjk69jFP6x64TMg5RJSChy73Ks_4q_8Nzt7VN08gpwdy75yKt0w8WjOcgildHnvYMqAYgrvUFuValubViZ2DOadukHpExaWDiqcSbQQ'); filter: grayscale(100%) invert(0%) brightness(0.4) sepia(10%) hue-rotate(-30deg) saturate(150%) contrast(1.1);">
+</div>
+<!-- Map Markers -->
+<!-- Marker 1: Selected -->
+<div class="absolute top-[40%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="relative flex items-center justify-center size-14 bg-primary rounded-full shadow-xl shadow-primary/30 z-10 border-4 border-surface-darker animate-bounce">
+<span class="material-symbols-outlined text-white text-2xl">music_note</span>
+</div>
+<div class="mt-1 px-3 py-1 bg-surface-darker/90 backdrop-blur rounded-md text-xs font-bold text-white shadow-lg">Jazz Festival</div>
+</div>
+<!-- Marker 2: Theater -->
+<div class="absolute top-[30%] left-[35%] flex items-center justify-center size-10 bg-purple-600 rounded-full shadow-lg border-2 border-surface-darker cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-white text-sm">theater_comedy</span>
+</div>
+<!-- Marker 3: Art -->
+<div class="absolute top-[55%] left-[65%] flex items-center justify-center size-10 bg-teal-500 rounded-full shadow-lg border-2 border-surface-darker cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-white text-sm">palette</span>
+</div>
+<!-- Marker 4: Cluster -->
+<div class="absolute top-[45%] left-[20%] flex items-center justify-center size-10 bg-surface-dark rounded-full shadow-lg border-2 border-surface-darker cursor-pointer text-white font-bold text-xs">
+                3+
+            </div>
+</div>
+<!-- Floating Controls (Right Side) -->
+<div class="absolute top-20 right-4 z-20 flex flex-col gap-3">
+<!-- Legend Toggle -->
+<button class="flex size-10 items-center justify-center rounded-full bg-surface-dark/90 backdrop-blur-md text-text-main shadow-lg border border-surface-darker/50 hover:bg-surface-dark transition-colors">
+<span class="material-symbols-outlined">layers</span>
+</button>
+<!-- GPS/Location -->
+<button class="flex size-10 items-center justify-center rounded-full bg-surface-dark/90 backdrop-blur-md text-primary shadow-lg border border-surface-darker/50 hover:bg-surface-dark transition-colors">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+<!-- Zoom Controls -->
+<div class="flex flex-col rounded-full bg-surface-dark/90 backdrop-blur-md shadow-lg border border-surface-darker/50 overflow-hidden">
+<button class="flex size-10 items-center justify-center text-text-main hover:bg-surface-darker/50 active:bg-surface-darker transition-colors border-b border-white/10">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex size-10 items-center justify-center text-text-main hover:bg-surface-darker/50 active:bg-surface-darker transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+</div>
+</div>
+<!-- Bottom Sheet / Event Preview Area -->
+<div class="absolute bottom-0 left-0 right-0 z-30 flex flex-col justify-end bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent pt-12 pb-24 pointer-events-none">
+<!-- Horizontal Swipe Container -->
+<div class="w-full overflow-x-auto no-scrollbar px-4 pb-4 pointer-events-auto snap-x snap-mandatory flex gap-4">
+<!-- Card 1 (Active) -->
+<div class="snap-center shrink-0 w-[85%] max-w-[340px] bg-surface-dark rounded-2xl overflow-hidden shadow-2xl border border-surface-darker/50 transform transition-transform hover:scale-[1.02]">
+<div class="relative h-32 w-full bg-cover bg-center" data-alt="Jazz musician playing saxophone on stage with warm lighting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAM5pAx5ANBGfjMr6q9jnJnmVS8sVP92ARfwv_UX1vqZXa2A2eBhy4Cu7hrODdxwefwMpgVrCpz8-rENraAZfwqDlbwlUCKajhSIjBzV7Tu8_CRA6nBX5JLHjOprMsKFzasVZ0aCN6uQ4d-F9m9fCsHD3JGL0VaJE5vipWzrzLIEAVI2u3Mh5E3Wf3dQMpEVMqk-UaGT_28GBGhEaq77Ct14mwBFm8sx1gjLs0sA16-ZOmWesgIiJJnA3SUVzP3TSjH1-0ylq5i23U');">
+<div class="absolute top-3 left-3 bg-primary/90 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
+                            HOY • 20:00
+                        </div>
+<div class="absolute top-3 right-3 bg-black/50 p-1.5 rounded-full backdrop-blur-sm text-white">
+<span class="material-symbols-outlined text-sm block">bookmark_border</span>
+</div>
+</div>
+<div class="p-4">
+<h3 class="text-lg font-bold text-white mb-1 truncate">Jazz Festival 2024</h3>
+<div class="flex items-center gap-1 text-text-muted text-sm mb-3">
+<span class="material-symbols-outlined text-base">location_on</span>
+<span class="truncate">Parque Santa Catalina</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-primary font-bold">Gratis</span>
+<button class="bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-4 py-2 rounded-full transition-colors flex items-center gap-1">
+                                Detalles <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="snap-center shrink-0 w-[85%] max-w-[340px] bg-surface-dark rounded-2xl overflow-hidden shadow-2xl border border-surface-darker/50 opacity-90 scale-95">
+<div class="relative h-32 w-full bg-cover bg-center" data-alt="Abstract theater mask and red curtains" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDeCrZM-PPqr02t-l2JCZRhzdyGYydRZ5ysEbsg8Mt2gVXGqxais0gQgjXktNzMKV5UpYl1KhcL0Tjv4kCvUqntYAwWjtgm7wv0j6KYG-FSr98iJD8pK_6sC3xTb8NKdQ8j0yKAev0gRk-LHWF_Z71XYsCAQg0qZ6O2Vay26yfNEJrMxLp5cR1ghnCtT9imsXZspMK97BdsmQhzUrUXOJkxrQW_cWYPD2eqIzu2lpnolegn1q82FBSKnG0ter1RZA2knfXVFOH7SuM');">
+<div class="absolute top-3 left-3 bg-purple-600/90 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
+                            MAÑANA • 18:30
+                        </div>
+</div>
+<div class="p-4">
+<h3 class="text-lg font-bold text-white mb-1 truncate">Teatro Pérez Galdós</h3>
+<div class="flex items-center gap-1 text-text-muted text-sm mb-3">
+<span class="material-symbols-outlined text-base">location_on</span>
+<span class="truncate">Calle Triana</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-white font-bold">15€</span>
+<button class="bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-4 py-2 rounded-full transition-colors flex items-center gap-1">
+                                Detalles <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Fixed) -->
+<nav class="absolute bottom-0 left-0 right-0 z-40 bg-surface-dark border-t border-surface-darker px-2 pb-5 pt-3">
+<ul class="flex justify-around items-center">
+<li>
+<a class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="text-[10px] font-medium">Agenda</span>
+</a>
+</li>
+<li>
+<!-- Active State -->
+<a class="flex flex-col items-center gap-1 p-2 text-primary" href="#">
+<div class="bg-primary/20 px-4 py-1 rounded-full flex items-center justify-center mb-0.5">
+<span class="material-symbols-outlined text-primary fill-current">map</span>
+</div>
+<span class="text-[10px] font-bold">Mapa</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-medium">Favoritos</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center gap-1 p-2 text-text-muted hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</body></html>

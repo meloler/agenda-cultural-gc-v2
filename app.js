@@ -44,10 +44,20 @@ const CAT_EMOJI = {
   'Exposición': '🖼️', 'Carnaval': '🎉', 'Cultura/Teatro': '🎭', 'Otros': '🌴',
 };
 const CAT_COLOR = {
-  'Música': '#38bdf8', 'Teatro': '#a78bfa', 'Cine': '#94a3b8', 'Danza': '#f472b6',
-  'Humor': '#fbbf24', 'Gastronomía': '#f59e0b', 'Deporte': '#4ade80', 'Infantil': '#f472b6',
-  'Formación': '#fbbf24', 'Exposición': '#22d3ee', 'Carnaval': '#fb7185',
-  'Cultura/Teatro': '#a78bfa', 'Otros': '#94a3b8',
+  'Música': '#f26c0d',      // Primary Orange
+  'Teatro': '#a855f7',      // Purple
+  'Cine': '#3b82f6',        // Blue
+  'Danza': '#ec4899',       // Pink
+  'Humor': '#eab308',       // Yellow
+  'Gastronomía': '#f59e0b', // Amber
+  'Deporte': '#22c55e',     // Green
+  'Infantil': '#f472b6',    // Rose
+  'Formación': '#6366f1',   // Indigo
+  'Exposición': '#fb923c',  // Orange Light
+  'Carnaval': '#ef4444',    // Red
+  'Cultura/Teatro': '#14b8a6', // Teal
+  'Otros': '#94a3b8',       // Slate
+  'Música/Espectáculo': '#f26c0d',
 };
 
 function catEmoji(cat) {
@@ -212,7 +222,7 @@ async function fetchAllEvents() {
 
   const { data, error } = await sb
     .from('evento')
-    .select('id, nombre, latitud, longitud, estilo, fecha_iso, hora, lugar, imagen_url')
+    .select('id, nombre, latitud, longitud, estilo, fecha_iso, hora, lugar, imagen_url, precio_num, descripcion, url_venta')
     .not('fecha_iso', 'is', null)
     .gte('fecha_iso', today)
     .lte('fecha_iso', finVentana)
@@ -270,6 +280,19 @@ function navigateTo(url) {
 
 function router() {
   const path = location.pathname || '/';
+
+  // Force scroll unlock on route change (e.g. leaving an open modal)
+  document.body.style.overflow = '';
+  document.body.classList.remove('leaflet-dragging'); // Just in case Leaflet leaves a dragging class
+
+  // Cleanup map instance if leaving map view to prevent zombie touch listeners
+  if (state.mapInstance && !path.startsWith('/mapa')) {
+    try {
+      state.mapInstance.remove();
+    } catch (e) { }
+    state.mapInstance = null;
+    state.mapMarkers = [];
+  }
 
   // Update nav active state
   document.querySelectorAll('.nav-link,.mobile-nav-links a').forEach(link => {
@@ -545,17 +568,27 @@ function resetFilters() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// VIEW: WEEK
+// VIEW: WEEK — Stitch 7-Column Grid
 // ═══════════════════════════════════════════════════════════════════
 async function renderWeekView() {
   const main = document.getElementById('app-main');
   main.innerHTML = `<div class="container week-view">
     <div class="week-header">
-      <h2 id="week-title">Esta semana</h2>
-      <div class="week-nav">
-        <button onclick="weekNav(-1)">← Anterior</button>
-        <button onclick="weekNav(0)">Hoy</button>
-        <button onclick="weekNav(1)">Siguiente →</button>
+      <div class="week-header-left">
+        <h2>Agenda Semanal</h2>
+        <p>Descubre los eventos culturales de Gran Canaria.</p>
+      </div>
+      <div class="week-controls">
+        <div class="week-range-pill">
+          <button class="range-btn" onclick="weekNav(-1)">‹</button>
+          <span class="week-range-text" id="week-range">—</span>
+          <button class="range-btn" onclick="weekNav(1)">›</button>
+        </div>
+        <div class="week-nav">
+          <button onclick="weekNav(-1)">Anterior</button>
+          <button class="btn-today" onclick="weekNav(0)">Hoy</button>
+          <button onclick="weekNav(1)">Siguiente</button>
+        </div>
       </div>
     </div>
     <div id="week-content"><div class="loading-screen"><div class="loader-pulse"></div><p>Cargando…</p></div></div>
@@ -571,7 +604,7 @@ async function renderWeekView() {
 
 function renderWeekDays(events) {
   const container = document.getElementById('week-content');
-  const titleEl = document.getElementById('week-title');
+  const rangeEl = document.getElementById('week-range');
   if (!container) return;
 
   const now = new Date();
@@ -587,51 +620,81 @@ function renderWeekDays(events) {
     days.push(d);
   }
 
-  const weekStart = formatDate(toISO(days[0]));
-  const weekEnd = formatDate(toISO(days[6]));
-  titleEl.textContent = state.weekOffset === 0 ? 'Esta semana' : `Semana del ${weekStart} al ${weekEnd}`;
+  // Update range text
+  const fmtShort = d => d.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+  const yr = days[0].getFullYear();
+  if (rangeEl) rangeEl.textContent = `${fmtShort(days[0])} – ${fmtShort(days[6])}, ${yr}`;
 
   const todayStr = toISO(new Date());
+  const DAY_ABBR = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
+  const MAX_EVENTS_SHOWN = 4;
 
-  let html = '';
-  days.forEach(day => {
+  let html = '<div class="week-grid">';
+
+  days.forEach((day, idx) => {
     const iso = toISO(day);
     const isToday = iso === todayStr;
-    const dayName = day.toLocaleDateString('es-ES', { weekday: 'long' });
-    const dayDate = day.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-
     const dayEvents = events.filter(e => e.fecha_iso === iso);
+    const abbr = DAY_ABBR[idx];
+    const dayNum = day.getDate();
+    const todayLabel = isToday ? ` • Hoy` : '';
 
+    html += `<div class="wk-day ${isToday ? 'is-today' : ''}">`;
+
+    // Day header
     html += `
-      <div class="day-column">
-        <div class="day-label ${isToday ? 'today' : ''}">
-          <span class="day-name">${dayName}</span>
-          <span class="day-date">${dayDate}</span>
-          ${dayEvents.length > 0 ? `<span class="day-count">${dayEvents.length}</span>` : ''}
+      <div class="wk-day-header">
+        <div class="wk-day-label">
+          <span class="wk-day-name">${abbr}${todayLabel}</span>
+          <span class="wk-day-num">${dayNum}</span>
         </div>
-        <div class="day-events">
-          ${dayEvents.length === 0
-        ? '<div class="day-empty">Sin eventos programados</div>'
-        : dayEvents.map(ev => `
-              <div class="day-event-row" onclick="navigateTo('/evento/${ev.id}')" role="button" tabindex="0">
-                <div class="day-event-time">${ev.hora || '—'}</div>
-                <div class="day-event-img">
-                  ${ev.imagen_url
-            ? `<img src="${ev.imagen_url}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='${catEmoji(ev.estilo)}'">`
-            : catEmoji(ev.estilo)}
-                </div>
-                <div class="day-event-info">
-                  <div class="day-event-name">${ev.nombre}</div>
-                  <div class="day-event-venue">${ICONS.pin} ${ev.lugar}</div>
-                </div>
-                <span class="day-event-badge ${badgeClass(ev.estilo)}">${ev.estilo}</span>
+        <span class="wk-day-count">${dayEvents.length}</span>
+      </div>`;
+
+    // Events stack
+    html += `<div class="wk-events-stack">`;
+
+    if (dayEvents.length === 0) {
+      html += `<div class="wk-empty">Sin eventos</div>`;
+    } else {
+      const shown = dayEvents.slice(0, MAX_EVENTS_SHOWN);
+      shown.forEach(ev => {
+        const color = catColor(ev.estilo);
+        const thumb = ev.imagen_url
+          ? `<img src="${ev.imagen_url}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='${catEmoji(ev.estilo)}';">`
+          : catEmoji(ev.estilo);
+        html += `
+          <div class="wk-event" onclick="navigateTo('/evento/${ev.id}')" role="button" tabindex="0">
+            <div class="wk-event-bar" style="background:${color}"></div>
+            
+            <div class="wk-event-time-col">
+              <span class="wk-event-time-val">${ev.hora || '—'}</span>
+            </div>
+            
+            <div class="wk-event-content">
+              <div class="wk-event-thumb">${thumb}</div>
+              <div class="wk-event-meta">
+                <span class="wk-event-cat" style="color:${color}">${ev.estilo}</span>
+                <span class="wk-event-time-desktop" style="color:${color}">${ev.hora || '—'}</span>
+                <span class="wk-event-name">${ev.nombre}</span>
+                <span class="wk-event-venue">
+                  <span class="material-symbols-outlined venue-icon">location_on</span>
+                  ${ev.lugar || ''}
+                </span>
               </div>
-            `).join('')}
-        </div>
-      </div>
-    `;
+            </div>
+          </div>`;
+      });
+
+      if (dayEvents.length > MAX_EVENTS_SHOWN) {
+        html += `<div class="wk-empty">+${dayEvents.length - MAX_EVENTS_SHOWN} más</div>`;
+      }
+    }
+
+    html += `</div></div>`;
   });
 
+  html += '</div>';
   container.innerHTML = html;
 }
 
@@ -648,11 +711,14 @@ async function renderCalendarView() {
   const main = document.getElementById('app-main');
   main.innerHTML = `<div class="container calendar-view">
     <div class="calendar-header">
-      <h2 id="cal-title"></h2>
+      <div class="cal-header-left">
+        <button onclick="calNav(-1)" class="cal-nav-btn"><span class="material-symbols-outlined">chevron_left</span></button>
+        <h2 id="cal-title"></h2>
+        <button onclick="calNav(1)" class="cal-nav-btn"><span class="material-symbols-outlined">chevron_right</span></button>
+      </div>
       <div class="cal-nav">
-        <button onclick="calNav(-1)">‹</button>
-        <button onclick="calNav(0)" title="Hoy" style="font-size:.75rem">Hoy</button>
-        <button onclick="calNav(1)">›</button>
+        <!-- Optional desktop nav elements, hidden on mobile -->
+        <button onclick="calNav(0)" title="Hoy" class="desktop-only text-sm font-bold cal-nav-btn">Hoy</button>
       </div>
     </div>
     <div id="cal-grid-wrap"><div class="loading-screen"><div class="loader-pulse"></div></div></div>
@@ -673,7 +739,10 @@ function renderCalGrid(events) {
   if (!wrap) return;
 
   const y = state.calYear, m = state.calMonth;
-  const monthName = new Date(y, m, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  let monthName = new Date(y, m, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  monthName = monthName.replace(' de ', ' '); // e.g. "marzo 2026" instead of "marzo de 2026"
+  // Capitalize first letter
+  monthName = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   titleEl.textContent = monthName;
 
   const firstDay = new Date(y, m, 1);
@@ -703,16 +772,16 @@ function renderCalGrid(events) {
     const dayEvs = evMap[iso] || [];
 
     html += `
-      <div class="cal-cell ${isToday ? 'today' : ''}" onclick="showCalDay('${iso}')" role="button" tabindex="0">
+      <div class="cal-cell ${isToday ? 'today' : ''}" data-iso="${iso}" onclick="showCalDay('${iso}')" role="button" tabindex="0">
         <span class="cal-date">${day}</span>
         ${dayEvs.length > 0 ? `
           <div class="cal-dots">
-            ${dayEvs.slice(0, 5).map(e => `<span class="cal-dot" style="background:${catColor(e.estilo)}" title="${e.estilo}"></span>`).join('')}
+            ${dayEvs.slice(0, 3).map(e => `<span class="cal-dot" style="background:${catColor(e.estilo)}" title="${e.estilo}"></span>`).join('')}
           </div>
           <div class="cal-cell-events">
-            ${dayEvs.slice(0, 2).map(e => `<span class="cal-event-mini">${e.nombre.slice(0, 20)}</span>`).join('')}
+            ${dayEvs.slice(0, 2).map(e => `<span class="cal-event-mini" style="background:${catColor(e.estilo)}1a; color:${catColor(e.estilo)}">${e.nombre}</span>`).join('')}
           </div>
-          ${dayEvs.length > 2 ? `<span class="cal-event-count">+${dayEvs.length - 2} más</span>` : ''}
+          ${dayEvs.length > 2 ? `<span class="cal-event-count">+${dayEvs.length - 2}</span>` : ''}
         ` : ''}
       </div>
     `;
@@ -745,32 +814,60 @@ async function showCalDay(iso) {
   const detail = document.getElementById('cal-day-detail');
   const events = await fetchAllEvents();
   const dayEvs = events.filter(e => e.fecha_iso === iso);
-  const dateStr = formatDateLong(iso);
+
+  // Format to "Lunes, 9 mayo" (dropping year if you want, or just making it cleaner)
+  const dateObj = new Date(iso);
+  let dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+  document.querySelectorAll('.cal-cell.selected').forEach(el => el.classList.remove('selected'));
+  const cell = document.querySelector(`.cal-cell[data-iso="${iso}"]`);
+  if (cell) cell.classList.add('selected');
+
+  // Lock scroll on mobile
+  if (window.innerWidth <= 768) {
+    document.body.style.overflow = 'hidden';
+  }
+
 
   if (dayEvs.length === 0) {
-    detail.innerHTML = `<div class="cal-day-popup"><h3>${dateStr}</h3><p style="color:var(--text-3)">Sin eventos este día</p></div>`;
+    detail.innerHTML = `<div class="cal-day-popup empty-popup"><h3>${dateStr}</h3><p style="color:var(--text-3)">Sin eventos este día</p></div>`;
     return;
   }
 
   detail.innerHTML = `
     <div class="cal-day-popup">
-      <h3>📅 ${dateStr} — ${dayEvs.length} evento${dayEvs.length > 1 ? 's' : ''}</h3>
+      <div class="cal-day-popup-header">
+        <div>
+          <h3>${dateStr}</h3>
+          <p>${dayEvs.length} evento${dayEvs.length > 1 ? 's' : ''}</p>
+        </div>
+        <button class="cal-popup-close mobile-only" onclick="closeCalDay()">×</button>
+      </div>
       <div class="day-events">
-        ${dayEvs.map(ev => `
+        ${dayEvs.map(ev => {
+    const color = catColor(ev.estilo);
+    return `
           <div class="day-event-row" onclick="navigateTo('/evento/${ev.id}')" role="button" tabindex="0">
-            <div class="day-event-time">${ev.hora || '—'}</div>
             <div class="day-event-img">
               ${ev.imagen_url
-      ? `<img src="${ev.imagen_url}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='${catEmoji(ev.estilo)}'">`
-      : catEmoji(ev.estilo)}
+        ? `<img src="${ev.imagen_url}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='${catEmoji(ev.estilo)}'">`
+        : catEmoji(ev.estilo)}
             </div>
             <div class="day-event-info">
+              <div class="day-event-meta-top">
+                <span class="day-event-badge" style="color:${color}; background:${color}1a">${ev.estilo}</span>
+                <span class="day-event-time">${ev.hora || '—'}</span>
+              </div>
               <div class="day-event-name">${ev.nombre}</div>
-              <div class="day-event-venue">${ev.lugar}</div>
+              <div class="day-event-venue">
+                  <span class="material-symbols-outlined venue-icon" style="font-size: 14px; margin-right: 4px;">location_on</span>
+                  <span class="venue-text">${ev.lugar}</span>
+              </div>
             </div>
-            <span class="day-event-badge ${badgeClass(ev.estilo)}">${ev.estilo}</span>
+            <span class="day-event-badge-desktop ${badgeClass(ev.estilo)}">${ev.estilo}</span>
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
     </div>
   `;
@@ -779,6 +876,11 @@ async function showCalDay(iso) {
 
 // Make global for onclick
 window.showCalDay = showCalDay;
+window.closeCalDay = () => {
+  document.getElementById('cal-day-detail').innerHTML = '';
+  document.querySelectorAll('.cal-cell.selected').forEach(el => el.classList.remove('selected'));
+  document.body.style.overflow = '';
+};
 window.calNav = calNav;
 window.weekNav = weekNav;
 window.goPage = goPage;
@@ -786,24 +888,59 @@ window.resetFilters = resetFilters;
 window.navigateTo = navigateTo;
 
 // ═══════════════════════════════════════════════════════════════════
-// VIEW: MAP
+// VIEW: MAP — Stitch Full-Screen Interactive
 // ═══════════════════════════════════════════════════════════════════
 async function renderMapView() {
   const main = document.getElementById('app-main');
 
-  const legendItems = Object.entries(CAT_COLOR).map(([k, v]) =>
-    `<span class="map-legend-item"><span class="map-legend-dot" style="background:${v}"></span>${k}</span>`
+  // Build legend checkboxes
+  const legendRows = Object.entries(CAT_COLOR).map(([cat, color]) =>
+    `<div class="map-legend-row" data-cat="${cat}" style="--cat-color:${color}">
+      <div class="map-legend-check" style="border-color:${color};background:${color}">✓</div>
+      <span class="map-legend-name">${cat}</span>
+      <span class="map-legend-glow" style="background:${color};box-shadow:0 0 8px ${color}80"></span>
+    </div>`
   ).join('');
 
-  main.innerHTML = `<div class="container map-view">
-    <div class="map-header">
-      <h2>📍 Mapa de Eventos</h2>
-      <div class="map-legend">${legendItems}</div>
-    </div>
+  main.innerHTML = `<div class="map-view">
     <div id="map-container"></div>
+    <div class="map-legend-panel">
+      <div class="map-legend-title">
+        <span>Categorías</span>
+      </div>
+      <div class="map-legend-list">${legendRows}</div>
+    </div>
+    <div class="map-preview-card" id="map-preview" style="display:none"></div>
   </div>`;
 
-  // Wait for Leaflet to load
+  // Set up legend filter clicks
+  const hiddenCats = new Set();
+  document.querySelectorAll('.map-legend-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const cat = row.dataset.cat;
+      if (hiddenCats.has(cat)) {
+        hiddenCats.delete(cat);
+        row.classList.remove('disabled');
+      } else {
+        hiddenCats.add(cat);
+        row.classList.add('disabled');
+      }
+      // Re-filter markers
+      if (state.mapMarkers) {
+        state.mapMarkers.forEach(({ marker, ev }) => {
+          if (hiddenCats.has(ev.estilo)) {
+            marker.setOpacity(0);
+            marker.getElement()?.style.setProperty('pointer-events', 'none');
+          } else {
+            marker.setOpacity(1);
+            marker.getElement()?.style.setProperty('pointer-events', 'auto');
+          }
+        });
+      }
+    });
+  });
+
+  // Wait for Leaflet
   if (typeof L === 'undefined') {
     await new Promise(resolve => {
       const check = setInterval(() => {
@@ -825,9 +962,13 @@ function initMap(events) {
   if (!container) return;
 
   if (state.mapInstance) { state.mapInstance.remove(); state.mapInstance = null; }
+  state.mapMarkers = [];
 
-  const map = L.map('map-container').setView([28.1, -15.43], 11);
+  const map = L.map('map-container', { zoomControl: false }).setView([28.1, -15.43], 11);
   state.mapInstance = map;
+
+  // Add zoom control to bottom-right (Stitch style)
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
 
   const isDark = document.body.classList.contains('theme-dark');
   L.tileLayer(
@@ -838,39 +979,88 @@ function initMap(events) {
   ).addTo(map);
 
   const geoEvents = events.filter(e => e.latitud && e.longitud);
+
   geoEvents.forEach(ev => {
     const color = catColor(ev.estilo);
+    const emoji = catEmoji(ev.estilo);
+
     const icon = L.divIcon({
       className: 'custom-marker',
-      html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)"></div>`,
-      iconSize: [14, 14],
-      iconAnchor: [7, 7],
+      html: `<div class="stitch-marker" style="border:2px solid ${color}" data-id="${ev.id}">
+        <span class="stitch-marker-inner">${emoji}</span>
+      </div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
     });
 
     const marker = L.marker([ev.latitud, ev.longitud], { icon }).addTo(map);
-    marker.bindPopup(`
-      <div class="map-popup">
-        <div class="map-popup-title">${ev.nombre}</div>
-        <div class="map-popup-meta">${formatDate(ev.fecha_iso)} ${ev.hora ? '· ' + ev.hora : ''}<br>${ev.lugar}</div>
-        <button class="map-popup-btn" onclick="navigateTo('/evento/${ev.id}')">Ver detalle</button>
-      </div>
-    `);
+    state.mapMarkers.push({ marker, ev });
+
+    marker.on('click', () => showMapPreview(ev, color));
   });
 
   if (geoEvents.length > 0) {
     const bounds = L.latLngBounds(geoEvents.map(e => [e.latitud, e.longitud]));
-    map.fitBounds(bounds, { padding: [30, 30] });
+    map.fitBounds(bounds, { padding: [60, 60] });
   }
+
+  // Close preview on map click
+  map.on('click', () => {
+    const preview = document.getElementById('map-preview');
+    if (preview) preview.style.display = 'none';
+  });
 
   setTimeout(() => map.invalidateSize(), 200);
 }
 
+function showMapPreview(ev, color) {
+  const preview = document.getElementById('map-preview');
+  if (!preview) return;
+
+  const precio = formatPrice(ev.precio_num);
+  const desc = ev.descripcion
+    ? ev.descripcion.replace(/<[^>]+>/g, '').slice(0, 200) + '...'
+    : '';
+
+  preview.style.display = 'flex';
+  preview.innerHTML = `
+      <div class="stitch-map-card" onclick="navigateTo('/evento/${ev.id}')">
+          <div class="stitch-map-card-img" style="background-image: ${ev.imagen_url ? `url('${ev.imagen_url}')` : 'none'}; ${!ev.imagen_url ? `background: linear-gradient(135deg, ${color}33, var(--surface2))` : ''}">
+              <div class="stitch-map-card-badge" style="background-color: ${color}e6;">
+                  ${ev.estilo.toUpperCase()}
+              </div>
+              <button class="stitch-map-card-close" onclick="event.stopPropagation(); document.getElementById('map-preview').style.display='none'">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+              </button>
+              ${!ev.imagen_url ? `<span class="stitch-map-card-emoji">${catEmoji(ev.estilo)}</span>` : ''}
+          </div>
+          <div class="stitch-map-card-content">
+              <h3 class="stitch-map-card-title">${ev.nombre}</h3>
+              <div class="stitch-map-card-location">
+                  <span class="material-symbols-outlined">location_on</span>
+                  <span class="truncate" style="flex:1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ev.lugar}</span>
+              </div>
+              <div class="stitch-map-card-date" style="color:var(--text-3); font-size:0.8rem; margin-bottom: 12px;">
+                  ${formatDate(ev.fecha_iso)}${ev.hora ? ' • ' + ev.hora : ''}
+              </div>
+              <div class="stitch-map-card-footer">
+                  <span class="stitch-map-card-price" style="color: ${color}; font-weight:700;">${precio}</span>
+                  <button class="stitch-map-card-btn" onclick="event.stopPropagation(); navigateTo('/evento/${ev.id}')">
+                      Detalles <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                  </button>
+              </div>
+          </div>
+      </div>
+    `;
+}
+window.showMapPreview = showMapPreview;
+
 // ═══════════════════════════════════════════════════════════════════
-// VIEW: EVENT DETAIL (shareable URL)
+// VIEW: EVENT DETAIL — Stitch Premium Layout
 // ═══════════════════════════════════════════════════════════════════
 async function renderEventDetail(id) {
   const main = document.getElementById('app-main');
-  main.innerHTML = `<div class="container event-detail-view">
+  main.innerHTML = `<div class="event-detail-view">
     <div class="loading-screen"><div class="loader-pulse"></div><p>Cargando evento…</p></div>
   </div>`;
 
@@ -878,83 +1068,144 @@ async function renderEventDetail(id) {
     const ev = await fetchEventoDetail(id);
     const detailContainer = main.querySelector('.event-detail-view');
     const emoji = catEmoji(ev.estilo);
-
+    const color = catColor(ev.estilo);
     const precio = formatPrice(ev.precio_num);
     const mapUrl = (ev.latitud && ev.longitud)
       ? `https://www.google.com/maps?q=${ev.latitud},${ev.longitud}`
+      : null;
+    const staticMapUrl = (ev.latitud && ev.longitud)
+      ? `https://maps.googleapis.com/maps/api/staticmap?center=${ev.latitud},${ev.longitud}&zoom=15&size=400x200&scale=2&maptype=roadmap&markers=color:orange%7C${ev.latitud},${ev.longitud}`
       : null;
 
     const shareText = `🎭 ${ev.nombre} — ${formatDate(ev.fecha_iso)} en ${ev.lugar}`;
     const shareUrl = `${SITE_URL}/evento/${ev.id}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
 
+    // Format day of week
+    const dateObj = new Date(ev.fecha_iso + 'T12:00:00');
+    const dayOfWeek = dateObj.toLocaleDateString('es-ES', { weekday: 'long' });
+
+    // Truncate description for subtitle (first sentence or 120 chars)
+    const subtitle = ev.descripcion
+      ? ev.descripcion.replace(/<[^>]+>/g, '').slice(0, 150).split('. ').slice(0, 2).join('. ') + '.'
+      : '';
+
     const rawHTML = `
-      <a href="/" class="event-detail-back">${ICONS.back} Volver a eventos</a>
+      <a href="/" class="event-detail-back">${ICONS.back} Volver</a>
 
-      ${ev.imagen_url ? `
-        <div class="event-detail-image">
-          <img src="${ev.imagen_url}" alt="${ev.nombre}" loading="lazy" class="detail-img" data-emoji="${emoji}">
-        </div>
-      ` : ''}
-
-      <div class="event-detail-badges">
-        <span class="card-badge ${badgeClass(ev.estilo)}" style="position:static">${ev.estilo}</span>
-      </div>
-
-      <h1 class="event-detail-title">${ev.nombre}</h1>
-
-      <div class="event-info-grid">
-        <div class="event-info-card">
-          <div class="event-info-icon">📅</div>
-          <div>
-            <div class="event-info-label">Fecha</div>
-            <div class="event-info-value">${formatDateLong(ev.fecha_iso)}</div>
-          </div>
-        </div>
-        ${ev.hora ? `
-        <div class="event-info-card">
-          <div class="event-info-icon">🕐</div>
-          <div>
-            <div class="event-info-label">Hora</div>
-            <div class="event-info-value">${ev.hora}</div>
-          </div>
-        </div>` : ''}
-        <div class="event-info-card">
-          <div class="event-info-icon">📍</div>
-          <div>
-            <div class="event-info-label">Lugar</div>
-            <div class="event-info-value">${ev.lugar}</div>
-          </div>
-        </div>
-        <div class="event-info-card">
-          <div class="event-info-icon">💰</div>
-          <div>
-            <div class="event-info-label">Precio</div>
-            <div class="event-info-value">${precio}</div>
+      <!-- Hero Section -->
+      <div class="ed-hero">
+        ${ev.imagen_url
+        ? `<div class="ed-hero-bg" style="background-image:url('${ev.imagen_url}')"></div>`
+        : `<div class="ed-hero-placeholder">${emoji}</div>`}
+        <div class="ed-hero-gradient"></div>
+        <div class="ed-hero-content">
+          <div class="ed-hero-inner">
+            <div class="ed-hero-badges">
+              <span class="ed-badge-primary">${emoji} ${ev.estilo}</span>
+            </div>
+            <h1 class="ed-hero-title">${ev.nombre}</h1>
+            ${subtitle ? `<p class="ed-hero-subtitle">${subtitle}</p>` : ''}
           </div>
         </div>
       </div>
 
-      ${ev.descripcion ? `<div class="event-detail-desc">${ev.descripcion}</div>` : ''}
+      <!-- Content Grid -->
+      <div class="ed-content">
+        <!-- Left Column -->
+        <div class="ed-main">
+          <!-- Info Cards -->
+          <div class="ed-info-grid">
+            <div class="ed-info-card">
+              <div class="ed-info-card-icon">📅</div>
+              <div>
+                <div class="ed-info-card-label">Fecha</div>
+                <div class="ed-info-card-value">${formatDateLong(ev.fecha_iso)}</div>
+                <div class="ed-info-card-sub">${dayOfWeek}</div>
+              </div>
+            </div>
+            ${ev.hora ? `
+            <div class="ed-info-card">
+              <div class="ed-info-card-icon">🕐</div>
+              <div>
+                <div class="ed-info-card-label">Hora</div>
+                <div class="ed-info-card-value">${ev.hora}</div>
+              </div>
+            </div>` : ''}
+            <div class="ed-info-card">
+              <div class="ed-info-card-icon">📍</div>
+              <div>
+                <div class="ed-info-card-label">Lugar</div>
+                <div class="ed-info-card-value">${ev.lugar}</div>
+                ${mapUrl ? `<div class="ed-info-card-sub"><a href="${mapUrl}" target="_blank" rel="noopener">Cómo llegar →</a></div>` : ''}
+              </div>
+            </div>
+            <div class="ed-info-card">
+              <div class="ed-info-card-icon">💰</div>
+              <div>
+                <div class="ed-info-card-label">Precio</div>
+                <div class="ed-info-card-value">${precio}</div>
+              </div>
+            </div>
+          </div>
 
-      <div class="event-detail-actions">
-        <a class="btn-buy" href="${ev.url_venta}" target="_blank" rel="noopener">🎟️ Comprar entradas</a>
-        ${mapUrl ? `<a class="btn-secondary" href="${mapUrl}" target="_blank" rel="noopener">${ICONS.map} Ver en mapa</a>` : ''}
-        <a class="btn-secondary btn-share-whatsapp" href="${waUrl}" target="_blank" rel="noopener">${ICONS.whatsapp} WhatsApp</a>
-        <button class="btn-secondary" id="btn-share-native">${ICONS.share} Compartir</button>
-        <button class="btn-secondary" id="btn-share-copy">${ICONS.copy} Copiar enlace</button>
+          <!-- Description -->
+          ${ev.descripcion ? `
+          <div class="ed-description">
+            <h3>Sobre el evento</h3>
+            ${ev.descripcion}
+          </div>` : ''}
+        </div>
+
+        <!-- Right Column: Sidebar -->
+        <div class="ed-sidebar">
+          <div class="ed-ticket-card">
+            <div class="ed-ticket-price-label">Precio</div>
+            <div class="ed-ticket-price">
+              <span class="ed-ticket-price-amount">${precio}</span>
+            </div>
+            <a class="ed-btn-buy" href="${ev.url_venta}" target="_blank" rel="noopener">
+              <span>🎟️ Comprar entradas</span>
+              <span class="arrow">→</span>
+            </a>
+            <div class="ed-secure-note">🔒 Enlace oficial del organizador</div>
+            <div class="ed-action-row">
+              <button class="ed-action-btn" id="btn-share-native">${ICONS.share} Compartir</button>
+              <a class="ed-action-btn wa" href="${waUrl}" target="_blank" rel="noopener">${ICONS.whatsapp} WhatsApp</a>
+            </div>
+            <div class="ed-action-row" style="margin-top:6px">
+              <button class="ed-action-btn" id="btn-share-copy">${ICONS.copy} Copiar enlace</button>
+              ${mapUrl ? `<a class="ed-action-btn" href="${mapUrl}" target="_blank" rel="noopener">${ICONS.map} Ver mapa</a>` : '<div></div>'}
+            </div>
+
+            ${ev.lugar ? `
+            <div class="ed-venue-map">
+              <h4><span class="map-icon">📍</span> Ubicación</h4>
+              ${mapUrl ? `
+              <a href="${mapUrl}" target="_blank" rel="noopener" class="ed-map-preview">
+                <div style="width:100%;height:100%;background:var(--surface2)"></div>
+                <div class="map-overlay">
+                  <span class="map-label">Ver en Google Maps</span>
+                </div>
+              </a>` : ''}
+              <div class="ed-venue-address">${ev.lugar}</div>
+            </div>` : ''}
+          </div>
+        </div>
       </div>
     `;
 
     // Strict DOMPurify sanitization
     detailContainer.innerHTML = DOMPurify.sanitize(rawHTML, { ADD_ATTR: ['target'] });
 
-    // Fallback for detail image
-    const detailImg = detailContainer.querySelector('.detail-img');
-    if (detailImg) {
-      detailImg.addEventListener('error', function () {
-        this.parentElement.innerHTML = `<div class="card-image-placeholder" style="height:240px">${this.dataset.emoji}</div>`;
-      });
+    // Fallback for hero image
+    const heroBg = detailContainer.querySelector('.ed-hero-bg');
+    if (heroBg) {
+      const testImg = new Image();
+      testImg.onerror = () => {
+        heroBg.outerHTML = `<div class="ed-hero-placeholder">${emoji}</div>`;
+      };
+      testImg.src = ev.imagen_url;
     }
 
     // Connect share actions dynamically (CSP friendly)
@@ -969,7 +1220,7 @@ async function renderEventDetail(id) {
   } catch (err) {
     console.error(err);
     main.querySelector('.event-detail-view').innerHTML = `
-      <a href="/" class="event-detail-back">${ICONS.back} Volver</a>
+      <a href="/" class="event-detail-back" style="position:static;margin:20px">${ICONS.back} Volver</a>
       <div class="empty-state">
         <div class="empty-icon">😕</div>
         <h3>Evento no encontrado</h3>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agenda Gran Canaria - Mobile Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d4a373","primary-dark": "#b08968",
+                        "accent": "#e6ccb2",
+                        "background-light": "#fdfcf5",
+                        "background-dark": "#2b1d16","surface-dark": "#3d2b22","surface-light": "#ffffff",
+                        "text-light": "#faedcd",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            background-color: #2b1d16;}
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-text-light font-display min-h-screen flex flex-col overflow-hidden max-w-md mx-auto border-x border-surface-dark shadow-2xl">
+<header class="flex items-center justify-between px-5 py-4 z-20 shrink-0 bg-surface-light dark:bg-[#2b1d16]">
+<h2 class="text-slate-900 dark:text-[#e6ccb2] text-lg font-bold leading-tight tracking-tight">Agenda Gran Canaria</h2>
+<button class="flex items-center justify-center rounded-full size-10 text-slate-600 dark:text-[#d4a373] hover:bg-black/10 transition-colors">
+<span class="material-symbols-outlined text-2xl">search</span>
+</button>
+</header>
+<main class="flex-1 flex flex-col overflow-hidden relative w-full">
+<div class="px-5 pb-4 shrink-0 z-10 bg-background-light dark:bg-[#2b1d16]">
+<div class="flex items-center justify-between mb-4">
+<button class="size-8 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-600 dark:text-[#b08968]">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<h1 class="text-xl font-bold text-slate-900 dark:text-[#faedcd]">Mayo 2024</h1>
+<button class="size-8 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-600 dark:text-[#b08968]">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<div class="w-full">
+<div class="grid grid-cols-7 mb-2">
+<div class="text-center text-[10px] font-bold text-[#b08968] uppercase tracking-wider">D</div>
+<div class="text-center text-[10px] font-bold text-slate-400/60 uppercase tracking-wider">L</div>
+<div class="text-center text-[10px] font-bold text-slate-400/60 uppercase tracking-wider">M</div>
+<div class="text-center text-[10px] font-bold text-slate-400/60 uppercase tracking-wider">M</div>
+<div class="text-center text-[10px] font-bold text-slate-400/60 uppercase tracking-wider">J</div>
+<div class="text-center text-[10px] font-bold text-slate-400/60 uppercase tracking-wider">V</div>
+<div class="text-center text-[10px] font-bold text-slate-400/60 uppercase tracking-wider">S</div>
+</div>
+<div class="grid grid-cols-7 gap-y-1 gap-x-1">
+<div class="aspect-square"></div>
+<div class="aspect-square"></div>
+<div class="aspect-square"></div>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">1</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#8a9a5b]"></div> 
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">2</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">3</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#bc6c25]"></div> 
+<div class="size-1 rounded-full bg-[#dda15e]"></div> 
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">4</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg bg-[#3d2b22] border border-[#d4a373] shadow-[0_0_15px_-3px_rgba(212,163,115,0.3)] relative transition-all transform scale-105 z-10">
+<span class="text-sm font-bold text-[#faedcd]">5</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#d4a373]"></div>
+<div class="size-1 rounded-full bg-[#d4a373]/70"></div>
+<div class="size-1 rounded-full bg-[#d4a373]/40"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">6</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#bc4749]"></div> 
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">7</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">8</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#d4a373]"></div>
+<div class="size-1 rounded-full bg-[#bc6c25]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">9</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">10</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#dda15e]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">11</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">12</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#bc4749]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">13</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">14</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#d4a373]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">15</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#8a9a5b]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">16</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">17</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">18</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#bc6c25]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">19</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">20</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#bc4749]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">21</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">22</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#dda15e]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">23</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">24</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#d4a373]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">25</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">26</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">27</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#8a9a5b]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">28</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">29</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#bc4749]"></div>
+</div>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">30</span>
+</button>
+<button class="group aspect-square flex flex-col items-center justify-center rounded-lg hover:bg-surface-dark/50 relative transition-all">
+<span class="text-sm font-medium text-slate-400">31</span>
+<div class="flex gap-0.5 mt-1 h-1">
+<div class="size-1 rounded-full bg-[#d4a373]"></div>
+</div>
+</button>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-surface-dark rounded-t-3xl shadow-inner overflow-hidden flex flex-col">
+<div class="px-5 pt-5 pb-3 shrink-0 flex items-center justify-between border-b border-[#4a362c]">
+<div>
+<h3 class="text-lg font-bold text-[#faedcd]">Sunday, May 5</h3>
+<p class="text-xs text-[#b08968] font-medium mt-0.5">3 Events</p>
+</div>
+<button class="text-xs font-bold text-[#d4a373] hover:text-[#faedcd] transition-colors uppercase tracking-wide bg-[#2b1d16] px-3 py-1.5 rounded-full">See All</button>
+</div>
+<div class="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+<div class="flex gap-4 items-center group cursor-pointer p-3 rounded-2xl bg-[#2b1d16] border border-[#4a362c] shadow-sm">
+<div class="size-16 rounded-xl bg-cover bg-center shrink-0 shadow-inner" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCXfOz6Niu6dmoQZ5PxfBFmyzmO9FZv0-wKeLYCvwdg-GfcTWmYBrWaDgaMXJSefCQU2BE8pk7MxMPGiHbcWRDSO_aO6v4nUVHp0XgQQv7POmeNOffmYLvxDNWwj9gBwwQkWskfq1ZmxZHdkq48ODmW8JzL09mV7H3CIdb_sVIB5xhNRVYQmW0l1-tQ6kRgYvevGXGyaJlZb4ow4_TjtWfV487nTsw9pjLb2xBIsIHbw91K7p_na86RyYzCyAbwbS6fDoGTrXc4-jQ');"></div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[10px] font-bold text-[#d4a373] bg-[#d4a373]/10 px-2 py-0.5 rounded-full">MUSIC</span>
+<span class="text-[10px] text-slate-400">20:00</span>
+</div>
+<h4 class="text-sm font-bold text-[#faedcd] truncate mb-0.5">Jazz Festival Opening</h4>
+<div class="flex items-center text-slate-400">
+<span class="material-symbols-outlined text-[14px] mr-1">location_on</span>
+<p class="text-xs truncate">Auditorio Alfredo Kraus</p>
+</div>
+</div>
+</div>
+<div class="flex gap-4 items-center group cursor-pointer p-3 rounded-2xl bg-[#2b1d16] border border-[#4a362c] shadow-sm">
+<div class="size-16 rounded-xl bg-cover bg-center shrink-0 shadow-inner" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDPg1j9O-pTe2iyo1xkj5gFi781OkGZPoCZhKasHfy-1tdSLcDFKQ0GbdHl6NnHJLGt07jmo5ZO0XKba4RYSCNoGQz4dlaatdesJILQFc4PXhiKW5HzhayjGvrb_8nJB5_o0n7P_tLlhjp8qsKiP4BazCnfJ8vvjc5vQhJDEHxAKiHZ8zB-jjyZsqfK304VCHzfD5Jazm0kGViqHjf8TBVCOcgDiCmpxUFN9MdcZktp1utXQMkEaIj6UHefD33A7Bxt-YR424UoQuc');"></div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[10px] font-bold text-[#bc6c25] bg-[#bc6c25]/10 px-2 py-0.5 rounded-full">ART</span>
+<span class="text-[10px] text-slate-400">10:00</span>
+</div>
+<h4 class="text-sm font-bold text-[#faedcd] truncate mb-0.5">Modern Art Exhibition</h4>
+<div class="flex items-center text-slate-400">
+<span class="material-symbols-outlined text-[14px] mr-1">location_on</span>
+<p class="text-xs truncate">CAAM</p>
+</div>
+</div>
+</div>
+<div class="flex gap-4 items-center group cursor-pointer p-3 rounded-2xl bg-[#2b1d16] border border-[#4a362c] shadow-sm">
+<div class="size-16 flex items-center justify-center rounded-xl bg-[#3d2b22] shrink-0 text-[#b08968]">
+<span class="material-symbols-outlined text-3xl">restaurant</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<span class="text-[10px] font-bold text-[#8a9a5b] bg-[#8a9a5b]/10 px-2 py-0.5 rounded-full">FOOD</span>
+<span class="text-[10px] text-slate-400">13:00</span>
+</div>
+<h4 class="text-sm font-bold text-[#faedcd] truncate mb-0.5">Local Tapas Tasting</h4>
+<div class="flex items-center text-slate-400">
+<span class="material-symbols-outlined text-[14px] mr-1">location_on</span>
+<p class="text-xs truncate">Vegueta Market</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<nav class="shrink-0 bg-surface-dark border-t border-[#4a362c] px-6 py-3 flex justify-between items-center z-30 pb-6">
+<a class="flex flex-col items-center gap-1 text-[#b08968] hover:text-[#d4a373] transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#b08968] hover:text-[#d4a373] transition-colors" href="#">
+<span class="material-symbols-outlined">view_week</span>
+<span class="text-[10px] font-medium">Week</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#d4a373]" href="#">
+<span class="material-symbols-outlined font-fill">calendar_month</span>
+<span class="text-[10px] font-bold">Calendar</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-[#b08968] hover:text-[#d4a373] transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-medium">Map</span>
+</a>
+</nav>
+
+</body></html>

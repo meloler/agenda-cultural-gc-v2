@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agenda Cultural Gran Canaria</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f26c0d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#231810",
+                        "surface-dark": "#342418",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        /* Hide scrollbar for clean mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased flex flex-col min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-slate-200 dark:border-white/10 px-4 py-3">
+<div class="max-w-md mx-auto w-full flex flex-col gap-4">
+<!-- Title & Week Range -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="bg-primary/20 text-primary p-2 rounded-lg">
+<span class="material-symbols-outlined text-[24px]">calendar_month</span>
+</span>
+<div>
+<h1 class="text-lg font-bold leading-tight">Agenda Cultural</h1>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400">Semana 14 - 20 Oct</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="size-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<button class="size-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-surface-dark hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Week Navigation Controls -->
+<div class="flex items-center justify-between gap-2 bg-slate-100 dark:bg-surface-dark p-1 rounded-full">
+<button class="flex size-9 items-center justify-center rounded-full bg-white dark:bg-white/10 shadow-sm text-slate-900 dark:text-white">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="flex-1 text-sm font-bold text-center text-primary uppercase tracking-wide">
+                    Hoy
+                </button>
+<button class="flex size-9 items-center justify-center rounded-full bg-white dark:bg-white/10 shadow-sm text-slate-900 dark:text-white">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 w-full max-w-md mx-auto pb-24 px-4">
+<!-- Day Section: Today -->
+<section class="mt-6">
+<div class="sticky top-[130px] z-30 py-2 bg-background-light dark:bg-background-dark mb-2 flex items-baseline justify-between border-b border-dashed border-slate-300 dark:border-white/10">
+<h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Hoy, Lunes 14</h2>
+<span class="text-xs font-bold bg-primary text-white px-2 py-0.5 rounded-full">8 eventos</span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Event Card 1 -->
+<article class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-white/5">
+<!-- Category Indicator Bar -->
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-500"></div>
+<div class="flex w-full p-3 pl-4 gap-3">
+<!-- Time Column -->
+<div class="flex flex-col items-center justify-center min-w-[50px] border-r border-slate-100 dark:border-white/5 pr-3">
+<span class="text-sm font-bold text-slate-900 dark:text-white">20:00</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">PM</span>
+</div>
+<!-- Content -->
+<div class="flex flex-1 gap-3">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden">
+<img alt="Jazz musician playing saxophone in dark lighting" class="w-full h-full object-cover" data-alt="Jazz musician silhouette" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPfTYXtVF6QS5T_cVuHQd9QuIq06wjHAX65T6EfiZafnvY9vPVqkLlkcIAllHOdBDBW-OSnRe1cJ6mUHWHWXHYrcNMOplS1Piw5hboa32h211ET4mdNxHW2oExABt3x0VsgjMRjxTWwwkezI3SiULcpstGJvjuRdfb84tcl5BAQpuQOTtzSSa_ghtYAONFDVesaHlwm-q0LaoNOrmW3Rqt2y3f-dn8tmzICebZ5Xb3oFMB1oI4js3zsYrv6-UBKZoAnvWfLMSvZgA"/>
+</div>
+<div class="flex flex-col justify-center flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="text-[10px] font-bold text-purple-500 uppercase tracking-wide">Música</span>
+</div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">Festival de Jazz Internacional</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                    Auditorio Alfredo Kraus
+                                </p>
+</div>
+</div>
+</div>
+</article>
+<!-- Event Card 2 -->
+<article class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-white/5">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-orange-500"></div>
+<div class="flex w-full p-3 pl-4 gap-3">
+<div class="flex flex-col items-center justify-center min-w-[50px] border-r border-slate-100 dark:border-white/5 pr-3">
+<span class="text-sm font-bold text-slate-900 dark:text-white">19:30</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">PM</span>
+</div>
+<div class="flex flex-1 gap-3">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden">
+<img alt="Theatre stage with red curtains and spotlight" class="w-full h-full object-cover" data-alt="Red theatre curtains" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMTypFFeqkaUAGm45fvZ4grwrm82lYM9jcFyzsCQGCdTXGruVb7O30oyRs1GwJaILpD7eWh5tL72a8AsSZik_hR5hTYpd-HeWvo8m0E7VtVR5_993q4FSXU-HXlWhmKr3-V2A5LGBL1mf5O4PmGXh_BPlj4cbYLChjj4lVOz8XPziyvO1YNIgfRCfnP8qARakgrtmAx6EQUoDJFW-0Q_qoPg1fp_mIxJH4Bgh0nIqxvID6ixu3-EzMQ0pDPqTmFWQhX6dBqOzaFSk"/>
+</div>
+<div class="flex flex-col justify-center flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="text-[10px] font-bold text-orange-500 uppercase tracking-wide">Teatro</span>
+</div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">La Casa de Bernarda Alba</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                    Teatro Pérez Galdós
+                                </p>
+</div>
+</div>
+</div>
+</article>
+<!-- Event Card 3 -->
+<article class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-white/5">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-500"></div>
+<div class="flex w-full p-3 pl-4 gap-3">
+<div class="flex flex-col items-center justify-center min-w-[50px] border-r border-slate-100 dark:border-white/5 pr-3">
+<span class="text-sm font-bold text-slate-900 dark:text-white">17:00</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">PM</span>
+</div>
+<div class="flex flex-1 gap-3">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden">
+<img alt="Colorful abstract art painting detail" class="w-full h-full object-cover" data-alt="Abstract art detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRrWymI9_yCaNkF_wE-80S6mzMjeYoeP0QlnhBfj1UQRtzZqEHZo_N4YYeXq9JOMD3A9lSSzbFzXe8_9GPMc3xbk_RiWCTSn9hF05K0XPw1jDGoYbvJPbHkfzFmev_Xouno5XddX_a6_pqeKmOwCMmjq8V-WNKczVLbyyM4rR6zvegSk2yZeXEkphiuHC3b6jt7q6jv71kcVYyJcg6Uh_bXsvbA0txMD_SiP3YsNKlae5fPsSWirRvnFXbw_AxKsZeN1thgF7qefY"/>
+</div>
+<div class="flex flex-col justify-center flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="text-[10px] font-bold text-blue-500 uppercase tracking-wide">Arte</span>
+</div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">Exposición: Luz y Color</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                    CAAM
+                                </p>
+</div>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Day Section: Tomorrow -->
+<section class="mt-8">
+<div class="sticky top-[130px] z-30 py-2 bg-background-light dark:bg-background-dark mb-2 flex items-baseline justify-between border-b border-dashed border-slate-300 dark:border-white/10">
+<h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Mañana, Martes 15</h2>
+<span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-white/10 px-2 py-0.5 rounded-full">3 eventos</span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Event Card 4 -->
+<article class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-white/5">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-green-500"></div>
+<div class="flex w-full p-3 pl-4 gap-3">
+<div class="flex flex-col items-center justify-center min-w-[50px] border-r border-slate-100 dark:border-white/5 pr-3">
+<span class="text-sm font-bold text-slate-900 dark:text-white">10:00</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">AM</span>
+</div>
+<div class="flex flex-1 gap-3">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden">
+<img alt="Group of people hiking in nature" class="w-full h-full object-cover" data-alt="Hiking group nature" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBghP5d_gfAqxpMqDC-Nr-Q-Tfpo7Cq_7Z12LZkQpLCvWnZ3bITYAzdTJj51lGAWKTGC6Yk0P03rrMjRhI0J35Wc6CkuSr1P41x8S1-cKiwi7SQrZJMRp7wnCtbZPbegGtFizYdOEyu34g-vuc9hpHelPt5tF_p2xLpEddlDcSdPjyswkiHH0ZOI3tiOg8oxn1Bqq_8GcuTEYWJbnEuZeK9kpoDy9_QOC-mSaI_08uyfWgAbHU_cUVqMBB9aWKkhermicbqjDCGxIU"/>
+</div>
+<div class="flex flex-col justify-center flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="text-[10px] font-bold text-green-500 uppercase tracking-wide">Aire Libre</span>
+</div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">Ruta de Senderismo Roque Nublo</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                    Tejeda, Gran Canaria
+                                </p>
+</div>
+</div>
+</div>
+</article>
+<!-- Event Card 5 -->
+<article class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-white/5">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500"></div>
+<div class="flex w-full p-3 pl-4 gap-3">
+<div class="flex flex-col items-center justify-center min-w-[50px] border-r border-slate-100 dark:border-white/5 pr-3">
+<span class="text-sm font-bold text-slate-900 dark:text-white">21:30</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">PM</span>
+</div>
+<div class="flex flex-1 gap-3">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden">
+<img alt="Rock concert with stage lights" class="w-full h-full object-cover" data-alt="Rock concert lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5I98q-GSt0bYab9UahPFzxhKflIG1UoQ30r9CFmktEZUY8XkCHeTQuIaDlXWeTlSy9HjE0heKb4GGkVUK8FnCd7bg_9rQ9josJOOOahDluaX36vVeAIqaWegHgkbdHryWHmFPcdrOEgTY_cP47VEiMwKn6GZ9O6lPqNeUHx6BGzuTCRwP6r47uIndy-MZPYxEVg_p2X0aNHb0mJvXwp0JIkmX__lX2M0CJXLCT1ggxwgOdaS2EY294zOCLVi_irthnWy9IJOdREc"/>
+</div>
+<div class="flex flex-col justify-center flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="text-[10px] font-bold text-red-500 uppercase tracking-wide">Concierto</span>
+</div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">Banda Local en Vivo</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                    Plaza de la Música
+                                </p>
+</div>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Day Section: Wednesday -->
+<section class="mt-8">
+<div class="sticky top-[130px] z-30 py-2 bg-background-light dark:bg-background-dark mb-2 flex items-baseline justify-between border-b border-dashed border-slate-300 dark:border-white/10">
+<h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Miércoles 16</h2>
+<span class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-white/10 px-2 py-0.5 rounded-full">1 evento</span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Event Card 6 -->
+<article class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-white/5">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-500"></div>
+<div class="flex w-full p-3 pl-4 gap-3">
+<div class="flex flex-col items-center justify-center min-w-[50px] border-r border-slate-100 dark:border-white/5 pr-3">
+<span class="text-sm font-bold text-slate-900 dark:text-white">18:00</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">PM</span>
+</div>
+<div class="flex flex-1 gap-3">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden">
+<img alt="Kids playing in a workshop" class="w-full h-full object-cover" data-alt="Kids workshop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2hWljhz9eE7KvhCWoWlYp4DJlmpxbHKFIASX6ogTspLkWF3_6IrP3Y4sIbGO-yPe7bijeyLvBeCVXgEzaf20bWp3rYMtMwB27Fsm9kgm5-rQXkWHwthwPINsjclStAmcAk1WB_d6FN-VgcEXSmu5dg9q1MGaWK1qfMGKhcEDOJpD6k__SfP6IdkhhtwGxiPzxY1iqVTEKbNM45RNm3xlUlWQuhUWif7eHQn7I1RQykgl166uAO5h7o2-bTbRUTgqNa7tQTbtuI5Y"/>
+</div>
+<div class="flex flex-col justify-center flex-1 min-w-0">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="text-[10px] font-bold text-yellow-500 uppercase tracking-wide">Infantil</span>
+</div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">Taller de Marionetas</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">location_on</span>
+                                    Biblioteca Pública
+                                </p>
+</div>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- CTA Block -->
+<div class="mt-8 mb-4 p-4 rounded-xl bg-gradient-to-r from-primary/20 to-orange-600/20 border border-primary/30 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-primary">¿Buscas más?</span>
+<span class="text-xs text-slate-600 dark:text-slate-300">Explora el calendario completo del mes.</span>
+</div>
+<button class="px-4 py-2 bg-primary text-white text-xs font-bold rounded-full shadow-lg hover:bg-orange-600 transition-colors">
+                Ver Mes
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 z-50 bg-background-light dark:bg-surface-dark border-t border-slate-200 dark:border-white/10 px-6 py-2 pb-5 lg:pb-2">
+<div class="max-w-md mx-auto w-full flex justify-between items-center">
+<a class="flex flex-col items-center gap-1 p-2 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">calendar_today</span>
+<span class="text-[10px] font-medium">Agenda</span>
+</a>
+<!-- Floating Action Button effect for Map -->
+<div class="relative -top-6">
+<button class="size-14 rounded-full bg-primary text-white shadow-lg shadow-primary/40 flex items-center justify-center border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-[28px]">map</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">favorite</span>
+<span class="text-[10px] font-medium">Favoritos</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</div>
+</nav>
+</body></html>

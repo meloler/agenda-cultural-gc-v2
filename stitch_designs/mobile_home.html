@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agenda Cultural GC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#f26c0d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                        "surface-dark": "#2d1f18",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom Scrollbar for horizontal scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex justify-center text-slate-900 dark:text-slate-100 antialiased selection:bg-primary selection:text-white">
+<!-- Mobile-first Layout Container (Centered on Desktop) -->
+<div class="w-full max-w-md h-screen flex flex-col bg-background-light dark:bg-background-dark relative shadow-2xl overflow-hidden border-x border-slate-200 dark:border-slate-800">
+<!-- Header: Compact Glassmorphism -->
+<header class="absolute top-0 left-0 right-0 z-50 px-4 py-3 flex items-center justify-between bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50">
+<div class="flex items-center gap-2">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center text-white font-bold shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-[20px]">palm_logo</span>
+</div>
+<h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Agenda GC</h1>
+</div>
+<div class="flex gap-2">
+<button class="size-9 flex items-center justify-center rounded-full bg-slate-200 dark:bg-surface-dark text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-[#3a2a22] transition-colors">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<button class="size-9 flex items-center justify-center rounded-full bg-slate-200 dark:bg-surface-dark text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-[#3a2a22] transition-colors">
+<span class="material-symbols-outlined text-[20px]">dark_mode</span>
+</button>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto pt-[68px] pb-[88px] no-scrollbar">
+<!-- Hero/Welcome Section -->
+<div class="px-4 py-4">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-12 h-12 rounded-full bg-slate-200 dark:bg-surface-dark overflow-hidden ring-2 ring-primary ring-offset-2 ring-offset-background-light dark:ring-offset-background-dark bg-cover bg-center" data-alt="User profile avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJAYbZjT-uEEZKNlcChAYOWxyitOdzY9bAbkYDa1gzU12uzrzPGFqwTzzwpN1N48bTahCnHJpsspLwR2KiMexpUsC47O3fCCDJ7onrLIJ7-_GY7a1fn1lSbUzOwvdHlX_y5pIvIdSyVhSskBbOuHGRUU1pg7xSZrBY9ezbmRT7Iry4gNZeO93xrA_r6ft9ej9KJjdej3IQxS7F1jq6oUKbHKgo91-w6A9897x9-UJTisFkz1O5_8P8NrLtWSoyhxk8DwE19SzblRg');"></div>
+<div>
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Buenos días</p>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white leading-none">Discover Gran Canaria</h2>
+</div>
+</div>
+</div>
+<!-- Filters & Categories Scroll -->
+<div class="sticky top-0 z-40 bg-background-light dark:bg-background-dark py-2 border-b border-slate-200 dark:border-slate-800">
+<div class="flex gap-2 px-4 overflow-x-auto no-scrollbar items-center">
+<button class="flex items-center gap-1 bg-surface-dark dark:bg-[#342418] text-white px-3 py-2 rounded-full text-sm font-semibold whitespace-nowrap shadow-sm border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span>Filter</span>
+</button>
+<div class="w-[1px] h-6 bg-slate-300 dark:bg-slate-700 mx-1 shrink-0"></div>
+<button class="bg-primary text-white px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap shadow-md shadow-primary/20">
+                        Hoy
+                    </button>
+<button class="bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-300 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#3a2a22]">
+                        Mañana
+                    </button>
+<button class="bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-300 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#3a2a22]">
+                        Esta Semana
+                    </button>
+<button class="bg-white dark:bg-surface-dark text-slate-600 dark:text-slate-300 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#3a2a22]">
+                        Finde
+                    </button>
+</div>
+</div>
+<!-- Events List -->
+<div class="px-4 pt-6 flex flex-col gap-6">
+<!-- Card 1: Featured -->
+<article class="group relative flex flex-col gap-3">
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Jazz musician playing saxophone in dim light" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDq6LbOjtmwledEFahVjhF_KfLq_r9dxX409eWGKk5oa-SCf7psy51LiKJE9Q6gVpWPUFzctWHD8V3S3kbO1gxVX92NWtk2zPbou6qYel-PNodoUcPDVRpdWSeIG-rU7cP0vN9L5_leSjxmOFfhiK8vaZRFlNX51OMF1DCcqI7EbLVHQoGgDoVi1mgEzFAn-Y9npihOz4AjhTomM-kPmi2e_NUVR9p_pTjAIREeV9sCc6q69cPI7lMvaZ3AmSoGBpUyPXgl6WpptW8');">
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute top-3 left-3">
+<span class="px-2.5 py-1 rounded-lg bg-blue-500/90 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wide">Music</span>
+</div>
+<div class="absolute top-3 right-3 flex items-center justify-center size-8 rounded-full bg-white/20 backdrop-blur-md text-white">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Jazz Night at the Park</h3>
+<span class="shrink-0 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-bold">Today</span>
+</div>
+<p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">Experience an evening of smooth jazz under the stars with the renowned local quartet.</p>
+<div class="flex items-center gap-4 mt-2 text-sm text-slate-600 dark:text-slate-300 font-medium">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+                                20:00
+                            </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary">euro</span>
+                                15.00
+                            </div>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Parque Santa Catalina
+                        </div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="group relative flex flex-col gap-3">
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Abstract colorful art exhibition painting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvze0MVDNZqwT-rPLyyIWmGs3rxydwneqBh_1OrEAG6nc3ppyJLaNF9Xu8OC9tNet0Mh9lohTWXBnggAGKe241-I_s5htqrONkb6-IqqqcgPFXaEiNskIYn7sfh6dA-9eQkZy0zAew0vow-B3RBFG7zuN1UMV4iNu20VjWr1RY_LfRQ-UXwGWQZv8zYy5RjSm059EN6pTXlX06Ng6U2MBVObA7QC3Oh7CR2vR2YCXbpbmQcE4BIxi-HyIT7j2ZTafrPp8gPrBB-Vg');">
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute top-3 left-3">
+<span class="px-2.5 py-1 rounded-lg bg-purple-500/90 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wide">Art</span>
+</div>
+<div class="absolute top-3 right-3 flex items-center justify-center size-8 rounded-full bg-white/20 backdrop-blur-md text-white">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Canarian Landscapes</h3>
+<span class="shrink-0 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold">Tomorrow</span>
+</div>
+<div class="flex items-center gap-4 mt-2 text-sm text-slate-600 dark:text-slate-300 font-medium">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+                                10:00 - 18:00
+                            </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-green-500">sell</span>
+                                Free Entry
+                            </div>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Casa de Colón
+                        </div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="group relative flex flex-col gap-3">
+<div class="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="Group of people hiking on a mountain trail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEwAR_LvabXeA6_50tN-LPKN2CWgTxT8d46FxF78M1Lwg4W65_yCa9GEAj46JOXN7iV9pe00pF4su4F2WREjLVK1zdclec5qMocyJp586vM0cB0b_irg0rzx4nUGT4XLezTrTu_bDhxHI3B6jiQHcEb6lR7TflzxD7CMliInSCxz5nMCMTir0zvip2B42l9wD0fSz_WthbmhZEykmbRV02TmXn0SgyHKAwkJ9o579wUI0FqF5wuVHPhiezQrLv9uEIh0PmtNIDDRM');">
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute top-3 left-3">
+<span class="px-2.5 py-1 rounded-lg bg-emerald-500/90 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wide">Outdoor</span>
+</div>
+<div class="absolute top-3 right-3 flex items-center justify-center size-8 rounded-full bg-white/20 backdrop-blur-md text-white">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Roque Nublo Hike</h3>
+<span class="shrink-0 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold">Sat, 14 Oct</span>
+</div>
+<div class="flex items-center gap-4 mt-2 text-sm text-slate-600 dark:text-slate-300 font-medium">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+                                08:30
+                            </div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary">euro</span>
+                                25.00
+                            </div>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Tejeda
+                        </div>
+</div>
+</article>
+</div>
+<!-- Bottom spacing for nav bar -->
+<div class="h-6"></div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="absolute bottom-0 left-0 right-0 h-20 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 px-2 pb-2">
+<div class="flex items-center justify-around h-full">
+<button class="flex flex-col items-center justify-center gap-1 w-16 h-full text-primary">
+<div class="w-12 h-8 rounded-full flex items-center justify-center bg-primary/10">
+<span class="material-symbols-outlined text-[24px] fill-1">confirmation_number</span>
+</div>
+<span class="text-[10px] font-bold">Events</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 w-16 h-full text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined text-[24px]">calendar_view_week</span>
+<span class="text-[10px] font-medium">Week</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 w-16 h-full text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined text-[24px]">calendar_month</span>
+<span class="text-[10px] font-medium">Calendar</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 w-16 h-full text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined text-[24px]">map</span>
+<span class="text-[10px] font-medium">Map</span>
+</button>
+</div>
+</nav>
+</div>
+</body></html>
