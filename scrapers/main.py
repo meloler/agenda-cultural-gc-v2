@@ -96,7 +96,7 @@ async def run_all_scrapers() -> list[Evento]:
         "Ticketmaster Web", "Auditorio A. Kraus", "Teatro Pérez Galdós",
         "CICCA", "Teatro Guiniguada", "Tomaticket", "Tickety",
         "Entradas.com", "Entrées.es", "EntradasCanarias", "TeldeCultura",
-        "SalanProducciones", "LocalGuideGC",
+        "Salan Producciones", "LocalGuideGC",
     ]
 
     fallos_scraper = 0

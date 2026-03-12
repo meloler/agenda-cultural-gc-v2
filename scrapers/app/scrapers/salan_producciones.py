@@ -413,6 +413,26 @@ async def scrape_salan_producciones(page: Page) -> list[Evento]:
                             seen_texts.add(fingerprint)
                             descripcion = text
                             break
+                            
+                # Fallback: Extraer directo de los <p> si Elementor cambia de markup
+                if not descripcion:
+                    try:
+                        all_p = page.locator("p, h2, h3")
+                        count = await all_p.count()
+                        clean_lines = []
+                        for i in range(count):
+                            texto = (await all_p.nth(i).inner_text(timeout=1000)).strip()
+                            # Filtrar paja (botones, cookies, etc)
+                            t_lower = texto.lower()
+                            if texto and len(texto) > 15 and "comprar" not in t_lower and "suscríbete" not in t_lower and "salán producciones" not in t_lower and "inicio" not in t_lower and "aviso legal" not in t_lower and "cookie" not in t_lower and "almacenamos" not in t_lower and "nuestros socios" not in t_lower:
+                                clean_lines.append(texto)
+                        if clean_lines:
+                            combined = "\n\n".join(clean_lines)
+                            seen_texts.add(combined[:200].strip())
+                            descripcion = combined
+                    except Exception as e:
+                        pass
+
 
                 # 5️⃣ Imagen: og:image como prioridad si no la tenemos
                 if not imagen_url:
@@ -462,11 +482,11 @@ async def scrape_salan_producciones(page: Page) -> list[Evento]:
                         fecha_iso=fecha_iso,
                         precio_num=precio_num,
                         hora=hora,
-                        organiza="SalanProducciones",
+                        organiza="Salan Producciones",
                         url_venta=url_venta,
                         imagen_url=imagen_url,
                         descripcion=descripcion,
-                        estilo=categorizar_pro(titulo_final, "SalanProducciones"),
+                        estilo=categorizar_pro(titulo_final, "Salan Producciones"),
                     )
                 )
 
