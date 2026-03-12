@@ -71,6 +71,8 @@ def _detectar_dominio(url: str) -> str:
         return "entradas_com"
     if "teldecultura" in domain:
         return "teldecultura"
+    if "salanproducciones" in domain:
+        return "salanproducciones"
     return "generico"
 
 

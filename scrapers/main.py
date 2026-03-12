@@ -37,6 +37,8 @@ from app.scrapers.entradas_com import scrape_entradas_com
 from app.scrapers.entrees import scrape_entrees
 from app.scrapers.entradas_canarias import scrape_entradas_canarias
 from app.scrapers.telde_cultura import scrape_telde_cultura
+from app.scrapers.salan_producciones import scrape_salan_producciones
+from app.scrapers.localguide_gc import scrape_localguide_gc
 
 
 async def _scrape_ticketmaster_smart(page) -> list[Evento]:
@@ -67,6 +69,8 @@ async def run_all_scrapers() -> list[Evento]:
         page_entrees = await browser.new_page()
         page_entradas_canarias = await browser.new_page()
         page_telde = await browser.new_page()
+        page_salan = await browser.new_page()
+        page_localguide = await browser.new_page()
 
         # Lanzar en paralelo
         results = await asyncio.gather(
@@ -81,6 +85,8 @@ async def run_all_scrapers() -> list[Evento]:
             scrape_entrees(page_entrees),
             scrape_entradas_canarias(page_entradas_canarias),
             scrape_telde_cultura(page_telde),
+            scrape_salan_producciones(page_salan),
+            scrape_localguide_gc(page_localguide),
             return_exceptions=True,
         )
 
@@ -90,6 +96,7 @@ async def run_all_scrapers() -> list[Evento]:
         "Ticketmaster Web", "Auditorio A. Kraus", "Teatro Pérez Galdós",
         "CICCA", "Teatro Guiniguada", "Tomaticket", "Tickety",
         "Entradas.com", "Entrées.es", "EntradasCanarias", "TeldeCultura",
+        "SalanProducciones", "LocalGuideGC",
     ]
 
     fallos_scraper = 0

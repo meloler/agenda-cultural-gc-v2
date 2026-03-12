@@ -281,6 +281,9 @@ function navigateTo(url) {
 function router() {
   const path = location.pathname || '/';
 
+  // Force scroll to top on every route change (important for mobile)
+  window.scrollTo(0, 0);
+
   // Force scroll unlock on route change (e.g. leaving an open modal)
   document.body.style.overflow = '';
   document.body.classList.remove('leaflet-dragging'); // Just in case Leaflet leaves a dragging class
@@ -1073,130 +1076,161 @@ async function renderEventDetail(id) {
     const mapUrl = (ev.latitud && ev.longitud)
       ? `https://www.google.com/maps?q=${ev.latitud},${ev.longitud}`
       : null;
-    const staticMapUrl = (ev.latitud && ev.longitud)
-      ? `https://maps.googleapis.com/maps/api/staticmap?center=${ev.latitud},${ev.longitud}&zoom=15&size=400x200&scale=2&maptype=roadmap&markers=color:orange%7C${ev.latitud},${ev.longitud}`
-      : null;
 
     const shareText = `🎭 ${ev.nombre} — ${formatDate(ev.fecha_iso)} en ${ev.lugar}`;
     const shareUrl = `${SITE_URL}/evento/${ev.id}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
 
-    // Format day of week
+    // Format date nicely
     const dateObj = new Date(ev.fecha_iso + 'T12:00:00');
-    const dayOfWeek = dateObj.toLocaleDateString('es-ES', { weekday: 'long' });
-
-    // Truncate description for subtitle (first sentence or 120 chars)
-    const subtitle = ev.descripcion
-      ? ev.descripcion.replace(/<[^>]+>/g, '').slice(0, 150).split('. ').slice(0, 2).join('. ') + '.'
-      : '';
+    const dateFormatted = dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 
     const rawHTML = `
-      <a href="/" class="event-detail-back">${ICONS.back} Volver</a>
-
-      <!-- Hero Section -->
+      <!-- Hero Section: full-bleed image with floating nav -->
       <div class="ed-hero">
         ${ev.imagen_url
         ? `<div class="ed-hero-bg" style="background-image:url('${ev.imagen_url}')"></div>`
         : `<div class="ed-hero-placeholder">${emoji}</div>`}
         <div class="ed-hero-gradient"></div>
-        <div class="ed-hero-content">
-          <div class="ed-hero-inner">
-            <div class="ed-hero-badges">
-              <span class="ed-badge-primary">${emoji} ${ev.estilo}</span>
+
+        <!-- Floating top nav: back + share -->
+        <header class="ed-floating-nav">
+          <a href="/" class="ed-nav-btn" id="ed-back-btn" aria-label="Volver">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </a>
+          <button class="ed-nav-btn" id="btn-share-native" aria-label="Compartir">
+            <span class="material-symbols-outlined">share</span>
+          </button>
+        </header>
+
+        <!-- Glassmorphism title card at bottom of hero -->
+        <div class="ed-hero-card">
+          <div class="ed-hero-card-inner">
+            <div class="ed-hero-top-row">
+              <div>
+                <span class="ed-badge-primary" style="color:${color}; background:${color}1a">${emoji} ${ev.estilo}</span>
+                <h1 class="ed-hero-title">${ev.nombre}</h1>
+              </div>
             </div>
-            <h1 class="ed-hero-title">${ev.nombre}</h1>
-            ${subtitle ? `<p class="ed-hero-subtitle">${subtitle}</p>` : ''}
+            <!-- CTA row inside hero -->
+            <div class="ed-hero-cta-row">
+              ${ev.url_venta
+        ? `<a class="ed-btn-buy-hero" href="${ev.url_venta}" target="_blank" rel="noopener noreferrer">
+                    <span>Comprar Entradas</span>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                  </a>`
+        : `<span class="ed-btn-buy-hero ed-btn-free">Entrada libre</span>`}
+              ${mapUrl
+        ? `<a class="ed-nav-btn ed-map-btn" href="${mapUrl}" target="_blank" rel="noopener" aria-label="Ver en mapa">
+                    <span class="material-symbols-outlined">map</span>
+                  </a>`
+        : ''}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Content Grid -->
-      <div class="ed-content">
-        <!-- Left Column -->
-        <div class="ed-main">
-          <!-- Info Cards -->
-          <div class="ed-info-grid">
-            <div class="ed-info-card">
-              <div class="ed-info-card-icon">📅</div>
-              <div>
-                <div class="ed-info-card-label">Fecha</div>
-                <div class="ed-info-card-value">${formatDateLong(ev.fecha_iso)}</div>
-                <div class="ed-info-card-sub">${dayOfWeek}</div>
-              </div>
+      <!-- Scrollable content body -->
+      <div class="ed-body">
+
+        <!-- 2-column info grid -->
+        <div class="ed-info-grid">
+          <div class="ed-info-card">
+            <div class="ed-info-icon" style="background:${color}1a; color:${color}">
+              <span class="material-symbols-outlined">calendar_month</span>
             </div>
-            ${ev.hora ? `
-            <div class="ed-info-card">
-              <div class="ed-info-card-icon">🕐</div>
-              <div>
-                <div class="ed-info-card-label">Hora</div>
-                <div class="ed-info-card-value">${ev.hora}</div>
-              </div>
-            </div>` : ''}
-            <div class="ed-info-card">
-              <div class="ed-info-card-icon">📍</div>
-              <div>
-                <div class="ed-info-card-label">Lugar</div>
-                <div class="ed-info-card-value">${ev.lugar}</div>
-                ${mapUrl ? `<div class="ed-info-card-sub"><a href="${mapUrl}" target="_blank" rel="noopener">Cómo llegar →</a></div>` : ''}
-              </div>
-            </div>
-            <div class="ed-info-card">
-              <div class="ed-info-card-icon">💰</div>
-              <div>
-                <div class="ed-info-card-label">Precio</div>
-                <div class="ed-info-card-value">${precio}</div>
-              </div>
+            <div>
+              <div class="ed-info-label">Fecha</div>
+              <div class="ed-info-value">${dateFormatted}</div>
             </div>
           </div>
-
-          <!-- Description -->
-          ${ev.descripcion ? `
-          <div class="ed-description">
-            <h3>Sobre el evento</h3>
-            ${ev.descripcion}
+          ${ev.hora ? `
+          <div class="ed-info-card">
+            <div class="ed-info-icon" style="background:${color}1a; color:${color}">
+              <span class="material-symbols-outlined">schedule</span>
+            </div>
+            <div>
+              <div class="ed-info-label">Hora</div>
+              <div class="ed-info-value">${ev.hora}</div>
+            </div>
           </div>` : ''}
-        </div>
-
-        <!-- Right Column: Sidebar -->
-        <div class="ed-sidebar">
-          <div class="ed-ticket-card">
-            <div class="ed-ticket-price-label">Precio</div>
-            <div class="ed-ticket-price">
-              <span class="ed-ticket-price-amount">${precio}</span>
+          <div class="ed-info-card">
+            <div class="ed-info-icon" style="background:${color}1a; color:${color}">
+              <span class="material-symbols-outlined">location_on</span>
             </div>
-            <a class="ed-btn-buy" href="${ev.url_venta}" target="_blank" rel="noopener">
-              <span>🎟️ Comprar entradas</span>
-              <span class="arrow">→</span>
-            </a>
-            <div class="ed-secure-note">🔒 Enlace oficial del organizador</div>
-            <div class="ed-action-row">
-              <button class="ed-action-btn" id="btn-share-native">${ICONS.share} Compartir</button>
-              <a class="ed-action-btn wa" href="${waUrl}" target="_blank" rel="noopener">${ICONS.whatsapp} WhatsApp</a>
+            <div style="min-width:0">
+              <div class="ed-info-label">Lugar</div>
+              <div class="ed-info-value ed-truncate">${ev.lugar}</div>
             </div>
-            <div class="ed-action-row" style="margin-top:6px">
-              <button class="ed-action-btn" id="btn-share-copy">${ICONS.copy} Copiar enlace</button>
-              ${mapUrl ? `<a class="ed-action-btn" href="${mapUrl}" target="_blank" rel="noopener">${ICONS.map} Ver mapa</a>` : '<div></div>'}
+          </div>
+          <div class="ed-info-card">
+            <div class="ed-info-icon" style="background:${color}1a; color:${color}">
+              <span class="material-symbols-outlined">confirmation_number</span>
             </div>
-
-            ${ev.lugar ? `
-            <div class="ed-venue-map">
-              <h4><span class="map-icon">📍</span> Ubicación</h4>
-              ${mapUrl ? `
-              <a href="${mapUrl}" target="_blank" rel="noopener" class="ed-map-preview">
-                <div style="width:100%;height:100%;background:var(--surface2)"></div>
-                <div class="map-overlay">
-                  <span class="map-label">Ver en Google Maps</span>
-                </div>
-              </a>` : ''}
-              <div class="ed-venue-address">${ev.lugar}</div>
-            </div>` : ''}
+            <div>
+              <div class="ed-info-label">Desde</div>
+              <div class="ed-info-value" style="color:${color}">${precio}</div>
+            </div>
           </div>
         </div>
+
+        <!-- Description -->
+        ${ev.descripcion ? `
+        <div class="ed-section">
+          <h2 class="ed-section-title">Sobre el evento</h2>
+          <div class="ed-description" id="ed-desc-text">${ev.descripcion}</div>
+          <button class="ed-read-more" id="btn-read-more">
+            Leer más <span class="material-symbols-outlined">expand_more</span>
+          </button>
+        </div>` : ''}
+
+        <!-- Organizer row -->
+        <div class="ed-organizer-row">
+          <div class="ed-organizer-avatar">${emoji}</div>
+          <div class="ed-organizer-info">
+            <div class="ed-organizer-label">Organizado por</div>
+            <div class="ed-organizer-name">${ev.lugar}</div>
+          </div>
+          <a class="ed-nav-btn" href="${waUrl}" target="_blank" rel="noopener" aria-label="WhatsApp">
+            ${ICONS.whatsapp}
+          </a>
+        </div>
+
+        <!-- Map Section -->
+        ${mapUrl ? `
+        <div class="ed-section">
+          <h2 class="ed-section-title">Ubicación</h2>
+          <a class="ed-map-thumb" href="${mapUrl}" target="_blank" rel="noopener">
+            <div class="ed-map-thumb-overlay">
+              <button class="ed-map-thumb-btn">
+                <span class="material-symbols-outlined" style="color:${color}">map</span>
+                Ver en Mapa
+              </button>
+            </div>
+          </a>
+          <p class="ed-map-address">
+            <span class="material-symbols-outlined">location_on</span>
+            ${ev.lugar}
+          </p>
+        </div>` : ''}
+
+        <!-- Copy link -->
+        <div class="ed-share-row">
+          <button class="ed-share-btn" id="btn-share-copy">
+            ${ICONS.copy} Copiar enlace
+          </button>
+        </div>
+
+        <!-- Bottom padding for nav -->
+        <div style="height: 90px"></div>
       </div>
     `;
 
     // Strict DOMPurify sanitization
-    detailContainer.innerHTML = DOMPurify.sanitize(rawHTML, { ADD_ATTR: ['target'] });
+    detailContainer.innerHTML = DOMPurify.sanitize(rawHTML, { ADD_ATTR: ['target', 'style'] });
+
+    // Explicitly scroll to top when content is ready
+    window.scrollTo(0, 0);
 
     // Fallback for hero image
     const heroBg = detailContainer.querySelector('.ed-hero-bg');
@@ -1206,6 +1240,27 @@ async function renderEventDetail(id) {
         heroBg.outerHTML = `<div class="ed-hero-placeholder">${emoji}</div>`;
       };
       testImg.src = ev.imagen_url;
+    }
+
+    // Intercept internal back button click to use SPA router
+    const backBtn = detailContainer.querySelector('#ed-back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        history.back();
+      });
+    }
+
+    // Read more toggle
+    const readMoreBtn = detailContainer.querySelector('#btn-read-more');
+    const descText = detailContainer.querySelector('#ed-desc-text');
+    if (readMoreBtn && descText) {
+      readMoreBtn.addEventListener('click', () => {
+        descText.classList.toggle('ed-desc-expanded');
+        readMoreBtn.innerHTML = descText.classList.contains('ed-desc-expanded')
+          ? 'Leer menos <span class="material-symbols-outlined">expand_less</span>'
+          : 'Leer más <span class="material-symbols-outlined">expand_more</span>';
+      });
     }
 
     // Connect share actions dynamically (CSP friendly)
@@ -1220,7 +1275,7 @@ async function renderEventDetail(id) {
   } catch (err) {
     console.error(err);
     main.querySelector('.event-detail-view').innerHTML = `
-      <a href="/" class="event-detail-back" style="position:static;margin:20px">${ICONS.back} Volver</a>
+      <a href="/" class="ed-nav-btn" style="margin:20px;display:inline-flex">${ICONS.back} Volver</a>
       <div class="empty-state">
         <div class="empty-icon">😕</div>
         <h3>Evento no encontrado</h3>
