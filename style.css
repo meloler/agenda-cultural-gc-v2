@@ -572,17 +572,51 @@ select {
 }
 
 @media (max-width: 768px) {
-    .mobile-filter-btn {
-        display: flex;
+    /* Filters: horizontal scrollable strip on mobile */
+    .filters-inner {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 8px;
+        padding: 0 12px;
     }
 
-    .hide-on-mobile {
+    .filters-inner::-webkit-scrollbar {
+        display: none;
+    }
+
+    .filter-group {
+        flex-wrap: nowrap;
+        flex-shrink: 0;
+    }
+
+    .filter-divider {
+        flex-shrink: 0;
+    }
+
+    /* Hide the old mobile filter toggle */
+    .mobile-filter-btn {
         display: none !important;
     }
 
+    /* Show category filters inline */
     #category-filters {
-        width: 100%;
-        margin-top: 8px;
+        display: flex !important;
+        flex-wrap: nowrap;
+        flex-shrink: 0;
+        width: auto;
+        margin-top: 0;
+    }
+
+    #category-filters .cat-pill {
+        flex-shrink: 0;
+    }
+
+    .pill,
+    .cat-pill {
+        flex-shrink: 0;
     }
 }
 
@@ -2676,33 +2710,43 @@ select {
     width: 100%;
     flex-shrink: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Push content down on mobile */
 }
 
 @media (max-width: 768px) {
     .ed-hero {
-        height: 420px;
+        min-height: 500px;
     }
 }
 
 @media (min-width: 769px) {
     .ed-hero {
-        height: 500px;
         border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-        box-shadow: 0 16px 48px rgba(0, 0, 0, .5);
-        margin-bottom: 32px;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, .4);
+        margin-bottom: 40px;
+        min-height: 600px; /* Increased to fit the poster comfortably */
+        justify-content: center;
     }
 }
 
-.ed-hero-bg {
+.ed-hero-blur-bg {
     position: absolute;
-    inset: 0;
+    inset: -10%; /* zoom a bit */
     background-size: cover;
     background-position: center;
+    filter: blur(24px);
+    opacity: 0.3;
     transition: transform .7s ease;
 }
 
-.ed-hero:hover .ed-hero-bg {
-    transform: scale(1.04);
+.theme-light .ed-hero-blur-bg {
+    opacity: 0.15;
+}
+
+.ed-hero:hover .ed-hero-blur-bg {
+    transform: scale(1.05);
 }
 
 .ed-hero-placeholder {
@@ -2713,15 +2757,24 @@ select {
     align-items: center;
     justify-content: center;
     font-size: 5rem;
+    height: 100%;
 }
 
 .ed-hero-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom,
-            rgba(0, 0, 0, .55) 0%,
-            transparent 40%,
-            rgba(34, 23, 16, .92) 100%);
+    /* Richer gradient for better text contrast */
+    background: linear-gradient(135deg,
+            rgba(34, 23, 16, .4) 0%,
+            rgba(34, 23, 16, .6) 50%,
+            rgba(34, 23, 16, 0.95) 100%);
+}
+
+.theme-light .ed-hero-gradient {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, .2) 0%,
+        rgba(255, 255, 255, .7) 60%,
+        rgba(255, 255, 255, 1) 100%);
 }
 
 /* ── Floating nav row ─────────────────────────────────────────────── */
@@ -2760,38 +2813,74 @@ select {
     color: #fff;
 }
 
-/* ── Glassmorphism hero card at bottom of image ──────────────────── */
-.ed-hero-card {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+/* ── Main Hero Content Layout ────────────────────────────────────────── */
+.ed-hero-content {
+    position: relative;
     z-index: 10;
-    padding: 16px 16px;
-}
-
-.ed-hero-card-inner {
-    background: rgba(34, 23, 16, 0.82);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, .1);
-    border-radius: 16px;
-    padding: 20px 20px 20px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
+    padding: 80px 20px 24px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-.theme-light .ed-hero-card-inner {
-    background: rgba(255, 255, 255, 0.88);
-    border-color: rgba(0, 0, 0, .08);
+@media (min-width: 769px) {
+    .ed-hero-content {
+        flex-direction: row;
+        align-items: center;
+        gap: 40px;
+        padding: 50px 32px 30px;
+    }
 }
 
-.ed-hero-top-row {
+.ed-hero-poster-container {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    aspect-ratio: 2/3;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
+    background: var(--surface2);
+}
+
+.theme-light .ed-hero-poster-container {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+}
+
+.ed-hero-poster-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ed-hero-text {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    flex: 1;
+    animation: edFadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes edFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 769px) {
+    .ed-hero-text {
+        align-items: flex-start;
+        text-align: left;
+    }
+}
+
+.ed-hero-tags {
+    margin-bottom: 12px;
 }
 
 .ed-badge-primary {
@@ -2804,15 +2893,16 @@ select {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .05em;
-    margin-bottom: 10px;
+    background: rgba(0,0,0,0.2) !important;
 }
 
 .ed-hero-title {
-    font-size: 1.65rem;
+    font-size: 2rem;
     font-weight: 900;
     color: #fff;
     line-height: 1.15;
     letter-spacing: -.02em;
+    margin-bottom: 24px;
 }
 
 .theme-light .ed-hero-title {
@@ -2821,7 +2911,8 @@ select {
 
 @media (min-width: 769px) {
     .ed-hero-title {
-        font-size: 2.8rem;
+        font-size: 3rem;
+        margin-bottom: 32px;
     }
 }
 
@@ -3142,18 +3233,6 @@ select {
 
 /* ── Desktop — restore sidebar-style layout ──────────────────────── */
 @media (min-width: 769px) {
-    .ed-hero-card {
-        padding: 24px 32px;
-    }
-
-    .ed-hero-card-inner {
-        padding: 28px 32px;
-    }
-
-    .ed-hero-title {
-        font-size: 2.4rem;
-    }
-
     .ed-info-grid {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -3330,6 +3409,13 @@ select {
     border-top: 1px solid var(--border);
     padding: 32px 0;
     margin-top: auto;
+}
+
+/* Hide footer on mobile for app-like experience */
+@media (max-width: 768px) {
+    .site-footer {
+        display: none;
+    }
 }
 
 .theme-light .site-footer {

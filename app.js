@@ -1086,10 +1086,10 @@ async function renderEventDetail(id) {
     const dateFormatted = dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 
     const rawHTML = `
-      <!-- Hero Section: full-bleed image with floating nav -->
+      <!-- Hero Section: Premium layout with vertical poster -->
       <div class="ed-hero">
         ${ev.imagen_url
-        ? `<div class="ed-hero-bg" style="background-image:url('${ev.imagen_url}')"></div>`
+        ? `<div class="ed-hero-blur-bg" style="background-image:url('${ev.imagen_url}')"></div>`
         : `<div class="ed-hero-placeholder">${emoji}</div>`}
         <div class="ed-hero-gradient"></div>
 
@@ -1103,15 +1103,21 @@ async function renderEventDetail(id) {
           </button>
         </header>
 
-        <!-- Glassmorphism title card at bottom of hero -->
-        <div class="ed-hero-card">
-          <div class="ed-hero-card-inner">
-            <div class="ed-hero-top-row">
-              <div>
-                <span class="ed-badge-primary" style="color:${color}; background:${color}1a">${emoji} ${ev.estilo}</span>
-                <h1 class="ed-hero-title">${ev.nombre}</h1>
-              </div>
+        <!-- Main hero content (poster + text side-by-side on desktop) -->
+        <div class="ed-hero-content">
+          <div class="ed-hero-poster-container">
+            ${ev.imagen_url 
+              ? `<img src="${ev.imagen_url}" alt="${ev.nombre}" class="ed-hero-poster-img" onerror="this.parentElement.innerHTML='<div class=\\'ed-hero-placeholder\\'>${emoji}</div>'">`
+              : `<div class="ed-hero-placeholder">${emoji}</div>`
+            }
+          </div>
+          
+          <div class="ed-hero-text">
+            <div class="ed-hero-tags">
+              <span class="ed-badge-primary" style="color:${color}; background:${color}1a">${emoji} ${ev.estilo}</span>
             </div>
+            <h1 class="ed-hero-title">${ev.nombre}</h1>
+            
             <!-- CTA row inside hero -->
             <div class="ed-hero-cta-row">
               ${ev.url_venta
@@ -1232,12 +1238,12 @@ async function renderEventDetail(id) {
     // Explicitly scroll to top when content is ready
     window.scrollTo(0, 0);
 
-    // Fallback for hero image
-    const heroBg = detailContainer.querySelector('.ed-hero-bg');
-    if (heroBg) {
+    // Fallback for hero background
+    const heroBlurBg = detailContainer.querySelector('.ed-hero-blur-bg');
+    if (heroBlurBg) {
       const testImg = new Image();
       testImg.onerror = () => {
-        heroBg.outerHTML = `<div class="ed-hero-placeholder">${emoji}</div>`;
+        heroBlurBg.outerHTML = `<div class="ed-hero-placeholder">${emoji}</div>`;
       };
       testImg.src = ev.imagen_url;
     }

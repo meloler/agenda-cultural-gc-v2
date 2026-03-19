@@ -4,10 +4,22 @@ import hashlib
 import requests
 import json
 import os
+import re
 from datetime import date
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def extract_coords_from_url(url):
+    """Extract (latitud, longitud) from a Google Maps URL like
+    'https://www.google.com/maps?q=28.1235,-15.4363'."""
+    if pd.isna(url) or not url:
+        return None, None
+    m = re.search(r'q=([-\d.]+),([-\d.]+)', str(url))
+    if m:
+        return float(m.group(1)), float(m.group(2))
+    return None, None
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
@@ -47,6 +59,12 @@ def subir_a_supabase():
                 "descripcion": clean(row['Descripción']),
                 "enriquecido": False
             }
+
+            # Extract latitud/longitud from 'Ver en Mapa' Google Maps URL
+            if 'Ver en Mapa' in row.index:
+                lat, lon = extract_coords_from_url(row.get('Ver en Mapa'))
+                ev["latitud"] = lat
+                ev["longitud"] = lon
             # Limpiar etiquetas de IA de la descripción
             if ev["descripcion"] and isinstance(ev["descripcion"], str):
                 ev["descripcion"] = ev["descripcion"].replace("[Descripción generada por IA]", "").replace("[Generado por IA]", "").strip()
