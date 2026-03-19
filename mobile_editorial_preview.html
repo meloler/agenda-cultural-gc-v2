@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Agenda Cultural GC — Editorial Mobile</title>
+
+  <!-- Typography: Syne for structural/UI, Cormorant Garamond for Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --c-bg: #0c0c0c;          /* Volcanic Black */
+      --c-text: #EAE6DF;        /* Sand White */
+      --c-accent: #FF3B00;      /* Magma Red */
+      --c-surface: #1a1a1a;
+      --c-border: #333333;
+
+      --f-display: 'Cormorant Garamond', serif;
+      --f-ui: 'Syne', sans-serif;
+
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 1.5rem;
+      --spacing-lg: 2.5rem;
+      --spacing-xl: 4rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--c-bg);
+      color: var(--c-text);
+      font-family: var(--f-ui);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      /* Mobile constraint for previewing on desktop */
+      max-width: 480px;
+      margin: 0 auto;
+      border-left: 1px solid var(--c-border);
+      border-right: 1px solid var(--c-border);
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 100px; /* Space for bottom nav */
+    }
+
+    /* --- MARQUEE --- */
+    .marquee-container {
+      width: 100%;
+      overflow: hidden;
+      border-bottom: 1px solid var(--c-border);
+      padding: var(--spacing-xs) 0;
+      background: var(--c-accent);
+      color: var(--c-bg);
+    }
+    
+    .marquee-content {
+      display: flex;
+      white-space: nowrap;
+      animation: marquee 15s linear infinite;
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    
+    .marquee-content span {
+      padding-right: 2rem;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* --- HEADER --- */
+    .header {
+      padding: var(--spacing-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--c-border);
+      position: sticky;
+      top: 0;
+      background: rgba(12, 12, 12, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .header-logo {
+      font-family: var(--f-display);
+      font-size: 1.8rem;
+      font-weight: 600;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .header-logo span {
+      display: block;
+      font-family: var(--f-ui);
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: var(--c-accent);
+      letter-spacing: 0.15em;
+      margin-top: 0.2rem;
+    }
+
+    .search-btn {
+      background: none;
+      border: 1px solid var(--c-border);
+      color: var(--c-text);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* --- HERO --- */
+    .hero {
+      padding: var(--spacing-xl) var(--spacing-md) var(--spacing-lg);
+    }
+
+    .hero-title {
+      font-family: var(--f-display);
+      font-size: 3.5rem;
+      font-weight: 400;
+      line-height: 0.9;
+      margin-bottom: var(--spacing-md);
+      font-style: italic;
+    }
+
+    .hero-title strong {
+      font-style: normal;
+      font-weight: 600;
+      display: block;
+      margin-left: 2rem;
+    }
+
+    .hero-filters {
+      display: flex;
+      gap: var(--spacing-sm);
+      overflow-x: auto;
+      padding-bottom: var(--spacing-sm);
+      scrollbar-width: none;
+    }
+    .hero-filters::-webkit-scrollbar { display: none; }
+
+    .filter-chip {
+      background: transparent;
+      border: 1px solid var(--c-border);
+      color: var(--c-text);
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+      font-family: var(--f-ui);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      transition: all 0.3s ease;
+    }
+
+    .filter-chip.active {
+      background: var(--c-text);
+      color: var(--c-bg);
+      border-color: var(--c-text);
+    }
+
+    /* --- EVENT LIST (EDITORIAL CARDS) --- */
+    .event-feed {
+      padding: 0 var(--spacing-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+    }
+
+    .event-card {
+      position: relative;
+      border-bottom: 1px solid var(--c-border);
+      padding-bottom: var(--spacing-md);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s forwards cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    .event-card:nth-child(2) { animation-delay: 0.1s; }
+    .event-card:nth-child(3) { animation-delay: 0.2s; }
+    .event-card:nth-child(4) { animation-delay: 0.3s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .event-image-wrapper {
+      width: 100%;
+      height: 240px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .event-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%) contrast(1.2);
+      transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), filter 0.6s ease;
+    }
+
+    .event-card:active .event-image,
+    .event-card:hover .event-image {
+      transform: scale(1.05);
+      filter: grayscale(0%) contrast(1);
+    }
+
+    .event-date-badge {
+      position: absolute;
+      top: -10px;
+      right: 15px;
+      background: var(--c-accent);
+      color: var(--c-bg);
+      padding: 0.5rem;
+      text-align: center;
+      font-family: var(--f-ui);
+      font-weight: 800;
+      line-height: 1;
+      border: 1px solid var(--c-bg);
+      z-index: 2;
+    }
+    
+    .event-date-badge .day { font-size: 1.5rem; display: block; }
+    .event-date-badge .month { font-size: 0.7rem; text-transform: uppercase; }
+
+    .event-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #888;
+    }
+
+    .event-category {
+      color: var(--c-accent);
+      font-weight: 600;
+    }
+
+    .event-title {
+      font-family: var(--f-display);
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+      color: var(--c-text);
+    }
+
+    .event-location {
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .event-location::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--c-text);
+      border-radius: 50%;
+    }
+
+    /* --- BOTTOM NAV (SHARP, NOT ROUNDED) --- */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 480px; /* matches body */
+      background: rgba(12, 12, 12, 0.9);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-top: 1px solid var(--c-border);
+      display: flex;
+      justify-content: space-around;
+      padding: var(--spacing-sm) 0 calc(var(--spacing-sm) + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      color: #666;
+      text-decoration: none;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: color 0.3s ease;
+    }
+
+    .nav-item.active {
+      color: var(--c-text);
+    }
+
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+    }
+
+    .nav-item.active .nav-icon {
+      stroke-width: 2;
+      stroke: var(--c-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Marquee -->
+  <div class="marquee-container">
+    <div class="marquee-content">
+      <span>✦ CULTURA EN VIVO</span>
+      <span>✦ GRAN CANARIA</span>
+      <span>✦ TEATRO & MÚSICA</span>
+      <span>✦ CULTURA EN VIVO</span>
+      <span>✦ GRAN CANARIA</span>
+      <span>✦ TEATRO & MÚSICA</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-logo">
+      Agenda
+      <span>Gran Canaria</span>
+    </div>
+    <button class="search-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/></svg>
+    </button>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1 class="hero-title">
+      Descubre
+      <strong>lo que vibra.</strong>
+    </h1>
+    
+    <div class="hero-filters">
+      <button class="filter-chip active">Todo</button>
+      <button class="filter-chip">Música</button>
+      <button class="filter-chip">Teatro</button>
+      <button class="filter-chip">Cine</button>
+      <button class="filter-chip">Danza</button>
+    </div>
+  </section>
+
+  <!-- Event Feed -->
+  <section class="event-feed">
+    
+    <!-- Card 1 -->
+    <article class="event-card">
+      <div class="event-date-badge">
+        <span class="day">24</span>
+        <span class="month">Oct</span>
+      </div>
+      <div class="event-image-wrapper">
+        <img src="https://images.unsplash.com/photo-1540039155732-618e11a3b174?auto=format&fit=crop&q=80&w=800" alt="Concierto Indie" class="event-image">
+      </div>
+      <div class="event-meta">
+        <span class="event-category">Música</span>
+        <span>20:30 H</span>
+      </div>
+      <h2 class="event-title">Festival Cero: Edición Volcánica</h2>
+      <div class="event-location">Plaza de la Música, Las Palmas</div>
+    </article>
+
+    <!-- Card 2 -->
+    <article class="event-card">
+      <div class="event-date-badge">
+        <span class="day">26</span>
+        <span class="month">Oct</span>
+      </div>
+      <div class="event-image-wrapper">
+        <img src="https://images.unsplash.com/photo-1507676184212-d0330a156f88?auto=format&fit=crop&q=80&w=800" alt="Teatro Pérez Galdós" class="event-image">
+      </div>
+      <div class="event-meta">
+        <span class="event-category">Teatro</span>
+        <span>19:00 H</span>
+      </div>
+      <h2 class="event-title">La Gaviota: Ensayo sobre el drama</h2>
+      <div class="event-location">Teatro Pérez Galdós</div>
+    </article>
+
+    <!-- Card 3 -->
+    <article class="event-card">
+      <div class="event-date-badge">
+        <span class="day">28</span>
+        <span class="month">Oct</span>
+      </div>
+      <div class="event-image-wrapper">
+        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=800" alt="Jazz" class="event-image">
+      </div>
+      <div class="event-meta">
+        <span class="event-category">Jazz</span>
+        <span>22:00 H</span>
+      </div>
+      <h2 class="event-title">Noches de Jazz en Vegueta</h2>
+      <div class="event-location">Casco Histórico</div>
+    </article>
+
+  </section>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Feed
+    </a>
+    <a href="#" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      Agenda
+    </a>
+    <a href="#" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      Mapa
+    </a>
+  </nav>
+
+  <script>
+    // Duplicate marquee content for seamless loop
+    const marquee = document.querySelector('.marquee-content');
+    marquee.innerHTML += marquee.innerHTML;
+  </script>
+</body>
+</html>
