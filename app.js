@@ -146,14 +146,10 @@ async function fetchEventos({ page = 1, size = PAGE_SIZE, categoria, fecha_inici
     query = query.gte('fecha_iso', effectiveInicio);
   }
 
-  // Full Text Search applied directly in the DB
+  // Búsqueda por nombre y lugar (ilike para parciales, prefijos y salas)
   if (search && search.trim()) {
-    // Escapar comillas para evitar errores de sintaxis en websearch_to_tsquery
     const safeSearch = search.trim().replace(/'/g, "''");
-    query = query.textSearch('fts', safeSearch, {
-      type: 'websearch',
-      config: 'spanish'
-    });
+    query = query.or(`nombre.ilike.%${safeSearch}%,lugar.ilike.%${safeSearch}%`);
   }
 
   if (sort === 'precio_asc') {
