@@ -62,7 +62,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 
   <!-- Styles -->
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 
   <!-- JSON-LD Structured Data (base) -->
   <script type="application/ld+json">
@@ -140,6 +140,11 @@
             <path d="M21 21l-4.35-4.35" />
           </svg>
         </div>
+        <button class="mobile-search-btn" id="mobile-search-btn" aria-label="Buscar eventos">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+        </button>
         <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema" title="Modo claro/oscuro">
           <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
             stroke-width="2">
@@ -160,6 +165,24 @@
       </button>
     </div>
   </header>
+
+  <!-- MOBILE SEARCH BAR (below header, toggleable) -->
+  <div class="mobile-search-bar" id="mobile-search-bar">
+    <div class="mobile-search-inner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input id="mobile-search-input-new" type="search" placeholder="Buscar eventos, artistas, lugares…" autocomplete="off" />
+      <button class="mobile-search-close" id="mobile-search-close" aria-label="Cerrar búsqueda">✕</button>
+    </div>
+  </div>
+
+  <!-- SCROLL TO TOP -->
+  <button class="scroll-top-btn" id="scroll-top-btn" aria-label="Volver arriba">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
 
   <!-- NEW STITCH DESIGN: MOBILE BOTTOM NAV -->
   <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="Navegación Móvil">
@@ -254,7 +277,7 @@
   <div class="toast hidden" id="toast"></div>
 
   <script src="env.js"></script>
-  <script src="app.js?v=8"></script>
+  <script src="app.js?v=11"></script>
 </body>
 
 </html>

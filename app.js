@@ -24,7 +24,7 @@ const state = {
   total: 0,
   pages: 0,
   categoria: '',
-  dateFilter: 'all',
+  dateFilter: 'today',
   search: '',
   sort: 'fecha',
   debounceTimer: null,
@@ -35,6 +35,14 @@ const state = {
   mapInstance: null,
   eventId: null,
   showArchive: false,
+  listMode: false,
+  appendMode: false,
+  loadingMore: false,
+  infiniteObserver: null,
+  userLat: null,
+  userLng: null,
+  cercaniaEvents: null,
+  cercaniaPage: 1,
 };
 
 // ── Category config ───────────────────────────────────────────────
@@ -241,9 +249,14 @@ function buildQuery() {
   }
   if (state.categoria) q.categoria = state.categoria;
   if (!state.showArchive) {
-    const dr = dateRange(state.dateFilter);
-    if (dr.fecha_inicio) q.fecha_inicio = dr.fecha_inicio;
-    if (dr.fecha_fin) q.fecha_fin = dr.fecha_fin;
+    if (state.dateFilter && /^\d{4}-\d{2}-\d{2}$/.test(state.dateFilter)) {
+      q.fecha_inicio = state.dateFilter;
+      q.fecha_fin = state.dateFilter;
+    } else if (state.dateFilter !== 'all') {
+      const dr = dateRange(state.dateFilter);
+      if (dr.fecha_inicio) q.fecha_inicio = dr.fecha_inicio;
+      if (dr.fecha_fin) q.fecha_fin = dr.fecha_fin;
+    }
   }
   return q;
 }
@@ -339,21 +352,10 @@ function renderGridView() {
   const main = document.getElementById('app-main');
   main.innerHTML = `
     <div class="filters-bar">
-      <div class="container filters-inner">
-        <div class="filter-group" id="date-filters">
-          <button class="pill active" data-date="all">Todos</button>
-          <button class="pill" data-date="today">Hoy</button>
-          <button class="pill" data-date="tomorrow">Mañana</button>
-          <button class="pill" data-date="weekend">Finde</button>
-          <button class="pill" data-date="month">Este mes</button>
-          <button class="pill pill-archive" data-date="archive">📁 Archivo</button>
-        </div>
-        <div class="filter-divider"></div>
-        <button class="mobile-filter-btn" id="mobile-filter-btn" aria-expanded="false">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
-          Filtrar categorías
-        </button>
-        <div class="filter-group hide-on-mobile" id="category-filters">
+      <div class="container">
+        <div class="date-strip" id="date-strip"></div>
+        <div class="filter-sep"></div>
+        <div class="cat-strip" id="category-filters">
           <button class="cat-pill active" data-cat="">Todo</button>
         </div>
       </div>
@@ -361,43 +363,67 @@ function renderGridView() {
     <div class="container">
       <div class="stats-bar">
         <span id="stats-text">Cargando…</span>
-        <select id="sort-select" aria-label="Ordenar por">
-          <option value="fecha">Por fecha</option>
-          <option value="precio_asc">Precio ↑</option>
-          <option value="precio_desc">Precio ↓</option>
-        </select>
+        <div class="stats-bar-right">
+          <div class="view-toggle">
+            <button class="view-btn ${!state.listMode ? 'active' : ''}" id="view-grid-btn" aria-label="Cuadrícula">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </button>
+            <button class="view-btn ${state.listMode ? 'active' : ''}" id="view-list-btn" aria-label="Lista">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="2" rx="1"/><rect x="3" y="11" width="18" height="2" rx="1"/><rect x="3" y="17" width="18" height="2" rx="1"/></svg>
+            </button>
+          </div>
+          <select id="sort-select" aria-label="Ordenar por">
+            <option value="fecha">Por fecha</option>
+            <option value="precio_asc">Precio ↑</option>
+            <option value="precio_desc">Precio ↓</option>
+            <option value="cercania">📍 Cerca de mí</option>
+          </select>
+        </div>
       </div>
-      <div class="events-grid" id="events-grid"></div>
+      <div class="${state.listMode ? 'events-list' : 'events-grid'}" id="events-grid"></div>
       <div class="empty-state hidden" id="empty-state">
-        <div class="empty-icon">🔍</div>
-        <h3>No se encontraron eventos</h3>
-        <p>Prueba cambiando los filtros o la búsqueda</p>
-        <button class="btn-reset" onclick="resetFilters()">Restablecer filtros</button>
+        <div class="empty-icon">📅</div>
+        <h3 id="empty-title">No se encontraron eventos</h3>
+        <p id="empty-msg">Prueba cambiando los filtros o la búsqueda</p>
+        <div id="empty-actions">
+          <button class="btn-reset" onclick="resetFilters()">Restablecer filtros</button>
+        </div>
       </div>
-      <div class="pagination" id="pagination"></div>
+      <div id="load-more-sentinel"></div>
     </div>
   `;
 
-  // Bind date filters
-  document.querySelectorAll('#date-filters .pill').forEach(btn => {
-    btn.addEventListener('click', () => setDate(btn.dataset.date, btn));
-  });
+  renderDateStrip();
 
   // Bind sort
-  document.getElementById('sort-select').addEventListener('change', e => {
-    state.sort = e.target.value;
-    loadGrid();
-  });
-
-  // Mobile filter toggle
-  const mobileFilterBtn = document.getElementById('mobile-filter-btn');
-  const catFilters = document.getElementById('category-filters');
-  if (mobileFilterBtn && catFilters) {
-    mobileFilterBtn.addEventListener('click', () => {
-      catFilters.classList.toggle('hide-on-mobile');
-      mobileFilterBtn.classList.toggle('active');
+  const sortSelect = document.getElementById('sort-select');
+  if (sortSelect) {
+    sortSelect.value = state.sort;
+    sortSelect.addEventListener('change', e => {
+      state.sort = e.target.value;
+      state.page = 1;
+      if (state.sort === 'cercania') { state.userLat = null; state.userLng = null; }
+      loadGrid();
     });
   }
+
+  // Bind view toggle
+  document.getElementById('view-grid-btn')?.addEventListener('click', () => {
+    if (!state.listMode) return;
+    state.listMode = false;
+    state.page = 1;
+    document.getElementById('view-grid-btn').classList.add('active');
+    document.getElementById('view-list-btn').classList.remove('active');
+    loadGrid();
+  });
+  document.getElementById('view-list-btn')?.addEventListener('click', () => {
+    if (state.listMode) return;
+    state.listMode = true;
+    state.page = 1;
+    document.getElementById('view-list-btn').classList.add('active');
+    document.getElementById('view-grid-btn').classList.remove('active');
+    loadGrid();
+  });
 
   // Load categories then events
   loadCategorias();
@@ -412,6 +438,10 @@ function cardHTML(ev) {
 
   const isPast = ev.estado === 'past' || (ev.fecha_iso && ev.fecha_iso < toISO(new Date()));
   const pastBanner = isPast ? '<div class="card-past-banner">Evento finalizado</div>' : '';
+  const isFree = ev.precio_num === 0;
+  const todayStr = toISO(new Date());
+  const isToday = ev.fecha_iso === todayStr;
+  const showHoyBadge = isToday && state.dateFilter !== 'today' && state.dateFilter !== todayStr;
 
   return `
     <article class="card${isPast ? ' card-past' : ''}" data-id="${ev.id}" tabindex="0" role="button" aria-label="${ev.nombre}">
@@ -419,6 +449,8 @@ function cardHTML(ev) {
         ${imgHTML}
         <span class="card-badge ${badgeClass(ev.estilo)}">${ev.estilo}</span>
         ${pastBanner}
+        ${showHoyBadge ? '<span class="card-badge-hoy">Hoy</span>' : ''}
+        ${isFree ? '<span class="card-badge-free">Gratis</span>' : ''}
       </div>
       <div class="card-body">
         <h2 class="card-title">${ev.nombre}</h2>
@@ -427,8 +459,43 @@ function cardHTML(ev) {
           ${ev.hora ? `<span>${ICONS.clock} ${ev.hora}</span>` : ''}
         </div>
         <div class="card-footer">
-          <span class="card-price${ev.precio_num === 0 ? ' free' : ''}">${formatPrice(ev.precio_num)}</span>
+          <span class="card-price${isFree ? ' free' : ''}">${formatPrice(ev.precio_num)}</span>
           <span class="card-venue">${ev.lugar}</span>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function cardListHTML(ev) {
+  const emoji = catEmoji(ev.estilo);
+  const imgHTML = ev.imagen_url
+    ? `<img src="${ev.imagen_url}" alt="${ev.nombre}" loading="lazy" class="card-img" data-emoji="${emoji}">`
+    : `<div class="card-image-placeholder">${emoji}</div>`;
+
+  const isPast = ev.estado === 'past' || (ev.fecha_iso && ev.fecha_iso < toISO(new Date()));
+  const isFree = ev.precio_num === 0;
+  const todayStr = toISO(new Date());
+  const isToday = ev.fecha_iso === todayStr;
+  const showHoyBadge = isToday && state.dateFilter !== 'today' && state.dateFilter !== todayStr;
+
+  return `
+    <article class="card-list${isPast ? ' card-past' : ''}" data-id="${ev.id}" tabindex="0" role="button" aria-label="${ev.nombre}">
+      <div class="card-list-img">
+        ${imgHTML}
+        ${showHoyBadge ? '<span class="card-badge-hoy">Hoy</span>' : ''}
+        ${isFree ? '<span class="card-badge-free">Gratis</span>' : ''}
+      </div>
+      <div class="card-list-body">
+        <span class="card-list-cat ${badgeClass(ev.estilo)}">${ev.estilo}</span>
+        <h2 class="card-list-title">${ev.nombre}</h2>
+        <div class="card-list-meta">
+          <span>${ICONS.cal} ${formatDate(ev.fecha_iso)}</span>
+          ${ev.hora ? `<span>${ICONS.clock} ${ev.hora}</span>` : ''}
+        </div>
+        <div class="card-list-footer">
+          <span class="card-price${isFree ? ' free' : ''}">${formatPrice(ev.precio_num)}</span>
+          <span class="card-venue">${ICONS.pin} ${ev.lugar || ''}</span>
         </div>
       </div>
     </article>
@@ -441,78 +508,379 @@ async function loadGrid() {
   const statsEl = document.getElementById('stats-text');
   if (!grid) return;
 
-  grid.innerHTML = Array(6).fill('<div class="card skeleton"></div>').join('');
-  emptyEl.classList.add('hidden');
+  // Disconnect old infinite scroll observer
+  if (state.infiniteObserver) {
+    state.infiniteObserver.disconnect();
+    state.infiniteObserver = null;
+  }
+
+  // Delegate to cercania handler
+  if (state.sort === 'cercania') {
+    await loadGridCercania(grid, emptyEl, statsEl);
+    return;
+  }
+
+  if (!state.appendMode) {
+    grid.className = state.listMode ? 'events-list' : 'events-grid';
+    grid.innerHTML = Array(6).fill('<div class="card skeleton"></div>').join('');
+    emptyEl.classList.add('hidden');
+    const sentinel = document.getElementById('load-more-sentinel');
+    if (sentinel) sentinel.innerHTML = '';
+  }
 
   try {
     const q = buildQuery();
     const data = await fetchEventos(q);
-    let items = data.items;
+    const items = data.items;
 
     state.total = data.total;
     state.pages = data.pages;
 
-    statsEl.innerHTML = `<strong>${data.total}</strong> evento${data.total !== 1 ? 's' : ''} encontrado${data.total !== 1 ? 's' : ''}`;
+    if (!state.appendMode) {
+      statsEl.innerHTML = `<strong>${data.total}</strong> evento${data.total !== 1 ? 's' : ''} encontrado${data.total !== 1 ? 's' : ''}`;
+    }
 
-    if (items.length === 0) {
+    if (items.length === 0 && !state.appendMode) {
+      // Auto-fallback: if today has no events and no other filters active, show all
+      if (state.dateFilter === 'today' && !state.categoria && !state.search && !state.showArchive) {
+        state.dateFilter = 'all';
+        renderDateStrip();
+        loadGrid();
+        return;
+      }
       grid.innerHTML = '';
-      emptyEl.classList.remove('hidden');
-      document.getElementById('pagination').innerHTML = '';
+      showSmartEmptyState(emptyEl);
       return;
     }
 
-    // Sanitize fully before injecting
-    grid.innerHTML = DOMPurify.sanitize(items.map(cardHTML).join(''), { ADD_ATTR: ['target'] });
-    renderPagination();
+    const cardFn = state.listMode ? cardListHTML : cardHTML;
+    const cardsHTML = DOMPurify.sanitize(items.map(cardFn).join(''), { ADD_ATTR: ['target'] });
 
-    // Attach native image error fallbacks (CSP friendly)
-    grid.querySelectorAll('.card-img').forEach(img => {
-      img.addEventListener('error', function () {
-        this.parentElement.innerHTML = `<div class="card-image-placeholder">${this.dataset.emoji}</div>`;
-      });
-    });
+    if (state.appendMode) {
+      grid.insertAdjacentHTML('beforeend', cardsHTML);
+    } else {
+      grid.innerHTML = cardsHTML;
+    }
 
-    // Card click → navigate to event detail
-    grid.querySelectorAll('.card').forEach(card => {
-      const go = () => navigateTo(`/evento/${card.dataset.id}`);
-      card.addEventListener('click', go);
-      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(); });
-    });
+    attachCardListeners(grid);
+    setupInfiniteScroll();
+
   } catch (err) {
     console.error(err);
-    grid.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-3)">
-        <div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>
-        <p>No se pudo conectar con la base de datos.<br>Intenta recargar la página.</p>
-      </div>`;
+    if (!state.appendMode) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--text-3)">
+          <div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>
+          <p>No se pudo conectar con la base de datos.<br>Intenta recargar la página.</p>
+        </div>`;
+    }
+  } finally {
+    state.appendMode = false;
   }
 }
 
-function renderPagination() {
-  const el = document.getElementById('pagination');
-  if (!el || state.pages <= 1) { if (el) el.innerHTML = ''; return; }
+function attachCardListeners(grid) {
+  grid.querySelectorAll('.card-img').forEach(img => {
+    img.addEventListener('error', function () {
+      this.parentElement.innerHTML = `<div class="card-image-placeholder">${this.dataset.emoji}</div>`;
+    });
+  });
+  grid.querySelectorAll('.card, .card-list').forEach(card => {
+    const go = () => navigateTo(`/evento/${card.dataset.id}`);
+    card.addEventListener('click', go);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(); });
+  });
+}
 
-  const MAX = 7;
-  let pages = [];
-  if (state.pages <= MAX) {
-    pages = Array.from({ length: state.pages }, (_, i) => i + 1);
-  } else {
-    const s = [1];
-    const around = [state.page - 1, state.page, state.page + 1].filter(p => p > 1 && p < state.pages);
-    const end = [state.pages];
-    const all = [...new Set([...s, ...around, ...end])].sort((a, b) => a - b);
-    let prev = null;
-    for (const p of all) { if (prev && p - prev > 1) pages.push('…'); pages.push(p); prev = p; }
+function setupInfiniteScroll() {
+  const sentinel = document.getElementById('load-more-sentinel');
+  if (!sentinel) return;
+
+  if (state.page >= state.pages) {
+    sentinel.innerHTML = state.pages > 1
+      ? '<p class="no-more-events">Has visto todos los eventos</p>'
+      : '';
+    return;
   }
 
-  el.innerHTML = `
-    <button class="page-btn" ${state.page <= 1 ? 'disabled' : ''} onclick="goPage(${state.page - 1})">‹</button>
-    ${pages.map(p => p === '…'
-    ? `<span class="page-btn" style="pointer-events:none">…</span>`
-    : `<button class="page-btn ${p === state.page ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`
-  ).join('')}
-    <button class="page-btn" ${state.page >= state.pages ? 'disabled' : ''} onclick="goPage(${state.page + 1})">›</button>
-  `;
+  sentinel.innerHTML = '<div class="load-more-trigger"></div>';
+
+  state.infiniteObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !state.loadingMore) {
+      state.loadingMore = true;
+      state.page++;
+      state.appendMode = true;
+      loadGrid().finally(() => {
+        state.loadingMore = false;
+        state.appendMode = false;
+      });
+    }
+  }, { rootMargin: '300px' });
+
+  const trigger = sentinel.querySelector('.load-more-trigger');
+  if (trigger) state.infiniteObserver.observe(trigger);
+}
+
+function showSmartEmptyState(emptyEl) {
+  emptyEl.classList.remove('hidden');
+  const titleEl = document.getElementById('empty-title');
+  const msgEl = document.getElementById('empty-msg');
+  const actionsEl = document.getElementById('empty-actions');
+
+  const df = state.dateFilter;
+  const todayStr = toISO(new Date());
+
+  // Find next date with events matching current category
+  const nextDate = state.allEvents ? (() => {
+    const filtered = state.allEvents.filter(ev =>
+      (!state.categoria || ev.estilo === state.categoria) && ev.fecha_iso > todayStr
+    );
+    return filtered.length > 0 ? filtered[0].fecha_iso : null;
+  })() : null;
+
+  const catLabel = state.categoria ? ` de ${state.categoria}` : '';
+
+  if (df === todayStr || df === 'today') {
+    if (titleEl) titleEl.textContent = 'Nada para hoy';
+    if (msgEl) msgEl.textContent = nextDate
+      ? `El próximo evento${catLabel} es el ${formatDate(nextDate)}.`
+      : `No hay eventos próximos${catLabel}.`;
+    if (actionsEl) actionsEl.innerHTML = `
+      ${nextDate ? `<button class="btn-suggest" onclick="setDate('${nextDate}')">Ver ${formatDate(nextDate)}</button>` : ''}
+      <button class="btn-reset" onclick="resetFilters()">Ver todos</button>
+    `;
+  } else if (df && /^\d{4}-\d{2}-\d{2}$/.test(df)) {
+    if (titleEl) titleEl.textContent = `Nada para el ${formatDate(df)}`;
+    if (msgEl) msgEl.textContent = nextDate
+      ? `El siguiente evento${catLabel} es el ${formatDate(nextDate)}.`
+      : `No hay más eventos próximos${catLabel}.`;
+    if (actionsEl) actionsEl.innerHTML = `
+      ${nextDate ? `<button class="btn-suggest" onclick="setDate('${nextDate}')">Ver ${formatDate(nextDate)}</button>` : ''}
+      <button class="btn-reset" onclick="resetFilters()">Ver todos</button>
+    `;
+  } else if (state.categoria) {
+    if (titleEl) titleEl.textContent = `No hay eventos de ${state.categoria}`;
+    if (msgEl) msgEl.textContent = nextDate
+      ? `Próximo: ${formatDate(nextDate)}`
+      : 'No hay eventos próximos de esta categoría.';
+    if (actionsEl) actionsEl.innerHTML = `
+      ${nextDate ? `<button class="btn-suggest" onclick="setDate('${nextDate}')">Ver ${formatDate(nextDate)}</button>` : ''}
+      <button class="btn-reset" onclick="resetFilters()">Restablecer filtros</button>
+    `;
+  } else {
+    if (titleEl) titleEl.textContent = 'No se encontraron eventos';
+    if (msgEl) msgEl.textContent = 'Prueba cambiando los filtros o la búsqueda';
+    if (actionsEl) actionsEl.innerHTML = `<button class="btn-reset" onclick="resetFilters()">Restablecer filtros</button>`;
+  }
+}
+
+function haversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function loadGridCercania(grid, emptyEl, statsEl) {
+  grid.className = state.listMode ? 'events-list' : 'events-grid';
+  grid.innerHTML = Array(6).fill('<div class="card skeleton"></div>').join('');
+  emptyEl.classList.add('hidden');
+
+  try {
+    if (!state.userLat) {
+      if (!navigator.geolocation) {
+        showToast('Tu navegador no soporta geolocalización');
+        state.sort = 'fecha';
+        document.getElementById('sort-select')?.setAttribute('value', 'fecha');
+        loadGrid();
+        return;
+      }
+      try {
+        const pos = await new Promise((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 })
+        );
+        state.userLat = pos.coords.latitude;
+        state.userLng = pos.coords.longitude;
+      } catch {
+        showToast('No se pudo obtener tu ubicación. Mostrando por fecha.');
+        state.sort = 'fecha';
+        const sel = document.getElementById('sort-select');
+        if (sel) sel.value = 'fecha';
+        loadGrid();
+        return;
+      }
+    }
+
+    const allEvents = await fetchAllEvents();
+    let filtered = [...allEvents];
+
+    // Apply date filter client-side
+    if (/^\d{4}-\d{2}-\d{2}$/.test(state.dateFilter)) {
+      filtered = filtered.filter(ev => ev.fecha_iso === state.dateFilter);
+    } else if (state.dateFilter === 'today') {
+      filtered = filtered.filter(ev => ev.fecha_iso === toISO(new Date()));
+    } else if (state.dateFilter === 'tomorrow') {
+      const t = new Date(); t.setDate(t.getDate() + 1);
+      filtered = filtered.filter(ev => ev.fecha_iso === toISO(t));
+    } else if (state.dateFilter === 'weekend') {
+      const dr = dateRange('weekend');
+      filtered = filtered.filter(ev => ev.fecha_iso >= dr.fecha_inicio && ev.fecha_iso <= dr.fecha_fin);
+    }
+
+    // Apply category filter
+    if (state.categoria) filtered = filtered.filter(ev => ev.estilo === state.categoria);
+
+    // Apply search filter
+    if (state.search) {
+      const q = state.search.toLowerCase();
+      filtered = filtered.filter(ev =>
+        ev.nombre?.toLowerCase().includes(q) ||
+        ev.lugar?.toLowerCase().includes(q) ||
+        ev.estilo?.toLowerCase().includes(q)
+      );
+    }
+
+    // Sort by distance (events without coords go to end)
+    filtered.sort((a, b) => {
+      const ad = (a.latitud && a.longitud) ? haversineDistance(state.userLat, state.userLng, a.latitud, a.longitud) : 9999;
+      const bd = (b.latitud && b.longitud) ? haversineDistance(state.userLat, state.userLng, b.latitud, b.longitud) : 9999;
+      return ad - bd;
+    });
+
+    statsEl.innerHTML = `<strong>${filtered.length}</strong> evento${filtered.length !== 1 ? 's' : ''} encontrado${filtered.length !== 1 ? 's' : ''}`;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '';
+      showSmartEmptyState(emptyEl);
+      return;
+    }
+
+    state.cercaniaEvents = filtered;
+    state.cercaniaPage = 1;
+
+    const cardFn = state.listMode ? cardListHTML : cardHTML;
+    grid.innerHTML = DOMPurify.sanitize(
+      filtered.slice(0, PAGE_SIZE).map(cardFn).join(''),
+      { ADD_ATTR: ['target'] }
+    );
+    attachCardListeners(grid);
+    setupCercaniaInfiniteScroll();
+
+  } catch (err) {
+    console.error(err);
+    grid.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--text-3)">
+      <div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>
+      <p>Error al cargar eventos</p></div>`;
+  }
+}
+
+function setupCercaniaInfiniteScroll() {
+  const sentinel = document.getElementById('load-more-sentinel');
+  if (!sentinel || !state.cercaniaEvents) return;
+
+  const totalPages = Math.ceil(state.cercaniaEvents.length / PAGE_SIZE);
+  if (state.cercaniaPage >= totalPages) {
+    sentinel.innerHTML = state.cercaniaEvents.length > PAGE_SIZE
+      ? '<p class="no-more-events">Has visto todos los eventos</p>'
+      : '';
+    return;
+  }
+
+  sentinel.innerHTML = '<div class="load-more-trigger"></div>';
+  if (state.infiniteObserver) state.infiniteObserver.disconnect();
+
+  state.infiniteObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !state.loadingMore) {
+      state.loadingMore = true;
+      state.cercaniaPage++;
+      const start = (state.cercaniaPage - 1) * PAGE_SIZE;
+      const newItems = state.cercaniaEvents.slice(start, start + PAGE_SIZE);
+      const grid = document.getElementById('events-grid');
+      if (grid && newItems.length) {
+        const cardFn = state.listMode ? cardListHTML : cardHTML;
+        grid.insertAdjacentHTML('beforeend', DOMPurify.sanitize(newItems.map(cardFn).join(''), { ADD_ATTR: ['target'] }));
+        attachCardListeners(grid);
+      }
+      state.loadingMore = false;
+      setupCercaniaInfiniteScroll();
+    }
+  }, { rootMargin: '300px' });
+
+  const trigger = sentinel.querySelector('.load-more-trigger');
+  if (trigger) state.infiniteObserver.observe(trigger);
+}
+
+function renderDateStrip() {
+  const strip = document.getElementById('date-strip');
+  if (!strip) return;
+
+  const today = new Date();
+  const todayStr = toISO(today);
+  const DAY_ABBR = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+  let html = '';
+
+  // "Todos" button
+  html += `<button class="date-day date-all${state.dateFilter === 'all' ? ' active' : ''}" data-date="all">
+    <span class="day-name">Todos</span>
+  </button>`;
+
+  // Next 31 days
+  for (let i = 0; i < 31; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const iso = toISO(d);
+    const isThisToday = iso === todayStr;
+    const isActive = state.dateFilter === iso || (isThisToday && state.dateFilter === 'today');
+    const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+    let label = DAY_ABBR[d.getDay()];
+    if (isThisToday) label = 'Hoy';
+    else if (i === 1) label = 'Mañ.';
+
+    html += `<button class="date-day${isActive ? ' active' : ''}${isThisToday ? ' is-today' : ''}${isWeekend ? ' is-weekend' : ''}" data-date="${iso}">
+      <span class="day-name">${label}</span>
+      <span class="day-num">${d.getDate()}</span>
+      <div class="day-dots" id="dots-${iso}"></div>
+    </button>`;
+  }
+
+  // Archive button
+  html += `<button class="date-day date-archive${state.showArchive ? ' active' : ''}" data-date="archive">
+    <span class="day-name">📁</span>
+    <span class="day-num" style="font-size:.65rem;font-weight:600">Arch.</span>
+  </button>`;
+
+  strip.innerHTML = html;
+
+  // Bind click events
+  strip.querySelectorAll('.date-day').forEach(btn => {
+    btn.addEventListener('click', () => setDate(btn.dataset.date));
+  });
+
+  // Scroll active day into view
+  const activeBtn = strip.querySelector('.date-day.active');
+  if (activeBtn) {
+    setTimeout(() => activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 50);
+  }
+
+  // Load dots asynchronously
+  fetchAllEvents().then(events => updateDateStripDots(events)).catch(() => {});
+}
+
+function updateDateStripDots(events) {
+  const evByDate = {};
+  events.forEach(ev => {
+    if (!evByDate[ev.fecha_iso]) evByDate[ev.fecha_iso] = [];
+    evByDate[ev.fecha_iso].push(ev);
+  });
+  Object.entries(evByDate).forEach(([date, evs]) => {
+    const dotsEl = document.getElementById(`dots-${date}`);
+    if (!dotsEl) return;
+    dotsEl.innerHTML = evs.slice(0, 3).map(ev =>
+      `<span class="day-dot" style="background:${catColor(ev.estilo)}"></span>`
+    ).join('');
+  });
 }
 
 async function loadCategorias() {
@@ -534,7 +902,7 @@ async function loadCategorias() {
   });
 }
 
-function setDate(filter, btn) {
+function setDate(filter) {
   if (filter === 'archive') {
     state.showArchive = true;
     state.dateFilter = 'archive';
@@ -543,8 +911,7 @@ function setDate(filter, btn) {
     state.dateFilter = filter;
   }
   state.page = 1;
-  document.querySelectorAll('#date-filters .pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  renderDateStrip();
   loadGrid();
 }
 function setCategoria(cat, btn) {
@@ -564,9 +931,18 @@ function goPage(p) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function resetFilters() {
-  state.categoria = ''; state.dateFilter = 'all'; state.search = ''; state.page = 1;
+  state.categoria = '';
+  state.dateFilter = 'today';
+  state.search = '';
+  state.page = 1;
+  state.sort = 'fecha';
+  state.userLat = null;
+  state.userLng = null;
+  state.cercaniaEvents = null;
   const searchEl = document.getElementById('search-input');
   if (searchEl) searchEl.value = '';
+  const mobileSearchEl = document.getElementById('mobile-search-input-new');
+  if (mobileSearchEl) mobileSearchEl.value = '';
   navigateTo('/');
 }
 
@@ -1061,6 +1437,98 @@ window.showMapPreview = showMapPreview;
 // ═══════════════════════════════════════════════════════════════════
 // VIEW: EVENT DETAIL — Stitch Premium Layout
 // ═══════════════════════════════════════════════════════════════════
+
+// ── Urgency chip ──────────────────────────────────────────────────
+function urgencyChip(fecha_iso) {
+  if (!fecha_iso) return '';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const evDate = new Date(fecha_iso + 'T00:00:00'); evDate.setHours(0, 0, 0, 0);
+  const diff = Math.round((evDate - today) / 86400000);
+  if (diff < 0) return '';
+  const dow = evDate.getDay();
+  let label, cls;
+  if      (diff === 0)                            { label = '🔥 Hoy';                cls = 'today'; }
+  else if (diff === 1)                            { label = '⚡ Mañana';             cls = 'soon'; }
+  else if (diff <= 3)                             { label = `📅 En ${diff} días`;    cls = 'soon'; }
+  else if (diff <= 7 && (dow === 0 || dow === 6)) { label = '🗓 Este fin de semana'; cls = 'weekend'; }
+  else return '';
+  return `<span class="ed-urgency-chip ed-urgency-${cls}">${label}</span>`;
+}
+
+// ── ICS calendar download ─────────────────────────────────────────
+function downloadICS(ev) {
+  const pad  = n => String(n).padStart(2, '0');
+  const esc  = s => (s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  const d    = ev.fecha_iso.replace(/-/g, '');
+  const allDay = !ev.hora;
+  let dtstart, dtend;
+  if (allDay) {
+    const next = new Date(ev.fecha_iso + 'T00:00:00');
+    next.setDate(next.getDate() + 1);
+    const nd = next.toISOString().split('T')[0].replace(/-/g, '');
+    dtstart = `DTSTART;VALUE=DATE:${d}`;
+    dtend   = `DTEND;VALUE=DATE:${nd}`;
+  } else {
+    const [h, m] = ev.hora.split(':').map(Number);
+    const endH = h + 2 <= 23 ? h + 2 : 23;
+    const endM = h + 2 <= 23 ? m : 59;
+    dtstart = `DTSTART:${d}T${pad(h)}${pad(m)}00`;
+    dtend   = `DTEND:${d}T${pad(endH)}${pad(endM)}00`;
+  }
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Agenda Cultural GC//ES', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${ev.id}@agendaculturalgc`,
+    `DTSTAMP:${stamp}`,
+    dtstart, dtend,
+    `SUMMARY:${esc(ev.nombre)}`,
+    `LOCATION:${esc(ev.lugar || '')}`,
+    ev.descripcion ? `DESCRIPTION:${esc(ev.descripcion).substring(0, 500)}` : null,
+    ev.url_venta   ? `URL:${ev.url_venta}` : null,
+    'END:VEVENT', 'END:VCALENDAR',
+  ].filter(Boolean).join('\r\n');
+  const blob = new Blob([lines], { type: 'text/calendar;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = Object.assign(document.createElement('a'), { href: url, download: `evento_${ev.id}.ics` });
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Related events HTML ───────────────────────────────────────────
+function relatedEventsHTML(currentId, estilo, allEvts) {
+  if (!allEvts || !estilo) return '';
+  const today = new Date().toISOString().split('T')[0];
+  const related = allEvts
+    .filter(e => e.id !== currentId && e.estilo === estilo && e.fecha_iso >= today)
+    .slice(0, 4);
+  if (!related.length) return '';
+  return `
+    <div class="ed-section">
+      <h2 class="ed-section-title">Eventos relacionados</h2>
+      <div class="ed-related-grid">
+        ${related.map(e => {
+          const c  = catColor(e.estilo);
+          const em = catEmoji(e.estilo);
+          return `
+            <div class="ed-related-card" data-id="${e.id}" role="button" tabindex="0">
+              <div class="ed-related-img">
+                ${e.imagen_url
+                  ? `<img src="${e.imagen_url}" alt="" loading="lazy">`
+                  : `<span class="ed-related-emoji">${em}</span>`}
+              </div>
+              <div class="ed-related-info">
+                <div class="ed-related-name">${e.nombre}</div>
+                <div class="ed-related-date" style="color:${c}">${formatDate(e.fecha_iso)}</div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
 async function renderEventDetail(id) {
   const main = document.getElementById('app-main');
   main.innerHTML = `<div class="event-detail-view">
@@ -1068,7 +1536,7 @@ async function renderEventDetail(id) {
   </div>`;
 
   try {
-    const ev = await fetchEventoDetail(id);
+    const [ev, allEvts] = await Promise.all([fetchEventoDetail(id), fetchAllEvents()]);
     const detailContainer = main.querySelector('.event-detail-view');
     const emoji = catEmoji(ev.estilo);
     const color = catColor(ev.estilo);
@@ -1081,19 +1549,19 @@ async function renderEventDetail(id) {
     const shareUrl = `${SITE_URL}/evento/${ev.id}`;
     const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
 
-    // Format date nicely
     const dateObj = new Date(ev.fecha_iso + 'T12:00:00');
     const dateFormatted = dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 
+    const urgencyLabel = urgencyChip(ev.fecha_iso);
+    const relatedHTML  = relatedEventsHTML(ev.id, ev.estilo, allEvts);
+
     const rawHTML = `
-      <!-- Hero Section: Premium layout with vertical poster -->
       <div class="ed-hero">
         ${ev.imagen_url
         ? `<div class="ed-hero-blur-bg" style="background-image:url('${ev.imagen_url}')"></div>`
         : `<div class="ed-hero-placeholder">${emoji}</div>`}
         <div class="ed-hero-gradient"></div>
 
-        <!-- Floating top nav: back + share -->
         <header class="ed-floating-nav">
           <a href="/" class="ed-nav-btn" id="ed-back-btn" aria-label="Volver">
             <span class="material-symbols-outlined">arrow_back</span>
@@ -1103,22 +1571,19 @@ async function renderEventDetail(id) {
           </button>
         </header>
 
-        <!-- Main hero content (poster + text side-by-side on desktop) -->
         <div class="ed-hero-content">
           <div class="ed-hero-poster-container">
-            ${ev.imagen_url 
+            ${ev.imagen_url
               ? `<img src="${ev.imagen_url}" alt="${ev.nombre}" class="ed-hero-poster-img" onerror="this.parentElement.innerHTML='<div class=\\'ed-hero-placeholder\\'>${emoji}</div>'">`
-              : `<div class="ed-hero-placeholder">${emoji}</div>`
-            }
+              : `<div class="ed-hero-placeholder">${emoji}</div>`}
           </div>
-          
+
           <div class="ed-hero-text">
             <div class="ed-hero-tags">
               <span class="ed-badge-primary" style="color:${color}; background:${color}1a">${emoji} ${ev.estilo}</span>
             </div>
             <h1 class="ed-hero-title">${ev.nombre}</h1>
             
-            <!-- CTA row inside hero -->
             <div class="ed-hero-cta-row">
               ${ev.url_venta
         ? `<a class="ed-btn-buy-hero" href="${ev.url_venta}" target="_blank" rel="noopener noreferrer">
@@ -1126,6 +1591,9 @@ async function renderEventDetail(id) {
                     <span class="material-symbols-outlined">arrow_forward</span>
                   </a>`
         : `<span class="ed-btn-buy-hero ed-btn-free">Entrada libre</span>`}
+              <button class="ed-btn-calendar" id="btn-add-calendar" aria-label="Añadir al calendario" title="Añadir al calendario">
+                <span class="material-symbols-outlined">event_available</span>
+              </button>
               ${mapUrl
         ? `<a class="ed-nav-btn ed-map-btn" href="${mapUrl}" target="_blank" rel="noopener" aria-label="Ver en mapa">
                     <span class="material-symbols-outlined">map</span>
@@ -1136,10 +1604,8 @@ async function renderEventDetail(id) {
         </div>
       </div>
 
-      <!-- Scrollable content body -->
       <div class="ed-body">
 
-        <!-- 2-column info grid -->
         <div class="ed-info-grid">
           <div class="ed-info-card">
             <div class="ed-info-icon" style="background:${color}1a; color:${color}">
@@ -1148,6 +1614,7 @@ async function renderEventDetail(id) {
             <div>
               <div class="ed-info-label">Fecha</div>
               <div class="ed-info-value">${dateFormatted}</div>
+              ${urgencyLabel}
             </div>
           </div>
           ${ev.hora ? `
@@ -1180,7 +1647,6 @@ async function renderEventDetail(id) {
           </div>
         </div>
 
-        <!-- Description -->
         ${ev.descripcion ? `
         <div class="ed-section">
           <h2 class="ed-section-title">Sobre el evento</h2>
@@ -1190,76 +1656,67 @@ async function renderEventDetail(id) {
           </button>
         </div>` : ''}
 
-        <!-- Organizer row -->
         <div class="ed-organizer-row">
           <div class="ed-organizer-avatar">${emoji}</div>
           <div class="ed-organizer-info">
             <div class="ed-organizer-label">Organizado por</div>
-            <div class="ed-organizer-name">${ev.lugar}</div>
+            <div class="ed-organizer-name">${ev.organiza || ev.lugar}</div>
           </div>
-          <a class="ed-nav-btn" href="${waUrl}" target="_blank" rel="noopener" aria-label="WhatsApp">
-            ${ICONS.whatsapp}
-          </a>
         </div>
 
-        <!-- Map Section -->
-        ${mapUrl ? `
+        ${ev.latitud && ev.longitud ? `
         <div class="ed-section">
           <h2 class="ed-section-title">Ubicación</h2>
-          <a class="ed-map-thumb" href="${mapUrl}" target="_blank" rel="noopener">
-            <div class="ed-map-thumb-overlay">
-              <button class="ed-map-thumb-btn">
-                <span class="material-symbols-outlined" style="color:${color}">map</span>
-                Ver en Mapa
-              </button>
-            </div>
-          </a>
+          <div id="ed-leaflet-map" class="ed-leaflet-map"></div>
           <p class="ed-map-address">
             <span class="material-symbols-outlined">location_on</span>
             ${ev.lugar}
           </p>
         </div>` : ''}
 
-        <!-- Copy link -->
-        <div class="ed-share-row">
-          <button class="ed-share-btn" id="btn-share-copy">
-            ${ICONS.copy} Copiar enlace
-          </button>
+        <div class="ed-share-panel">
+          <div class="ed-share-panel-title">Compartir</div>
+          <div class="ed-share-btns">
+            <a class="ed-share-btn-item ed-share-wa" href="${waUrl}" target="_blank" rel="noopener noreferrer">
+              ${ICONS.whatsapp}
+              <span>WhatsApp</span>
+            </a>
+            <button class="ed-share-btn-item ed-share-copy" id="btn-share-copy">
+              ${ICONS.copy}
+              <span>Copiar enlace</span>
+            </button>
+            <button class="ed-share-btn-item ed-share-more" id="btn-share-more">
+              <span class="material-symbols-outlined" style="font-size:18px">ios_share</span>
+              <span>Más opciones</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Bottom padding for nav -->
+        ${relatedHTML}
+
         <div style="height: 90px"></div>
       </div>
     `;
 
-    // Strict DOMPurify sanitization
-    detailContainer.innerHTML = DOMPurify.sanitize(rawHTML, { ADD_ATTR: ['target', 'style'] });
+    detailContainer.innerHTML = DOMPurify.sanitize(rawHTML, { ADD_ATTR: ['target', 'style', 'data-id'] });
 
-    // Explicitly scroll to top when content is ready
     window.scrollTo(0, 0);
 
-    // Fallback for hero background
+    // Hero background fallback
     const heroBlurBg = detailContainer.querySelector('.ed-hero-blur-bg');
     if (heroBlurBg) {
       const testImg = new Image();
-      testImg.onerror = () => {
-        heroBlurBg.outerHTML = `<div class="ed-hero-placeholder">${emoji}</div>`;
-      };
+      testImg.onerror = () => { heroBlurBg.outerHTML = `<div class="ed-hero-placeholder">${emoji}</div>`; };
       testImg.src = ev.imagen_url;
     }
 
-    // Intercept internal back button click to use SPA router
+    // Back button → SPA router
     const backBtn = detailContainer.querySelector('#ed-back-btn');
-    if (backBtn) {
-      backBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        history.back();
-      });
-    }
+    if (backBtn) backBtn.addEventListener('click', e => { e.preventDefault(); history.back(); });
 
     // Read more toggle
     const readMoreBtn = detailContainer.querySelector('#btn-read-more');
-    const descText = detailContainer.querySelector('#ed-desc-text');
+    const descText    = detailContainer.querySelector('#ed-desc-text');
     if (readMoreBtn && descText) {
       readMoreBtn.addEventListener('click', () => {
         descText.classList.toggle('ed-desc-expanded');
@@ -1269,11 +1726,45 @@ async function renderEventDetail(id) {
       });
     }
 
-    // Connect share actions dynamically (CSP friendly)
+    // Add to calendar
+    const btnCal = detailContainer.querySelector('#btn-add-calendar');
+    if (btnCal) btnCal.addEventListener('click', () => downloadICS(ev));
+
+    // Share actions
     const btnNative = detailContainer.querySelector('#btn-share-native');
-    const btnCopy = detailContainer.querySelector('#btn-share-copy');
+    const btnMore   = detailContainer.querySelector('#btn-share-more');
+    const btnCopy   = detailContainer.querySelector('#btn-share-copy');
     if (btnNative) btnNative.addEventListener('click', () => shareEvent(ev.id, ev.nombre));
-    if (btnCopy) btnCopy.addEventListener('click', () => copyLink(shareUrl));
+    if (btnMore)   btnMore.addEventListener('click',   () => shareEvent(ev.id, ev.nombre));
+    if (btnCopy)   btnCopy.addEventListener('click',   () => copyLink(shareUrl));
+
+    // Related events navigation
+    detailContainer.querySelectorAll('.ed-related-card[data-id]').forEach(card => {
+      card.addEventListener('click', () => navigateTo(`/evento/${card.dataset.id}`));
+      card.addEventListener('keydown', e => { if (e.key === 'Enter') navigateTo(`/evento/${card.dataset.id}`); });
+    });
+
+    // Leaflet mini-map
+    if (ev.latitud && ev.longitud && typeof L !== 'undefined') {
+      const mapEl = detailContainer.querySelector('#ed-leaflet-map');
+      if (mapEl) {
+        const miniMap = L.map(mapEl, {
+          zoomControl: false, dragging: false, scrollWheelZoom: false,
+          attributionControl: false, tap: false,
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(miniMap);
+        miniMap.setView([ev.latitud, ev.longitud], 15);
+        L.marker([ev.latitud, ev.longitud], {
+          icon: L.divIcon({
+            className: '',
+            html: `<div style="background:${color};width:14px;height:14px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>`,
+            iconSize: [20, 20], iconAnchor: [10, 10],
+          }),
+        }).addTo(miniMap);
+        mapEl.style.cursor = 'pointer';
+        mapEl.addEventListener('click', () => window.open(mapUrl, '_blank', 'noopener'));
+      }
+    }
 
     injectEventJsonLd(ev);
     document.title = `${ev.nombre} — Agenda Cultural Gran Canaria`;
@@ -1454,6 +1945,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
 
+  // Desktop search
   document.getElementById('search-input')?.addEventListener('input', e => {
     clearTimeout(state.debounceTimer);
     state.debounceTimer = setTimeout(() => {
@@ -1462,6 +1954,36 @@ document.addEventListener('DOMContentLoaded', () => {
       if (state.view === 'grid') loadGrid();
     }, 350);
   });
+
+  // Mobile search toggle
+  const mobileSearchBtn = document.getElementById('mobile-search-btn');
+  const mobileSearchBar = document.getElementById('mobile-search-bar');
+  const mobileSearchInput = document.getElementById('mobile-search-input-new');
+  const mobileSearchClose = document.getElementById('mobile-search-close');
+
+  mobileSearchBtn?.addEventListener('click', () => {
+    const isOpen = mobileSearchBar?.classList.toggle('open');
+    if (isOpen) mobileSearchInput?.focus();
+  });
+  mobileSearchClose?.addEventListener('click', () => {
+    mobileSearchBar?.classList.remove('open');
+    if (mobileSearchInput) { mobileSearchInput.value = ''; state.search = ''; state.page = 1; if (state.view === 'grid') loadGrid(); }
+  });
+  mobileSearchInput?.addEventListener('input', e => {
+    clearTimeout(state.debounceTimer);
+    state.debounceTimer = setTimeout(() => {
+      state.search = e.target.value;
+      state.page = 1;
+      if (state.view === 'grid') loadGrid();
+    }, 350);
+  });
+
+  // Scroll-to-top button
+  const scrollTopBtn = document.getElementById('scroll-top-btn');
+  window.addEventListener('scroll', () => {
+    scrollTopBtn?.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+  scrollTopBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
   document.getElementById('modal-close')?.addEventListener('click', closeModal);
   document.getElementById('modal-overlay')?.addEventListener('click', e => {

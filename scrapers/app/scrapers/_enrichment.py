@@ -674,7 +674,15 @@ async def enriquecer_evento(
 
         # Prioridad 2: imagen principal visible (ignora og:image si era NULL)
         if not detalle["imagen_url"]:
-            for img_sel in [
+            # Selectores específicos por dominio
+            domain_img_selectors = {
+                "entrees": [
+                    "img[src*='media.entrees.es']",
+                    "img[data-image*='media.entrees.es']",
+                ],
+            }
+            extra_selectors = domain_img_selectors.get(_detectar_dominio(url), [])
+            for img_sel in extra_selectors + [
                 ".event-image img", ".detail-image img",
                 "[class*='poster'] img", "[class*='cartel'] img",
                 ".main-image img", ".entry-content img",
@@ -687,8 +695,9 @@ async def enriquecer_evento(
                 try:
                     img_loc = page.locator(img_sel).first
                     if await img_loc.count() > 0:
-                        src = await img_loc.get_attribute("src") or \
-                              await img_loc.get_attribute("data-src")
+                        src = (await img_loc.get_attribute("src") or
+                               await img_loc.get_attribute("data-image") or
+                               await img_loc.get_attribute("data-src"))
                         src = _validar_imagen(src)
                         if src and "logo" not in src.lower():
                             detalle["imagen_url"] = src
@@ -704,12 +713,17 @@ async def enriquecer_evento(
                 for i in range(min(img_count, 15)):
                     try:
                         img = all_imgs.nth(i)
-                        src = await img.get_attribute("src")
+                        src = (await img.get_attribute("src") or
+                               await img.get_attribute("data-image") or
+                               await img.get_attribute("data-src"))
                         src = _validar_imagen(src)
                         if not src or "logo" in src.lower() or "icon" in src.lower():
                             continue
-                        # Check natural dimensions
-                        width = await img.evaluate("el => el.naturalWidth || el.width")
+                        # naturalWidth es el tamaño intrínseco (funciona aunque el elemento
+                        # esté oculto o position:absolute); fallback a atributo HTML width
+                        width = await img.evaluate(
+                            "el => el.naturalWidth || parseInt(el.getAttribute('width')) || 0"
+                        )
                         if width and int(width) > 200:
                             detalle["imagen_url"] = src
                             break
