@@ -39,6 +39,8 @@ from app.scrapers.entradas_canarias import scrape_entradas_canarias
 from app.scrapers.telde_cultura import scrape_telde_cultura
 from app.scrapers.salan_producciones import scrape_salan_producciones
 from app.scrapers.localguide_gc import scrape_localguide_gc
+from app.scrapers.canarias_en_vivo import scrape_canarias_en_vivo
+from app.scrapers.entradium import scrape_entradium
 
 
 async def _scrape_ticketmaster_smart(page) -> list[Evento]:
@@ -71,6 +73,8 @@ async def run_all_scrapers() -> list[Evento]:
         page_telde = await browser.new_page()
         page_salan = await browser.new_page()
         page_localguide = await browser.new_page()
+        page_canarias_en_vivo = await browser.new_page()
+        page_entradium = await browser.new_page()
 
         # Lanzar en paralelo
         results = await asyncio.gather(
@@ -87,6 +91,8 @@ async def run_all_scrapers() -> list[Evento]:
             scrape_telde_cultura(page_telde),
             scrape_salan_producciones(page_salan),
             scrape_localguide_gc(page_localguide),
+            scrape_canarias_en_vivo(page_canarias_en_vivo),
+            scrape_entradium(page_entradium),
             return_exceptions=True,
         )
 
@@ -96,7 +102,7 @@ async def run_all_scrapers() -> list[Evento]:
         "Ticketmaster Web", "Auditorio A. Kraus", "Teatro Pérez Galdós",
         "CICCA", "Teatro Guiniguada", "Tomaticket", "Tickety",
         "Entradas.com", "Entrées.es", "EntradasCanarias", "TeldeCultura",
-        "Salan Producciones", "LocalGuideGC",
+        "Salan Producciones", "LocalGuideGC", "CanariasEnVivo", "Entradium",
     ]
 
     fallos_scraper = 0
@@ -287,7 +293,7 @@ async def main():
     df = df.drop_duplicates(subset=["organiza", "url_venta", "fecha_iso", "_hora_norm"], keep="first")
     
     # 3.5️⃣ Dedupe CROSS-SOURCE en 2 fases (P0-C fix)
-    PREF = {"Ticketmaster": 100, "EntradasCanarias": 90, "Tickety": 80, "Tomaticket": 70, "CICCA": 65, "Teatro Guiniguada": 65, "Entrées.es": 40}
+    PREF = {"Ticketmaster": 100, "EntradasCanarias": 90, "Tickety": 80, "Tomaticket": 70, "CICCA": 65, "Teatro Guiniguada": 65, "Entrées.es": 40, "CanariasEnVivo": 35}
 
     def quality_score(r):
         s = PREF.get(r["organiza"], 50)
