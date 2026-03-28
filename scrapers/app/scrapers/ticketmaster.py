@@ -116,7 +116,7 @@ def _parse_event(item: dict) -> Evento | None:
             organiza="Ticketmaster",
             url_venta=url_venta,
             imagen_url=img_url,
-            estilo="Música/Espectáculo",
+            estilo="Otros",
             source_id=event_id,
         )
     except Exception:

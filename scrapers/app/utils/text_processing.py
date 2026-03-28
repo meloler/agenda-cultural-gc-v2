@@ -66,17 +66,13 @@ def normalizar_fecha(fecha_texto: str) -> str | None:
 
 
 def categorizar_pro(nombre: str, organiza: str) -> str:
-    """Categoriza eventos según keywords en nombre/organizador."""
-    if organiza in ["Auditorio A. Kraus", "Teatro Pérez Galdós", "CICCA", "Teatro Guiniguada"]:
-        return "Cultura/Teatro"
-    n = nombre.lower()
-    if any(x in n for x in ['concierto', 'festival', 'live', 'musica', 'banda', 'rock', 'jazz']):
-        return 'Música'
-    if any(x in n for x in ['carnaval', 'gala', 'reina', 'drag']):
-        return 'Carnaval'
-    if any(x in n for x in ['humor', 'monologo', 'comedia']):
-        return 'Humor'
-    return 'Otros'
+    """Pre-clasificación del scraper — siempre devuelve 'Otros'.
+
+    La clasificación real la hace el clasificador de IA (classifier.py)
+    que corre sobre TODOS los eventos con título + descripción completa.
+    Esta función existe por compatibilidad con los scrapers; no clasifica.
+    """
+    return "Otros"
 
 
 def normalizar_titulo_export(t: str) -> str:

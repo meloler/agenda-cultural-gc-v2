@@ -177,9 +177,11 @@ def test_normalizar_fecha_text():
 
 def test_categorizar_pro():
     from app.utils.text_processing import categorizar_pro
-    assert categorizar_pro("Concierto de Rock", "Tomaticket") == "Música"
-    assert categorizar_pro("Caperucita Roja", "Teatro Pérez Galdós") == "Cultura/Teatro"
-    assert categorizar_pro("Carnaval de Las Palmas", "Fuente X") == "Carnaval"
+    # categorizar_pro ahora siempre devuelve "Otros" — la clasificación
+    # real la hace el classifier.py con IA sobre título + descripción.
+    assert categorizar_pro("Concierto de Rock", "Tomaticket") == "Otros"
+    assert categorizar_pro("Caperucita Roja", "Teatro Pérez Galdós") == "Otros"
+    assert categorizar_pro("Carnaval de Las Palmas", "Fuente X") == "Otros"
     assert categorizar_pro("Charla sobre IA", "Fuente Y") == "Otros"
 
 def test_validar_imagen():

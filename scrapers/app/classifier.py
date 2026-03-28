@@ -28,7 +28,7 @@ from app.models import Evento
 CATEGORIAS_VALIDAS = [
     "Música", "Teatro", "Cine", "Danza", "Humor",
     "Gastronomía", "Deporte", "Infantil", "Formación",
-    "Exposición", "Carnaval", "Otros",
+    "Exposición", "Carnaval", "Fiesta", "Otros",
 ]
 
 # ─────────────────────────────────────────────────────────────────────
@@ -102,12 +102,21 @@ _KEYWORDS: dict[str, list[str]] = {
         "carnaval", "gala", "reina", "drag", "murga", "comparsa",
         "cabalgata", "chirigota", "mogollón",
     ],
+    "Fiesta": [
+        "fiesta", "party", "parties", "after", "verbena", "baile popular",
+        "nochevieja", "fin de año", "nochebuena", "halloween", "carnaval party",
+        "universitari", "erasmus", "rave", "discoteca", "club", "noche de",
+        "celebración", "celebracion", "cumpleaños", "bodas", "gala de",
+        "regularización", "regularizacion", "fila 0", "copa", "copas",
+        "open bar", "botellón", "botellon", "dj set", "sala de fiestas",
+    ],
 }
 
 
 def _clasificar_local(nombre: str, descripcion: str | None, organiza: str) -> str:
     """Clasifica un evento usando keywords expandidas sobre nombre + descripción."""
     texto = f"{nombre} {descripcion or ''}".lower()
+    nombre_low = nombre.lower()
 
     # Puntuación por categoría: contar cuántas keywords coinciden
     scores: dict[str, int] = defaultdict(int)
@@ -115,9 +124,9 @@ def _clasificar_local(nombre: str, descripcion: str | None, organiza: str) -> st
     for categoria, keywords in _KEYWORDS.items():
         for kw in keywords:
             if kw in texto:
-                # Keywords en el nombre pesan doble
-                if kw in nombre.lower():
-                    scores[categoria] += 2
+                # Keywords en el nombre pesan 3x, en descripción 1x
+                if kw in nombre_low:
+                    scores[categoria] += 3
                 else:
                     scores[categoria] += 1
 
@@ -132,14 +141,28 @@ def _clasificar_local(nombre: str, descripcion: str | None, organiza: str) -> st
 # ─────────────────────────────────────────────────────────────────────
 # Clasificación con LLM (OpenAI Responses API / Gemini)
 # ─────────────────────────────────────────────────────────────────────
-_LLM_PROMPT = """Eres un clasificador de eventos culturales. Clasifica cada evento en UNA SOLA categoría.
+_LLM_PROMPT = """Eres un clasificador experto de eventos culturales y de ocio en Gran Canaria.
+Clasifica cada evento en UNA SOLA categoría basándote en el título y la descripción.
 
-Categorías válidas: {categorias}
+Categorías y sus criterios:
+- Música: conciertos, recitales, festivales de música, actuaciones de bandas, DJs en contexto musical
+- Teatro: obras teatrales, monólogos dramáticos, piezas escénicas, musicales
+- Cine: proyecciones, ciclos de cine, documentales, cortometrajes
+- Danza: ballet, danza contemporánea, flamenco, espectáculos de baile
+- Humor: stand-up, comedy, monólogos de humor, espectáculos cómicos
+- Gastronomía: catas, showcooking, ferias de alimentación, eventos culinarios
+- Deporte: competiciones, carreras, torneos, actividades deportivas
+- Infantil: actividades para niños y familias, cuentacuentos, teatro infantil
+- Formación: talleres, cursos, conferencias, seminarios, charlas
+- Exposición: exposiciones de arte, instalaciones, muestras, inauguraciones
+- Carnaval: galas de carnaval, elecciones de reina, murgas, comparsas
+- Fiesta: fiestas nocturnas, parties universitarias, eventos de discoteca, verbenas, celebraciones con open bar o DJ de fiesta, eventos de regularización
+- Otros: cualquier evento que no encaje claramente en las categorías anteriores
 
-Responde SOLO con un JSON array donde cada elemento tiene "id" y "categoria".
-No uses markdown ni explicaciones.
+IMPORTANTE: Usa el contexto completo del título y descripción. "Bach íntimo" es Música aunque sea en un teatro.
+Responde SOLO con un JSON array donde cada elemento tiene "id" y "categoria". Sin markdown.
 
-Eventos a clasificar:
+Eventos:
 {eventos_json}
 """
 
@@ -154,19 +177,21 @@ async def _clasificar_lote_openai(lote: list[dict], api_key: str, model: str) ->
     ]
 
     prompt = _LLM_PROMPT.format(
-        categorias=", ".join(CATEGORIAS_VALIDAS),
         eventos_json=json.dumps(eventos_para_prompt, ensure_ascii=False),
     )
 
     try:
         client = OpenAI(api_key=api_key)
-        resp = client.responses.create(
+        resp = client.chat.completions.create(
             model=model,
-            instructions="Eres un clasificador de eventos culturales. Responde solo con JSON.",
-            input=prompt,
+            messages=[
+                {"role": "system", "content": "Eres un clasificador de eventos culturales. Responde solo con JSON."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.1,
         )
 
-        text = resp.output_text
+        text = resp.choices[0].message.content or ""
         text = text.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
         clasificaciones = json.loads(text)
 
@@ -192,7 +217,6 @@ async def _clasificar_lote_gemini(lote: list[dict], api_key: str) -> dict[int, s
     ]
 
     prompt = _LLM_PROMPT.format(
-        categorias=", ".join(CATEGORIAS_VALIDAS),
         eventos_json=json.dumps(eventos_para_prompt, ensure_ascii=False),
     )
 
@@ -232,18 +256,21 @@ BATCH_SIZE = 15  # Eventos por lote para LLM
 
 
 async def categorizar_eventos() -> dict[str, int]:
-    """Clasifica eventos con estilo='Otros' usando keywords o LLM.
+    """Clasifica TODOS los eventos usando IA (título + descripción) o keywords como fallback.
 
     Modo se determina por variables de entorno:
-      - CLASSIFIER_MODE=llm  + GEMINI_API_KEY → usa Gemini
+      - CLASSIFIER_MODE=llm  + GEMINI_API_KEY → usa Gemini (recomendado, gratis)
       - CLASSIFIER_MODE=llm  + OPENAI_API_KEY → usa OpenAI
       - (default) → clasificación local por keywords
+
+    A diferencia de versiones anteriores, reclasifica TODOS los eventos en cada
+    ejecución para corregir pre-clasificaciones incorrectas del scraper.
 
     Returns:
         Dict con estadísticas: {"procesados": N, "reclasificados": M, "modo": str}
     """
     print("\n" + "=" * 60)
-    print("🏷️  CLASIFICACIÓN INTELIGENTE DE EVENTOS")
+    print("🏷️  CLASIFICACIÓN INTELIGENTE DE EVENTOS (IA para todos)")
     print("=" * 60)
 
     mode = os.getenv("CLASSIFIER_MODE", "local").lower()
@@ -252,7 +279,7 @@ async def categorizar_eventos() -> dict[str, int]:
     gemini_key = os.getenv("GEMINI_API_KEY")
 
     if mode == "llm" and openai_key:
-        print(f"   🤖 Modo: OpenAI Responses API ({openai_model})")
+        print(f"   🤖 Modo: OpenAI Chat API ({openai_model})")
         llm_fn = lambda lote: _clasificar_lote_openai(lote, openai_key, openai_model)
     elif mode == "llm" and gemini_key:
         print("   🤖 Modo: Gemini API (gemini-2.0-flash)")
@@ -268,14 +295,15 @@ async def categorizar_eventos() -> dict[str, int]:
     stats = {"procesados": 0, "reclasificados": 0, "modo": "local" if not llm_fn else "llm"}
 
     with get_session() as session:
-        # Seleccionar eventos sin clasificar o con 'Otros'
-        statement = select(Evento).where(Evento.estilo == "Otros")
-        eventos_otros: list[Evento] = list(session.exec(statement).all())
-
-        print(f"   📊 Eventos con estilo='Otros': {len(eventos_otros)}")
+        # Reclasificar TODOS los eventos, no solo los "Otros"
+        # Esto corrige pre-clasificaciones incorrectas del scraper
+        statement = select(Evento)
+        todos_eventos: list[Evento] = list(session.exec(statement).all())
+        eventos_otros = todos_eventos  # alias para compatibilidad con el código siguiente
+        print(f"   📊 Total eventos a clasificar: {len(eventos_otros)}")
 
         if not eventos_otros:
-            print("   ✨ Todos los eventos ya están clasificados.")
+            print("   ✨ No hay eventos en la base de datos.")
             print("=" * 60)
             return stats
 

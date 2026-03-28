@@ -224,24 +224,9 @@ async def scrape_canarias_en_vivo(page: Page) -> list[Evento]:
                 # Imagen
                 imagen_url = _validar_imagen(item.get("imagenUrl", ""))
 
-                # Categoría/Estilo desde los tags de Odoo
-                tags = item.get("tags", [])
-                estilo = categorizar_pro(titulo, "CanariasEnVivo")
-                # Si algún tag coincide con categorías conocidas, usarlo
-                for tag in tags:
-                    tag_low = tag.lower()
-                    if "rock" in tag_low or "metal" in tag_low:
-                        estilo = "Conciertos"
-                        break
-                    elif "jazz" in tag_low or "blues" in tag_low:
-                        estilo = "Conciertos"
-                        break
-                    elif "festival" in tag_low:
-                        estilo = "Festivales"
-                        break
-                    elif "tributo" in tag_low:
-                        estilo = "Conciertos"
-                        break
+                # La categoría la asigna el clasificador de IA (classifier.py)
+                # que usa título + descripción completa para mayor precisión
+                estilo = "Otros"
 
                 eventos.append(
                     Evento(
