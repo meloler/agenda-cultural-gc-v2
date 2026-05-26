@@ -2,35 +2,42 @@
 
 ## Status
 
-Proposed. TBD — requires user decision.
+Accepted as provisional for rebuild V0. Assumption — to be validated.
 
 ## Context
 
-The current frontend is a vanilla JS SPA in the repository root. The rebuild should prepare a future app in `apps/web/`, but the stack has not been chosen.
+The current frontend has been moved to `legacy/frontend-static/`. The rebuild needs a minimal, testable web app location that does not interfere with `scrapers/`.
 
 ## Decision
 
-No final stack decision yet.
+Use `apps/web` with Next.js + TypeScript for the new mobile-first web app.
 
-The repo will prepare for `apps/web/` as the future app location, while preserving the current frontend until a legacy move is approved.
+Use npm workspaces from the repository root:
 
-## Options To Evaluate
+- Root: coordination scripts.
+- `apps/web`: new Next.js app.
+- `packages/event-intelligence`: future Event Intelligence package placeholder.
 
-- Vanilla/Vite.
-- React/Vite.
-- Next.js.
-- Other lightweight mobile-first setup.
+## Current Scope
 
-## Decision Criteria
+This decision only establishes a minimal compilable shell.
 
-- Mobile-first speed.
-- Simple deployment.
-- Easy testing.
-- Low maintenance.
-- Good developer/agent ergonomics.
-- Works with Supabase or curated event exports.
+It does not implement:
+
+- FEAT-001 Event Intelligence.
+- Product home collections.
+- Supabase connection.
+- Login.
+- Personalization.
 
 ## Consequences
 
-- No UI scaffold should be built until stack is chosen.
-- Harness docs can proceed without stack lock-in.
+- Root `npm run build` now builds `apps/web`.
+- Root `npm run validate` runs typecheck, lint, build and the current test placeholder.
+- `vercel.json` still needs a separate deployment/config decision.
+- Legacy env/feed scripts remain in `scripts/` for now and are not part of the new app path.
+
+## Open Questions
+
+- Whether final hosting uses Vercel project root `apps/web` or root workspace build settings: TBD — requires user decision.
+- Whether Event Intelligence runs in Python, TypeScript or both: TBD — requires user decision.

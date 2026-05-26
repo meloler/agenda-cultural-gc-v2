@@ -4,18 +4,23 @@
 
 The repository currently has:
 
+- A new minimal Next.js + TypeScript app in `apps/web/`.
 - A legacy vanilla frontend preserved in `legacy/frontend-static/`.
 - A Python ingestion pipeline in `scrapers/`.
-- Supabase as event storage and frontend data source for the legacy app.
-- Build scripts in `scripts/` for environment injection and feed generation.
-- Vercel deployment configuration.
+- Supabase as event storage and legacy frontend data source.
+- Build/feed/env scripts in `scripts/`, some of which still belong to the legacy static frontend assumptions.
+- Vercel deployment configuration still pending review for the new app.
 
-## Target Architecture For Controlled Rebuild
+## Workspace Layout
 
 ```text
 apps/
   web/
-    # future mobile-first discovery app
+    # new mobile-first app shell, Next.js + TypeScript
+
+packages/
+  event-intelligence/
+    # placeholder for future Event Intelligence layer
 
 scrapers/
   # existing ingestion, enrichment, geolocation and export pipeline
@@ -24,12 +29,23 @@ docs/
   # decisions, playbooks, checklists and plans
 
 scripts/
-  # shared build/validation scripts
+  # legacy/shared build, feed and env scripts; review before reuse
 
 legacy/
   frontend-static/
     # previous static frontend preserved as reference
 ```
+
+## Root Scripts
+
+The root `package.json` coordinates workspace commands:
+
+- `npm run dev` -> `apps/web` dev server.
+- `npm run build` -> builds `apps/web`.
+- `npm run lint` -> lints `apps/web`.
+- `npm run typecheck` -> typechecks `apps/web`.
+- `npm test` -> currently runs the web test placeholder.
+- `npm run validate` -> typecheck, lint, build and test.
 
 ## Legacy Frontend Status
 
@@ -39,7 +55,19 @@ It includes the former root `index.html`, `app.js`, `style.css`, PWA files, mobi
 
 It is not the base of the new app. It is historical reference only.
 
-Important: `scripts/inject_env.mjs`, `scripts/generate_feeds.mjs`, `package.json` and `vercel.json` still reflect the previous root-static frontend assumptions. They were not changed in this task because production configuration changes should be handled separately and explicitly.
+## Vercel Status
+
+`vercel.json` was not changed in the Next.js scaffold task.
+
+Reason: it still points to the old root `/index.html` flow, and changing deployment configuration should be a separate explicit task to avoid accidental production breakage.
+
+Assumption — to be validated: future Vercel setup should either use `apps/web` as project root or a root monorepo configuration that builds `apps/web` safely.
+
+## Legacy Scripts Status
+
+`scripts/inject_env.mjs` and `scripts/generate_feeds.mjs` remain in place.
+
+They are not deleted because they may still hold useful legacy/feed behavior, but `inject_env.mjs` no longer applies directly to the new `apps/web` shell.
 
 ## Pipeline To Preserve
 
@@ -58,6 +86,8 @@ Important: `scripts/inject_env.mjs`, `scripts/generate_feeds.mjs`, `package.json
 
 A new Event Intelligence layer should sit between raw/curated event data and the frontend experience.
 
+Target placeholder location: `packages/event-intelligence/`.
+
 Responsibilities:
 
 - Validate whether an event is publishable.
@@ -66,19 +96,11 @@ Responsibilities:
 - Explain why an event appears in a collection.
 - Provide stable data for the mobile-first app.
 
-Implementation location TBD — requires user decision.
-
-Potential options:
-
-- Python module inside `scrapers/app/intelligence/`.
-- Separate scripts under `scripts/event-intelligence/`.
-- Frontend adapter under `apps/web/` for V0 mock/derived collections.
+Implementation details are TBD — requires user decision.
 
 ## Frontend Direction
 
-The future app should live under `apps/web/`.
-
-Stack TBD — requires user decision.
+The future app lives under `apps/web/`.
 
 Constraints:
 
@@ -86,6 +108,7 @@ Constraints:
 - No login in V0.
 - Must support mock data before production data connection.
 - Must consume curated event shape, not raw scraper internals.
+- Must not use Supabase service role keys in frontend.
 
 ## Data Flow Target
 

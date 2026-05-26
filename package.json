@@ -1,20 +1,27 @@
 {
-  "name": "eventos-v2",
-  "version": "1.0.0",
-  "description": "![Canarias](https://img.shields.io/badge/Region-Gran%20Canaria-blue?style=for-the-badge&logoColor=white)\r ![Python](https://img.shields.io/badge/python-3.10+-yellow?style=for-the-badge&logo=python&logoColor=white)\r ![Playwright](https://img.shields.io/badge/Scraper-Playwright-green?style=for-the-badge&logo=playwright&logoColor=white)\r ![IA](https://img.shields.io/badge/AI-Enrichment-blueviolet?style=for-the-badge&logo=openai&logoColor=white)",
-  "main": "app.js",
+  "name": "agenda-cultural-gc-v2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agenda Cultural GC controlled rebuild workspace.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "build": "node scripts/inject_env.mjs && node scripts/generate_feeds.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install:workspaces": "npm install",
+    "dev": "npm --workspace apps/web run dev",
+    "build": "npm --workspace apps/web run build",
+    "lint": "npm --workspace apps/web run lint",
+    "typecheck": "npm --workspace apps/web run typecheck",
+    "test": "npm --workspace apps/web run test",
+    "validate": "npm run typecheck && npm run lint && npm run build && npm test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meloler/agenda-cultural-gc-v2.git"
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/meloler/agenda-cultural-gc-v2/issues"
   },

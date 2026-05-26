@@ -4,7 +4,7 @@ This file documents real commands that exist now and sensors that still need to 
 
 ## Current Real Commands
 
-### Frontend / Root
+### Root Workspace
 
 Install dependencies:
 
@@ -12,26 +12,63 @@ Install dependencies:
 npm install
 ```
 
-Build currently defined in `package.json`:
+Run the new web app locally:
+
+```bash
+npm run dev
+```
+
+Build the new web app:
 
 ```bash
 npm run build
 ```
 
-This runs:
+Lint the new web app:
 
 ```bash
-node scripts/inject_env.mjs
-node scripts/generate_feeds.mjs
+npm run lint
 ```
 
-Current test command:
+Typecheck the new web app:
+
+```bash
+npm run typecheck
+```
+
+Run current test command:
 
 ```bash
 npm test
 ```
 
-Status: not useful yet. It currently exits with `Error: no test specified`.
+Status: this is a placeholder test command for `apps/web`. It exits successfully and prints that no tests are configured yet.
+
+Run grouped validation:
+
+```bash
+npm run validate
+```
+
+Current `validate` runs:
+
+1. `npm run typecheck`
+2. `npm run lint`
+3. `npm run build`
+4. `npm test`
+
+### apps/web
+
+From `apps/web/` or through npm workspace:
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run typecheck
+npm test
+npm run validate
+```
 
 ### Scrapers / Pipeline
 
@@ -47,42 +84,46 @@ python -m pytest test_precision.py -v
 python -m pytest tests/ -v
 ```
 
-Note: some commands depend on local environment variables, Playwright browsers, Excel outputs, local DB or network access.
+Note: some scraper commands depend on local environment variables, Playwright browsers, Excel outputs, local DB or network access.
+
+## Last Known Validation
+
+After creating the minimal Next.js app:
+
+- `npm install` passed.
+- `npm run typecheck` passed.
+- `npm run lint` passed.
+- First `npm run build` failed due BOM encoding in JSON files.
+- BOM was fixed.
+- `npm run build` passed.
+- `npm test` passed as placeholder.
+- `npm run validate` passed.
+
+Security note: `npm install` reported 3 moderate vulnerabilities. No automatic `npm audit fix` was run because that may change dependency versions outside this task scope.
 
 ## Current CI
 
-`.github/workflows/ci.yml` currently:
+`.github/workflows/ci.yml` still reflects the older CI shape and should be updated in a later explicit task.
 
-- Installs Python dependencies.
-- Installs Playwright Chromium.
-- Runs `ruff check . --exit-zero` in `scrapers/`.
-- Runs `python -m pytest test_precision.py -v`.
-- Runs a small model import smoke test.
-- Checks that `index.html`, `app.js` and `style.css` exist.
+Known limitations:
 
-Limitations:
-
-- Ruff does not fail the CI because of `--exit-zero`.
+- CI may still check old root frontend assumptions.
+- CI may not yet run root `npm run validate`.
+- Ruff currently does not fail CI because of `--exit-zero`.
 - Full `scrapers/tests/` suite is not guaranteed in CI.
-- No real frontend test exists.
-- No frontend lint exists.
-- No typecheck exists.
-- No real build verification gate exists in CI.
 
 ## Missing Sensors
 
 Pending sensors to add:
 
 - Format check.
-- Frontend lint.
-- Frontend typecheck.
-- Unit tests.
-- Real build check.
+- Real unit tests for `apps/web`.
 - Event quality checks.
 - Secret scanning.
-- Manual mobile QA checklist.
+- Manual mobile QA checklist execution.
 - Broken link/image checks for event cards.
 - Data contract validation between Event Intelligence and frontend.
+- CI update for the workspace structure.
 
 ## Manual Mobile QA
 

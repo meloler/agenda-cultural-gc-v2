@@ -25,3 +25,13 @@ sitemap.xml
 rss.xml
 robots.txt
 env.js
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+dist/
+apps/web/.next/
+**/node_modules/
+**/.next/
+*.tsbuildinfo

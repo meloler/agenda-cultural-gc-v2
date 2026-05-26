@@ -13,6 +13,13 @@ Before changing code, read:
 7. `progress.md`
 8. Relevant ADRs in `docs/decisions/`
 
+## Repository Shape
+
+- New web app shell: `apps/web/`.
+- Future Event Intelligence placeholder: `packages/event-intelligence/`.
+- Protected scraper/enrichment pipeline: `scrapers/`.
+- Legacy static frontend reference: `legacy/frontend-static/`.
+
 ## Working Rules
 
 - Work in the current feature branch, not `main`.
@@ -24,7 +31,30 @@ Before changing code, read:
 - Do not break or rewrite `scrapers/` without a documented reason.
 - Preserve the existing scraping and IA enrichment pipeline.
 - V0 has no login, no persistent favorites and no behavioral personalization.
-- Mark unclear decisions as `TBD — requires user decision`.
+- Do not connect Supabase to `apps/web` until the data contract and security path are documented.
+- Mark unclear decisions as `TBD — requires user decision` or `Assumption — to be validated`.
+
+## Current Commands
+
+Root workspace:
+
+```bash
+npm install
+npm run dev
+npm run typecheck
+npm run lint
+npm run build
+npm test
+npm run validate
+```
+
+Scraper validations, from `scrapers/` when scraper files change:
+
+```bash
+python -m pytest test_precision.py -v
+python -m pytest tests/ -v
+python scripts/qa_report.py
+```
 
 ## Validation Rule
 
@@ -41,3 +71,5 @@ Update `progress.md` after every task with:
 - Files touched.
 - Validations run.
 - Next recommended task.
+
+Do not mark any `feature_list.json` item as `passes:true` unless its acceptance criteria and validation are complete.

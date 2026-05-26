@@ -4,9 +4,13 @@
 
 Branch: `rebuild/product-harness-v0`.
 
-This is a controlled restart from `main`, not a full deletion. The old static frontend has been isolated in `legacy/frontend-static/` for reference. The `scrapers/` pipeline remains untouched and must be preserved.
+This is a controlled restart from `main`, not a full deletion. The old static frontend is isolated in `legacy/frontend-static/` for reference. The new minimal web app shell now exists in `apps/web/`. The `scrapers/` pipeline remains untouched and must be preserved.
 
-## Files Created Or Updated In Previous Harness Task
+## Previous Completed Steps
+
+### Product Harness
+
+Created the project harness:
 
 - `PROJECT.md`
 - `PRODUCT_SPEC.md`
@@ -19,26 +23,11 @@ This is a controlled restart from `main`, not a full deletion. The old static fr
 - `feature_list.json`
 - `progress.md`
 - `init.sh`
-- `docs/decisions/ADR-001-product-shape.md`
-- `docs/decisions/ADR-002-stack.md`
-- `docs/decisions/ADR-003-data-model.md`
-- `docs/decisions/ADR-004-auth-personalization.md`
-- `docs/decisions/ADR-005-scraping-ai-enrichment.md`
-- `docs/playbooks/implement-feature.md`
-- `docs/playbooks/add-api-endpoint.md`
-- `docs/playbooks/add-database-table.md`
-- `docs/playbooks/fix-bug.md`
-- `docs/playbooks/review-pr.md`
-- `docs/playbooks/run-validation.md`
-- `docs/checklists/manual-qa.md`
-- `docs/checklists/event-quality.md`
-- `docs/checklists/privacy.md`
-- `docs/plans/active/`
-- `docs/plans/completed/`
+- ADRs, playbooks, checklists and plan folders under `docs/`.
 
-## Files Moved To Legacy In This Task
+### Legacy Frontend Isolation
 
-Moved to `legacy/frontend-static/`:
+Moved the old static frontend to `legacy/frontend-static/`:
 
 - `index.html`
 - `app.js`
@@ -46,82 +35,92 @@ Moved to `legacy/frontend-static/`:
 - `manifest.json`
 - `sw.js`
 - `purify.min.js`
-- `mobile_cupertino_preview.html`
-- `mobile_editorial_preview.html`
-- `mobile_mensual.html`
-- `stitch_calendar.html`
-- `stitch_event_detail.html`
-- `serve.json`
-- `stitch_designs/`
+- old mobile prototypes
+- Stitch design artifacts
 
-Created:
+Created `legacy/frontend-static/README.md`.
 
-- `legacy/frontend-static/README.md`
+## Current Task: Minimal apps/web Scaffold
 
-Updated:
+Created a minimal Next.js + TypeScript app in `apps/web/`.
 
-- `PROJECT.md`
+Created/updated:
+
+- `package.json`
+- `package-lock.json`
+- `.gitignore`
+- `apps/web/package.json`
+- `apps/web/next.config.ts`
+- `apps/web/eslint.config.mjs`
+- `apps/web/tsconfig.json`
+- `apps/web/next-env.d.ts`
+- `apps/web/app/layout.tsx`
+- `apps/web/app/page.tsx`
+- `apps/web/app/globals.css`
+- `packages/event-intelligence/README.md`
+- `docs/decisions/ADR-002-stack.md`
 - `ARCHITECTURE.md`
+- `TESTING.md`
+- `AGENTS.md`
 - `progress.md`
-
-## Files Not Moved And Why
-
-- `scrapers/`: protected ingestion, enrichment, geolocation, sanitization and export pipeline.
-- `scripts/`: may be shared build/feed/env infrastructure; not moved without a separate config decision.
-- `package.json`: references old frontend assumptions but also owns root commands/dependencies; not moved without deciding new app stack.
-- `package-lock.json`: paired with `package.json`.
-- `vercel.json`: production/deploy configuration; not changed in this task.
-- `.env.example`: environment documentation; not frontend-only.
-- `README.md`, `PROJECT.md`, `PRODUCT_SPEC.md`, `ROADMAP.md`, `RISKS.md`, `SECURITY.md`, `TESTING.md`: harness/documentation.
-- `ARCHITECTURE.md`: updated in place because it describes the repository.
-- `scripts/generate_feeds.mjs`: generates feeds; may be reused later.
-- `scripts/inject_env.mjs`: currently assumes root `index.html`; left in place and documented as pending.
 
 ## Decisions Made
 
-- V0 is anonymous discovery only.
-- V0 does not include login, persistent favorites, admin panel or behavioral personalization.
-- The product shape is dynamic collections, not chronological agenda.
-- `scrapers/` and existing IA enrichment are preserved.
-- A future Event Intelligence layer is required before the new app consumes real event data deeply.
-- The old static frontend is now legacy reference, not the base of the new app.
-- Features in `feature_list.json` remain `passes:false`.
+- Stack provisional: `apps/web` with Next.js + TypeScript.
+- Root repo uses npm workspaces.
+- `packages/event-intelligence/` is reserved as a placeholder only.
+- The initial app page is a minimal placeholder.
+- No FEAT-001 implementation was started.
+- No Supabase connection was added.
+- No login or personalization was added.
+- `scrapers/` was not changed.
+- `vercel.json` was not changed in this task.
+- `node_modules/` and Next build outputs were added to `.gitignore` to avoid committing generated install/build artifacts.
 
-## Reviewable Assumptions
+## Assumptions — To Be Validated
 
-- New app will live in `apps/web/`.
-- Event Intelligence implementation location is TBD — requires user decision.
-- Frontend stack is TBD — requires user decision.
-- Cheap-price threshold is TBD — requires user decision.
-- Friday evening cutoff for weekend collections is TBD — requires user decision.
-- Root build/deploy config will be updated in a later explicit task.
+- Next.js + TypeScript is the right stack for V0.
+- New app remains in `apps/web/`.
+- Event Intelligence will live in `packages/event-intelligence/`.
+- Vercel should later be configured explicitly for the monorepo/new app.
 
-## Blockers
+## Current Root Scripts
 
-- No frontend stack decision yet.
-- No formal data contract yet.
-- No real frontend lint/typecheck/unit test setup yet.
-- No secret scanning configured yet.
-- No Event Intelligence implementation yet.
-- Root `npm run build` may fail or be incomplete until `scripts/inject_env.mjs` and app entrypoint are updated for the new structure.
+- `npm install`
+- `npm run dev`
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- `npm test`
+- `npm run validate`
 
 ## Validation Run
 
-Validation performed for legacy isolation:
+Commands executed:
 
-- Checked candidate frontend references before moving.
-- Moved only frontend-static files and prototype/design assets.
-- Confirmed `scrapers/` still exists.
-- Confirmed no files under `scrapers/` changed.
-- Checked Git status and diff summary.
+- `npm install` — passed.
+- `npm run typecheck` — passed.
+- `npm run lint` — initially failed due ESLint flat-config/Next config issue; config was corrected; passed.
+- `npm run build` — initially failed due BOM encoding in `apps/web/package.json` and `apps/web/tsconfig.json`; encoding was corrected; passed.
+- `npm test` — passed as placeholder, prints that no tests are configured yet.
+- `npm run validate` — passed: typecheck, lint, build and placeholder test.
 
-Not run:
+Additional checks:
 
-- Frontend tests: no useful frontend test command exists yet.
-- Frontend lint/typecheck: not configured yet.
-- `npm run build`: intentionally not run after moving `index.html` because current build script still assumes root legacy frontend and needs a separate explicit update.
-- Scraper tests: not needed for frontend file move and `scrapers/` was not touched.
+- `feature_list.json` remains unchanged with all features `passes:false`.
+- No files under `scrapers/` changed.
+
+## Risks / Blockers
+
+- `vercel.json` still points to the old root static frontend flow. It was intentionally not changed to avoid accidental deployment/config breakage.
+- CI still needs to be updated for the new workspace structure.
+- `npm test` is only a placeholder; real tests are still pending.
+- `npm install` reported 3 moderate vulnerabilities. No automatic `npm audit fix` was run because it may change dependency versions outside this task scope.
+- `node_modules/` contains generated local install artifacts and is intentionally ignored for new files. Existing tracked historical `node_modules` content remains a separate cleanup risk.
+- No Event Intelligence implementation exists yet.
+- No Supabase data contract exists yet.
 
 ## Next Recommended Task
 
-Create the first active plan in `docs/plans/active/` for `FEAT-001 Event Intelligence`, defining publishable-event rules, scoring inputs and collection assignment rules using mock/sample data only.
+Update CI and deployment harness for the new workspace without deploying production: make CI run `npm run validate`, keep scraper checks separate, and document the required Vercel project-root/build setting for `apps/web`.
+
