@@ -6,7 +6,7 @@ Branch: `rebuild/product-harness-v0`.
 
 This is a controlled restart from `main`, not a full deletion. The old static frontend is isolated in `legacy/frontend-static/` for reference. The new minimal web app shell exists in `apps/web/`. The `scrapers/` pipeline remains untouched and must be preserved.
 
-## Previous Completed Steps
+## Completed Steps
 
 ### Product Harness
 
@@ -20,80 +20,93 @@ Moved the old static frontend to `legacy/frontend-static/` and documented it as 
 
 Created a minimal Next.js + TypeScript app in `apps/web/`, npm workspace scripts, and `packages/event-intelligence/` placeholder.
 
-## Current Task: Repository Hygiene Before FEAT-001
+### Repository Hygiene
 
-Performed safe repo hygiene before implementing Event Intelligence.
+Removed tracked `node_modules/` from the Git index without deleting local dependencies. Confirmed generated artifacts are covered by `.gitignore`. Documented the 3 moderate npm audit findings.
 
-Changes made:
+### FEAT-001: Event Intelligence
 
-- Confirmed `node_modules/` was tracked by Git from the old repo state.
-- Removed `node_modules/` from the Git index with `git rm -r --cached node_modules`.
-- Kept local dependencies installed; files were removed from tracking, not from local working dependencies.
-- Confirmed no tracked generated artifacts remain for patterns: `node_modules/`, `.next/`, `dist/`, `build/`, `coverage/`, `.log`, `.tmp`, `.cache/`, `.tsbuildinfo`.
-- Confirmed `.gitignore` covers `node_modules/`, nested `node_modules/`, `.next/`, nested `.next/`, `dist/`, `out/` and `*.tsbuildinfo`.
-- Documented npm audit risk in `RISKS.md`.
+Implemented `packages/event-intelligence/` as a pure TypeScript package.
 
-Files updated:
+What changed:
 
-- `.gitignore`
-- `RISKS.md`
+- Added minimal event and context types.
+- Added publishable-event validation.
+- Added quality issue reporting.
+- Added deterministic scoring.
+- Added MVP dynamic collection assignment.
+- Added ranking explanations.
+- Added 14 real unit tests.
+- Replaced the root placeholder `npm test` with real Event Intelligence tests.
+- Updated workspace validation so `npm run validate` includes the real tests.
+
+Files created or updated:
+
+- `packages/event-intelligence/package.json`
+- `packages/event-intelligence/tsconfig.json`
+- `packages/event-intelligence/README.md`
+- `packages/event-intelligence/src/types.ts`
+- `packages/event-intelligence/src/quality.ts`
+- `packages/event-intelligence/src/scoring.ts`
+- `packages/event-intelligence/src/collections.ts`
+- `packages/event-intelligence/src/index.ts`
+- `packages/event-intelligence/src/__tests__/event-intelligence.test.ts`
+- `package.json`
+- `package-lock.json`
+- `ARCHITECTURE.md`
+- `TESTING.md`
+- `AGENTS.md`
+- `feature_list.json`
 - `progress.md`
 
-Index-only cleanup:
+Important boundaries respected:
 
-- `node_modules/` removed from Git tracking.
+- `scrapers/` unchanged.
+- `vercel.json` unchanged.
+- No UI implemented.
+- No login implemented.
+- No Supabase connection added.
+- No production connection added.
+- No secrets added.
 
-## npm Audit Result
+## FEAT-001 Decisions
 
-Command:
+- Event Intelligence is deterministic and does not use IA for V0 scoring.
+- Vitest is used for fast unit testing of pure TypeScript rules.
+- Cheap event threshold is `10` euros.
+- Public collections exclude past events.
+- Missing hour, image, price or coordinates lowers score but does not block publishing.
 
-```bash
-npm audit --json
-```
+Assumptions — to be validated:
 
-Result: 3 moderate vulnerabilities.
-
-Details:
-
-- `postcss` `<8.5.10`: moderate XSS advisory `GHSA-qx2v-qp2m-jg93`, transitive through `next`.
-- `next`: moderate because it depends on the affected `postcss` range reported by npm audit.
-- `ws` `>=8.0.0 <8.20.1`: moderate uninitialized memory disclosure advisory `GHSA-58qx-3vcg-4xpx`, transitive.
-
-Action taken:
-
-- No automatic fix applied.
-- No `npm audit fix --force` run.
-- Risk documented for follow-up before production deployment.
+- Weekend collection currently means upcoming Saturday/Sunday from `context.now`.
+- Hidden gems use a simple quality/local-signal rule until real popularity or dedupe signals exist.
+- Duplicate penalty only uses tag-based signals until a formal duplicate field exists.
 
 ## Validation Run
 
-Commands executed:
+Commands executed for FEAT-001:
 
 - `npm install` — passed; still reports 3 moderate vulnerabilities.
-- `npm run validate` — passed.
-
-`npm run validate` executed:
-
 - `npm run typecheck` — passed.
 - `npm run lint` — passed.
+- `npm test` — passed, 14 tests.
 - `npm run build` — passed.
-- `npm test` — passed as placeholder, prints that no tests are configured yet.
+- `npm run validate` — passed.
 
 Additional checks:
 
-- `feature_list.json` remains unchanged with all features `passes:false`.
 - No files under `scrapers/` changed.
 - `vercel.json` unchanged.
 
 ## Risks / Blockers
 
-- 3 moderate npm audit findings remain open.
-- `npm test` is still only a placeholder.
-- CI still needs to be updated for the workspace structure.
+- 3 moderate npm audit findings remain open and documented in `RISKS.md`.
+- CI still needs to be updated for the workspace structure in a later explicit task.
 - `vercel.json` still needs a separate explicit review for `apps/web`.
-- No Event Intelligence implementation exists yet.
-- No Supabase data contract exists yet.
+- Event Intelligence uses a minimal event model; final mapping from scraper/Supabase fields remains pending.
+- Weekend definition may need product decision if Friday evening must be included in V0 collections.
 
 ## Next Recommended Task
 
-Update CI and deployment harness for the new workspace without deploying production: make CI run `npm run validate`, keep scraper checks separate, and document the required Vercel project-root/build setting for `apps/web`.
+Implement FEAT-002 with mock data only: a mobile-first home using Event Intelligence collections, without Supabase, login or production connections.

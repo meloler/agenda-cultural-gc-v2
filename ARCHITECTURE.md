@@ -20,7 +20,7 @@ apps/
 
 packages/
   event-intelligence/
-    # placeholder for future Event Intelligence layer
+    # pure TypeScript Event Intelligence layer
 
 scrapers/
   # existing ingestion, enrichment, geolocation and export pipeline
@@ -41,10 +41,10 @@ legacy/
 The root `package.json` coordinates workspace commands:
 
 - `npm run dev` -> `apps/web` dev server.
-- `npm run build` -> builds `apps/web`.
-- `npm run lint` -> lints `apps/web`.
-- `npm run typecheck` -> typechecks `apps/web`.
-- `npm test` -> currently runs the web test placeholder.
+- `npm run build` -> builds `apps/web` and typechecks `packages/event-intelligence`.
+- `npm run lint` -> lints `apps/web` and typechecks `packages/event-intelligence`.
+- `npm run typecheck` -> typechecks `apps/web` and `packages/event-intelligence`.
+- `npm test` -> runs real Vitest unit tests for `packages/event-intelligence`.
 - `npm run validate` -> typecheck, lint, build and test.
 
 ## Legacy Frontend Status
@@ -82,11 +82,11 @@ They are not deleted because they may still hold useful legacy/feed behavior, bu
 7. Export Excel/JSON.
 8. Upload curated events to Supabase.
 
-## New Event Intelligence Layer
+## Event Intelligence Layer
 
-A new Event Intelligence layer should sit between raw/curated event data and the frontend experience.
+The Event Intelligence layer sits between raw/curated event data and the frontend experience.
 
-Target placeholder location: `packages/event-intelligence/`.
+Location: `packages/event-intelligence/`.
 
 Responsibilities:
 
@@ -96,7 +96,28 @@ Responsibilities:
 - Explain why an event appears in a collection.
 - Provide stable data for the mobile-first app.
 
-Implementation details are TBD — requires user decision.
+Current implementation:
+
+- Pure TypeScript functions.
+- Deterministic rules; no IA calls.
+- No Supabase connection.
+- No production connection.
+- No secrets.
+- Unit-tested with Vitest.
+
+Public API:
+
+- `isPublishableEvent(event)`
+- `getEventQualityIssues(event)`
+- `scoreEvent(event, context)`
+- `assignCollections(event, context)`
+- `explainEventRanking(event, context)`
+
+Assumptions — to be validated:
+
+- Cheap event threshold is `10` euros.
+- Weekend collection currently means upcoming Saturday/Sunday from `context.now`.
+- Hidden gem uses a simple quality/local-signal rule until real popularity or dedupe data exists.
 
 ## Frontend Direction
 

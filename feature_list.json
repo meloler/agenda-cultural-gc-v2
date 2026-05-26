@@ -12,9 +12,13 @@
         "Cada evento destacado puede explicar sus señales principales.",
         "Funciona con datos mock o sample sin tocar producción."
       ],
-      "dependencies": ["PRODUCT_SPEC.md", "ARCHITECTURE.md", "docs/decisions/ADR-003-data-model.md"],
+      "dependencies": [
+        "PRODUCT_SPEC.md",
+        "ARCHITECTURE.md",
+        "docs/decisions/ADR-003-data-model.md"
+      ],
       "risk": "Una mala fórmula puede convertir la app en otro listado cronológico o esconder eventos relevantes.",
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-002",
@@ -28,7 +32,9 @@
         "No requiere login.",
         "No conecta a producción."
       ],
-      "dependencies": ["FEAT-001"],
+      "dependencies": [
+        "FEAT-001"
+      ],
       "risk": "Si se conecta demasiado pronto a datos reales, la UX puede quedar secuestrada por problemas de calidad de datos.",
       "passes": false
     },
@@ -44,7 +50,11 @@
         "Los datos se filtran por evento publicable.",
         "La conexión no rompe el pipeline existente."
       ],
-      "dependencies": ["FEAT-001", "FEAT-002", "SECURITY.md"],
+      "dependencies": [
+        "FEAT-001",
+        "FEAT-002",
+        "SECURITY.md"
+      ],
       "risk": "Exponer credenciales o acoplar la UI a tablas internas de Supabase.",
       "passes": false
     },
@@ -60,7 +70,9 @@
         "Funciona bien en móvil.",
         "No requiere login."
       ],
-      "dependencies": ["FEAT-002"],
+      "dependencies": [
+        "FEAT-002"
+      ],
       "risk": "Copiar la ficha antigua puede mantener una experiencia demasiado informativa y poco decisional.",
       "passes": false
     },
@@ -76,7 +88,11 @@
         "Se revisan enlaces e imágenes críticas.",
         "Los fallos bloqueantes quedan documentados."
       ],
-      "dependencies": ["TESTING.md", "docs/checklists/manual-qa.md", "docs/checklists/event-quality.md"],
+      "dependencies": [
+        "TESTING.md",
+        "docs/checklists/manual-qa.md",
+        "docs/checklists/event-quality.md"
+      ],
       "risk": "Sin QA la app puede verse bien con mock pero fallar con datos reales.",
       "passes": false
     },
@@ -92,7 +108,10 @@
         "No se almacena dato personal nuevo en V0.",
         "Las decisiones quedan en ADR."
       ],
-      "dependencies": ["SECURITY.md", "docs/decisions/ADR-004-auth-personalization.md"],
+      "dependencies": [
+        "SECURITY.md",
+        "docs/decisions/ADR-004-auth-personalization.md"
+      ],
       "risk": "Añadir personalización antes de tiempo introduce deuda legal, de privacidad y de producto.",
       "passes": false
     }

@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "agenda-cultural-gc-v2",
   "version": "0.1.0",
   "private": true,
@@ -10,10 +10,10 @@
   "scripts": {
     "install:workspaces": "npm install",
     "dev": "npm --workspace apps/web run dev",
-    "build": "npm --workspace apps/web run build",
-    "lint": "npm --workspace apps/web run lint",
-    "typecheck": "npm --workspace apps/web run typecheck",
-    "test": "npm --workspace apps/web run test",
+    "build": "npm --workspace apps/web run build && npm --workspace packages/event-intelligence run typecheck",
+    "lint": "npm --workspace apps/web run lint && npm --workspace packages/event-intelligence run lint",
+    "typecheck": "npm --workspace apps/web run typecheck && npm --workspace packages/event-intelligence run typecheck",
+    "test": "npm --workspace packages/event-intelligence run test",
     "validate": "npm run typecheck && npm run lint && npm run build && npm test"
   },
   "repository": {

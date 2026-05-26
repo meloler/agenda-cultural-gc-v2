@@ -32,6 +32,7 @@ Before changing code, read:
 - Preserve the existing scraping and IA enrichment pipeline.
 - V0 has no login, no persistent favorites and no behavioral personalization.
 - Do not connect Supabase to `apps/web` until the data contract and security path are documented.
+- Keep Event Intelligence in `packages/event-intelligence/` pure, deterministic and free of production connections.
 - Mark unclear decisions as `TBD — requires user decision` or `Assumption — to be validated`.
 
 ## Current Commands
@@ -47,6 +48,8 @@ npm run build
 npm test
 npm run validate
 ```
+
+`npm test` currently runs real Event Intelligence unit tests. Run it whenever scoring, quality rules or collection assignment changes.
 
 Scraper validations, from `scrapers/` when scraper files change:
 

@@ -42,7 +42,7 @@ Run current test command:
 npm test
 ```
 
-Status: this is a placeholder test command for `apps/web`. It exits successfully and prints that no tests are configured yet.
+Status: this now runs real Vitest unit tests for `packages/event-intelligence`.
 
 Run grouped validation:
 
@@ -70,6 +70,19 @@ npm test
 npm run validate
 ```
 
+### packages/event-intelligence
+
+From `packages/event-intelligence/` or through npm workspace:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run validate
+```
+
+Vitest is used for FEAT-001 because the Event Intelligence layer is pure TypeScript, deterministic and benefits from fast unit tests without browser setup.
+
 ### Scrapers / Pipeline
 
 From `scrapers/`:
@@ -88,15 +101,13 @@ Note: some scraper commands depend on local environment variables, Playwright br
 
 ## Last Known Validation
 
-After creating the minimal Next.js app:
+After implementing FEAT-001:
 
 - `npm install` passed.
 - `npm run typecheck` passed.
-- `npm run lint` passed.
-- First `npm run build` failed due BOM encoding in JSON files.
-- BOM was fixed.
 - `npm run build` passed.
-- `npm test` passed as placeholder.
+- `npm run lint` passed.
+- `npm test` passed with 14 real Event Intelligence tests.
 - `npm run validate` passed.
 
 Security note: `npm install` reported 3 moderate vulnerabilities. No automatic `npm audit fix` was run because that may change dependency versions outside this task scope.
