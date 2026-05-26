@@ -17,6 +17,10 @@ The repository currently has:
 apps/
   web/
     # new mobile-first app shell, Next.js + TypeScript
+    components/
+      # V0 home components
+    lib/
+      # mock data and collection presentation helpers
 
 packages/
   event-intelligence/
@@ -130,6 +134,15 @@ Constraints:
 - Must support mock data before production data connection.
 - Must consume curated event shape, not raw scraper internals.
 - Must not use Supabase service role keys in frontend.
+
+Current FEAT-002 implementation:
+
+- `apps/web/app/page.tsx` renders the V0 mock home.
+- `apps/web/components/` contains the hero, intention cloud, event rails and event cards.
+- `apps/web/lib/mock-events.ts` contains clearly marked mock event data.
+- `apps/web/lib/collections.ts` adapts Event Intelligence output for the home.
+- The UI imports `packages/event-intelligence`; it does not duplicate scoring or collection logic.
+- `apps/web/next.config.ts` uses `transpilePackages` so Next can consume the local workspace package.
 
 ## Data Flow Target
 

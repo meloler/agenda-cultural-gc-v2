@@ -36,6 +36,20 @@ The user should not need to understand event sources, scraping, categories or da
 - Clear reason why an event appears in a collection.
 - Mock-data support for early UI development.
 
+### Home V0 Shape
+
+The first home experience is a mobile-first discovery surface, not a calendar.
+
+It contains:
+
+- A simple header with the product name and a short discovery promise.
+- A hero asking: "¿Qué plan te apetece?"
+- An intention cloud with quick prompts such as Hoy, Este finde, Gratis, Con niños, Música and Teatro.
+- Horizontal collection rails generated from Event Intelligence.
+- Event cards focused on fast decisions: what, when, where, price, category and why it appears.
+
+Current FEAT-002 data is mock-only and clearly marked as demo content.
+
 ### Excluded
 
 - Login.

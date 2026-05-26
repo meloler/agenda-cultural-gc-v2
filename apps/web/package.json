@@ -8,10 +8,11 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node -e \"console.log('No tests configured yet for apps/web')\"",
+    "test": "vitest run",
     "validate": "npm run typecheck && npm run lint && npm run build && npm run test"
   },
   "dependencies": {
+    "@agenda-cultural-gc/event-intelligence": "^0.1.0",
     "next": "^16.0.7",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
@@ -23,6 +24,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.0.7",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
   }
 }

@@ -1,17 +1,20 @@
-﻿{
-  "name": "@agenda-cultural-gc/event-intelligence",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "main": "src/index.ts",
-  "scripts": {
-    "lint": "tsc --noEmit",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "validate": "npm run typecheck && npm run test"
-  },
-  "devDependencies": {
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.14"
-  }
+{
+    "name":  "@agenda-cultural-gc/event-intelligence",
+    "version":  "0.1.0",
+    "private":  true,
+    "type":  "module",
+    "main":  "src/index.ts",
+    "scripts":  {
+                    "lint":  "tsc --noEmit",
+                    "typecheck":  "tsc --noEmit",
+                    "test":  "vitest run",
+                    "validate":  "npm run typecheck \u0026\u0026 npm run test"
+                },
+    "devDependencies":  {
+                            "typescript":  "^5.9.3",
+                            "vitest":  "^4.0.14"
+                        },
+    "exports":  {
+                    ".":  "./src/index.ts"
+                }
 }

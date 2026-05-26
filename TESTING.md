@@ -43,6 +43,7 @@ npm test
 ```
 
 Status: this now runs real Vitest unit tests for `packages/event-intelligence`.
+It also runs real Vitest unit tests for `apps/web` home collection presentation.
 
 Run grouped validation:
 
@@ -69,6 +70,14 @@ npm run typecheck
 npm test
 npm run validate
 ```
+
+Current `apps/web` tests cover:
+
+- Non-publishable mock events are excluded from the home.
+- Mock data appears in at least five MVP collections.
+- Events are sorted by descending Event Intelligence score inside each collection.
+- Main intention chips are available.
+- The mock data set is present and varied.
 
 ### packages/event-intelligence
 
@@ -108,6 +117,14 @@ After implementing FEAT-001:
 - `npm run build` passed.
 - `npm run lint` passed.
 - `npm test` passed with 14 real Event Intelligence tests.
+- `npm run validate` passed.
+
+After implementing FEAT-002:
+
+- `npm run typecheck` passed.
+- `npm run lint` passed with one non-blocking Next image warning for mock images.
+- `npm test` passed with 19 real tests total.
+- `npm run build` passed after removing BOM from package JSON files and configuring local package transpilation.
 - `npm run validate` passed.
 
 Security note: `npm install` reported 3 moderate vulnerabilities. No automatic `npm audit fix` was run because that may change dependency versions outside this task scope.

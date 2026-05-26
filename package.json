@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "agenda-cultural-gc-v2",
   "version": "0.1.0",
   "private": true,
@@ -13,7 +13,7 @@
     "build": "npm --workspace apps/web run build && npm --workspace packages/event-intelligence run typecheck",
     "lint": "npm --workspace apps/web run lint && npm --workspace packages/event-intelligence run lint",
     "typecheck": "npm --workspace apps/web run typecheck && npm --workspace packages/event-intelligence run typecheck",
-    "test": "npm --workspace packages/event-intelligence run test",
+    "test": "npm --workspace packages/event-intelligence run test && npm --workspace apps/web run test",
     "validate": "npm run typecheck && npm run lint && npm run build && npm test"
   },
   "repository": {

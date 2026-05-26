@@ -36,7 +36,7 @@
         "FEAT-001"
       ],
       "risk": "Si se conecta demasiado pronto a datos reales, la UX puede quedar secuestrada por problemas de calidad de datos.",
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-003",
