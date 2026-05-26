@@ -4,9 +4,9 @@
 
 The repository currently has:
 
-- A legacy vanilla frontend at the repository root.
+- A legacy vanilla frontend preserved in `legacy/frontend-static/`.
 - A Python ingestion pipeline in `scrapers/`.
-- Supabase as event storage and frontend data source.
+- Supabase as event storage and frontend data source for the legacy app.
 - Build scripts in `scripts/` for environment injection and feed generation.
 - Vercel deployment configuration.
 
@@ -27,8 +27,19 @@ scripts/
   # shared build/validation scripts
 
 legacy/
-  # current frontend after a future approved move
+  frontend-static/
+    # previous static frontend preserved as reference
 ```
+
+## Legacy Frontend Status
+
+The previous static frontend has been isolated in `legacy/frontend-static/`.
+
+It includes the former root `index.html`, `app.js`, `style.css`, PWA files, mobile prototypes and Stitch design references.
+
+It is not the base of the new app. It is historical reference only.
+
+Important: `scripts/inject_env.mjs`, `scripts/generate_feeds.mjs`, `package.json` and `vercel.json` still reflect the previous root-static frontend assumptions. They were not changed in this task because production configuration changes should be handled separately and explicitly.
 
 ## Pipeline To Preserve
 

@@ -21,9 +21,9 @@ Events are prioritized by:
 This repository contains two important systems:
 
 - Existing ingestion pipeline in `scrapers/`: scraping, enrichment, classification, geolocation, sanitization, export and Supabase upload.
-- Current legacy frontend in the repository root: vanilla HTML/CSS/JS SPA.
+- Legacy static frontend preserved in `legacy/frontend-static/`: previous vanilla HTML/CSS/JS SPA and design prototypes.
 
-The restart is controlled: preserve the pipeline, prepare a safer product harness, then build the new mobile-first web app.
+The restart is controlled: preserve the pipeline, keep the old frontend as reference, then build the new mobile-first web app.
 
 ## V0 Scope
 
@@ -49,5 +49,5 @@ V0 is anonymous discovery:
 - Do not break `scrapers/`.
 - Do not expose secrets.
 - Do not deploy production without explicit approval.
-- Do not delete existing frontend; move to legacy only when approved.
+- Do not delete existing frontend; it is preserved in `legacy/frontend-static/` as reference only.
 - Update `progress.md` after each task.

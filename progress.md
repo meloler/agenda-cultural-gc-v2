@@ -1,12 +1,12 @@
-# Progress
+﻿# Progress
 
 ## Current State
 
 Branch: `rebuild/product-harness-v0`.
 
-This is a controlled restart from `main`, not a full deletion. The existing frontend remains in place. The `scrapers/` pipeline remains untouched and must be preserved.
+This is a controlled restart from `main`, not a full deletion. The old static frontend has been isolated in `legacy/frontend-static/` for reference. The `scrapers/` pipeline remains untouched and must be preserved.
 
-## Files Created Or Updated In This Task
+## Files Created Or Updated In Previous Harness Task
 
 - `PROJECT.md`
 - `PRODUCT_SPEC.md`
@@ -36,6 +36,47 @@ This is a controlled restart from `main`, not a full deletion. The existing fron
 - `docs/plans/active/`
 - `docs/plans/completed/`
 
+## Files Moved To Legacy In This Task
+
+Moved to `legacy/frontend-static/`:
+
+- `index.html`
+- `app.js`
+- `style.css`
+- `manifest.json`
+- `sw.js`
+- `purify.min.js`
+- `mobile_cupertino_preview.html`
+- `mobile_editorial_preview.html`
+- `mobile_mensual.html`
+- `stitch_calendar.html`
+- `stitch_event_detail.html`
+- `serve.json`
+- `stitch_designs/`
+
+Created:
+
+- `legacy/frontend-static/README.md`
+
+Updated:
+
+- `PROJECT.md`
+- `ARCHITECTURE.md`
+- `progress.md`
+
+## Files Not Moved And Why
+
+- `scrapers/`: protected ingestion, enrichment, geolocation, sanitization and export pipeline.
+- `scripts/`: may be shared build/feed/env infrastructure; not moved without a separate config decision.
+- `package.json`: references old frontend assumptions but also owns root commands/dependencies; not moved without deciding new app stack.
+- `package-lock.json`: paired with `package.json`.
+- `vercel.json`: production/deploy configuration; not changed in this task.
+- `.env.example`: environment documentation; not frontend-only.
+- `README.md`, `PROJECT.md`, `PRODUCT_SPEC.md`, `ROADMAP.md`, `RISKS.md`, `SECURITY.md`, `TESTING.md`: harness/documentation.
+- `ARCHITECTURE.md`: updated in place because it describes the repository.
+- `scripts/generate_feeds.mjs`: generates feeds; may be reused later.
+- `scripts/inject_env.mjs`: currently assumes root `index.html`; left in place and documented as pending.
+
 ## Decisions Made
 
 - V0 is anonymous discovery only.
@@ -43,16 +84,17 @@ This is a controlled restart from `main`, not a full deletion. The existing fron
 - The product shape is dynamic collections, not chronological agenda.
 - `scrapers/` and existing IA enrichment are preserved.
 - A future Event Intelligence layer is required before the new app consumes real event data deeply.
-- Features in `feature_list.json` are all marked `passes:false`.
+- The old static frontend is now legacy reference, not the base of the new app.
+- Features in `feature_list.json` remain `passes:false`.
 
 ## Reviewable Assumptions
 
 - New app will live in `apps/web/`.
-- Current frontend will later move to `legacy/`, but not in this task.
 - Event Intelligence implementation location is TBD — requires user decision.
 - Frontend stack is TBD — requires user decision.
 - Cheap-price threshold is TBD — requires user decision.
 - Friday evening cutoff for weekend collections is TBD — requires user decision.
+- Root build/deploy config will be updated in a later explicit task.
 
 ## Blockers
 
@@ -61,15 +103,15 @@ This is a controlled restart from `main`, not a full deletion. The existing fron
 - No real frontend lint/typecheck/unit test setup yet.
 - No secret scanning configured yet.
 - No Event Intelligence implementation yet.
+- Root `npm run build` may fail or be incomplete until `scripts/inject_env.mjs` and app entrypoint are updated for the new structure.
 
 ## Validation Run
 
-Documentation-only task. No product features were implemented.
+Validation performed for legacy isolation:
 
-Validation performed:
-
-- Confirmed harness files exist.
-- Confirmed `feature_list.json` parses as valid JSON.
+- Checked candidate frontend references before moving.
+- Moved only frontend-static files and prototype/design assets.
+- Confirmed `scrapers/` still exists.
 - Confirmed no files under `scrapers/` changed.
 - Checked Git status and diff summary.
 
@@ -77,7 +119,8 @@ Not run:
 
 - Frontend tests: no useful frontend test command exists yet.
 - Frontend lint/typecheck: not configured yet.
-- Scraper tests: not needed for documentation-only changes and `scrapers/` was not touched.
+- `npm run build`: intentionally not run after moving `index.html` because current build script still assumes root legacy frontend and needs a separate explicit update.
+- Scraper tests: not needed for frontend file move and `scrapers/` was not touched.
 
 ## Next Recommended Task
 
