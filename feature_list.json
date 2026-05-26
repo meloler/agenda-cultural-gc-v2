@@ -94,7 +94,7 @@
         "docs/checklists/event-quality.md"
       ],
       "risk": "Sin QA la app puede verse bien con mock pero fallar con datos reales.",
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-006",

@@ -127,6 +127,28 @@ Possible scoring inputs:
 - Is it relevant for the current collection?
 - Is the source trusted?
 
+## Event Quality Principles
+
+V0 should prefer fewer reliable plans over many doubtful rows.
+
+An event must not appear publicly unless it has:
+
+- A title.
+- A valid date.
+- A clear place signal.
+- A category or useful tags.
+- A source name or official/source URL.
+
+Incomplete events may still appear with lower score if they are publicable. Examples:
+
+- Missing image.
+- Missing hour.
+- Missing description.
+- Missing price.
+- Missing coordinates.
+
+Past events should not be prioritized in public discovery collections.
+
 ## Success Criteria V0
 
 - A user can understand what to do today or this weekend without opening filters.

@@ -4,6 +4,7 @@ export interface EventSourceResult<T> {
   kind: EventSourceKind;
   events: T[];
   warning?: string;
+  isFallback?: boolean;
 }
 
 export function getPublicSupabaseConfig(env: Partial<NodeJS.ProcessEnv> = process.env):

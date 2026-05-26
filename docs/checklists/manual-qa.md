@@ -1,35 +1,71 @@
 ﻿# Manual QA Checklist
 
-Use this when a V0 UI exists.
+Use this checklist before marking a mobile-facing feature ready for review.
 
-## Mobile First
+## Setup
 
-- [ ] Home loads on mobile width.
-- [ ] Main value appears without scrolling too far.
-- [ ] Collections are visible and understandable.
-- [ ] Touch targets are comfortable.
-- [ ] Text is readable outdoors/mobile.
-- [ ] No desktop-only interactions are required.
+- [ ] Run `npm run validate` from the repository root.
+- [ ] Run `npm run dev` and open the app locally.
+- [ ] Set browser viewport to 375px wide.
+- [ ] Confirm no real secrets are needed for the review.
+- [ ] Confirm whether the app is using Supabase or mock fallback banner.
 
-## Discovery
+## Home At 375px
 
-- [ ] User can understand what to do today.
-- [ ] User can understand what to do this weekend.
-- [ ] Collection names are clear.
-- [ ] Event cards explain enough to choose.
-- [ ] Empty states are useful.
+- [ ] Header text is readable: `Agenda Cultural GC` and the short promise.
+- [ ] Hero is visible without horizontal page overflow.
+- [ ] Hero communicates discovery, not a chronological agenda.
+- [ ] Intention chips are visible and each chip is at least finger-tappable.
+- [ ] Chips can scroll horizontally without breaking the page.
+- [ ] At least one collection rail is visible.
+- [ ] Rails scroll horizontally and do not create full-page horizontal overflow.
+- [ ] Event cards show title, date, place, price/category and a reason.
+- [ ] Long event titles do not hide date, place or price.
+- [ ] Empty home state is understandable if there are no publicable events.
 
-## Detail Page
+## Event Detail At 375px
 
-- [ ] Date/time visible.
-- [ ] Place visible.
-- [ ] Price/free signal visible if known.
-- [ ] Main action visible.
-- [ ] Source/link visible.
+- [ ] Open an event card from the home.
+- [ ] Detail page shows image or fallback placeholder.
+- [ ] Title is readable and not visually crushed.
+- [ ] Date and time are visible when present.
+- [ ] Place and address/location are visible when present.
+- [ ] Price or `Gratis`/unknown handling is visible.
+- [ ] Source is visible.
+- [ ] Recommendation reasons are readable and explain why the event appears.
+- [ ] CTA is large, clear and tappable when a safe official URL exists.
+- [ ] No CTA is shown when official URL is missing or unsafe.
+- [ ] Back link returns to the home.
 
-## Technical
+## States
 
-- [ ] No console errors.
-- [ ] Images degrade gracefully.
-- [ ] Links open correctly.
-- [ ] Loading state is clear.
+- [ ] Loading state says recommendations are being prepared.
+- [ ] Error state explains that doubtful data is not shown.
+- [ ] Not-found detail state is clear and offers return home.
+- [ ] Non-publicable detail state is clear and does not present the event as valid.
+- [ ] Mock fallback state is visible when Supabase public config is absent.
+- [ ] In production-like review, missing Supabase config is not silent.
+
+## Accessibility Basics
+
+- [ ] Images have meaningful alt text or accessible placeholder text.
+- [ ] Buttons and links have readable text.
+- [ ] Keyboard focus is visible on chips, cards, CTA and back links.
+- [ ] The page has a sensible heading order.
+- [ ] Meaning is not communicated by color only.
+
+## External Links
+
+- [ ] Safe official links open in a new tab.
+- [ ] Safe official links use `noopener noreferrer`.
+- [ ] Unsafe links such as `javascript:`, `data:` and `vbscript:` are not clickable.
+
+## Notes
+
+Record any failed item with:
+
+- URL or screen.
+- Viewport width.
+- Event ID if relevant.
+- What was expected.
+- What happened.

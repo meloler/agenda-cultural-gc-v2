@@ -40,39 +40,40 @@ Implemented a safe data source layer for the home, with optional public Supabase
 
 Implemented the first event detail page optimized for fast mobile decision-making.
 
+### FEAT-005: QA Mobile, Event Quality And Link/Data Review
+
+Implemented a quality hardening pass before adding new product functionality.
+
 What changed:
 
-- Added route `apps/web/app/events/[id]/page.tsx`.
-- Added controlled not-found route state.
-- Added `getEventById` using the same curated source/fallback layer from FEAT-003.
-- Prevented non-publishable events from rendering as valid detail pages.
-- Linked home event cards to `/events/[id]`.
-- Added detail hero with image or placeholder, title, category and signal.
-- Added decision panel with date, time, place, address, price, source and official CTA.
-- Added recommendation reasons powered by Event Intelligence.
-- Added safe external link validation for official URLs.
-- Added tests for detail lookup, non-publicable events, not found, safe links, detail rendering, Event Intelligence reasons and card navigation.
+- Added controlled loading state in `apps/web/app/loading.tsx`.
+- Added controlled error state in `apps/web/app/error.tsx`.
+- Added visible focus styles for links and buttons.
+- Added `apps/web/lib/events/quality-report.ts` for local event quality reporting.
+- Strengthened Supabase fallback messaging so production-like missing config is not silent.
+- Added tests for past-event priority, empty event lists, optional missing fields, local quality report, unsafe external URL schemes, missing CTA URL and production fallback warning.
+- Updated manual mobile QA checklist with concrete 375px review steps.
+- Updated event quality checklist with publishable minimums, lower-quality signals, reject/review cases and Supabase contract checks.
+- Documented remaining real-data QA risks.
 
 Files created or updated:
 
-- `apps/web/app/events/[id]/page.tsx`
-- `apps/web/app/events/[id]/not-found.tsx`
-- `apps/web/components/EventDetailHero.tsx`
-- `apps/web/components/EventDecisionPanel.tsx`
-- `apps/web/components/EventRecommendationReasons.tsx`
-- `apps/web/components/SafeExternalLink.tsx`
-- `apps/web/components/EventCard.tsx`
+- `apps/web/app/loading.tsx`
+- `apps/web/app/error.tsx`
+- `apps/web/lib/events/quality-report.ts`
+- `apps/web/lib/__tests__/event-quality.test.ts`
+- `apps/web/lib/events/__tests__/fallback.test.ts`
 - `apps/web/components/__tests__/SafeExternalLink.test.tsx`
-- `apps/web/components/__tests__/EventDetail.test.tsx`
-- `apps/web/components/__tests__/EventCard.test.tsx`
-- `apps/web/lib/events/get-event-by-id.ts`
-- `apps/web/lib/events/presentation.ts`
-- `apps/web/lib/events/__tests__/get-event-by-id.test.ts`
+- `apps/web/lib/events/source.ts`
+- `apps/web/lib/events/supabase.ts`
 - `apps/web/app/globals.css`
+- `docs/checklists/manual-qa.md`
+- `docs/checklists/event-quality.md`
 - `PRODUCT_SPEC.md`
 - `ARCHITECTURE.md`
-- `SECURITY.md`
 - `TESTING.md`
+- `SECURITY.md`
+- `RISKS.md`
 - `feature_list.json`
 - `progress.md`
 
@@ -85,30 +86,31 @@ Important boundaries respected:
 - No favorites implemented.
 - No personalization implemented.
 - No tracking implemented.
+- No admin panel added.
 - No production deployment.
 - No secrets added.
 - No service role key used in `apps/web` source.
 
-## FEAT-004 Decisions
+## FEAT-005 Decisions
 
-- Event detail uses the same event source/fallback path as the home.
-- Unsafe official links are not rendered.
-- No map is included in V0 detail; location remains textual for fast decision.
-- Component tests use React static rendering instead of a heavier browser/component testing stack.
+- QA hardening stays local and testable; no external production checks were added.
+- Browser/mobile QA remains a manual checklist for now.
+- Link validation remains scheme-based; live HTTP link checking is future CI/QA work.
+- `next/image` remains deferred until external image domains are decided.
 
 Assumptions — to be validated:
 
-- `source_url` is the official destination when available.
-- `lugar` can still stand in for venue/address until the real data contract is refined.
-- Image optimization with `next/image` is deferred until external image domains are decided.
+- Manual QA at 375px will be run before any production deployment.
+- Real Supabase rows need editorial sampling beyond automated publishable checks.
+- The fallback mock warning is acceptable in local development when Supabase public config is absent.
 
 ## Validation Run
 
-Commands executed for FEAT-004:
+Commands executed for FEAT-005:
 
 - `npm run typecheck` — passed.
 - `npm run lint` — passed with two non-blocking Next image warnings for mock/external images.
-- `npm test` — passed, 33 tests total.
+- `npm test` — passed, 41 tests total.
 - `npm run build` — passed.
 - `npm run validate` — passed.
 
@@ -124,8 +126,8 @@ Additional checks:
 - CI still needs to be updated for the workspace structure in a later explicit task.
 - `vercel.json` still needs a separate explicit review for `apps/web`.
 - Real Supabase data quality depends on RLS/public read configuration and current table contents.
-- Browser-level mobile QA is still manual.
+- Live link/image checking is not automated yet.
 
 ## Next Recommended Task
 
-Run a mobile visual QA pass on the home and event detail pages, then implement FEAT-005: mobile QA, event quality and link/data review.
+Run the manual mobile QA checklist on the local app at 375px, then decide whether to polish visual details or move to FEAT-006 planning for future registered-user preferences without implementing login.

@@ -185,6 +185,15 @@ External link policy:
 - Only `http:` and `https:` URLs render.
 - Links open in a new tab with `rel="noopener noreferrer"`.
 
+Current FEAT-005 implementation:
+
+- `apps/web/app/loading.tsx` provides a controlled loading state.
+- `apps/web/app/error.tsx` provides a controlled error state.
+- `apps/web/lib/events/quality-report.ts` provides a local event quality report utility.
+- `docs/checklists/manual-qa.md` documents concrete mobile QA steps.
+- `docs/checklists/event-quality.md` documents publishable-event and Supabase-contract checks.
+- Additional tests cover empty inputs, optional fields, past events, fallback messaging and unsafe links.
+
 ## Data Flow Target
 
 ```text

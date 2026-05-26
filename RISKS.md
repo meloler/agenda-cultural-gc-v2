@@ -72,3 +72,22 @@ Action recommended:
 - Do not run `npm audit fix --force` blindly; npm suggests a major/incoherent downgrade path for `next` in this environment.
 - Re-run audit after dependency updates or when Next/PostCSS patched versions are available.
 - Treat this as a blocker before production deployment, not a blocker for local scaffold work.
+
+## R9 — Real Data Quality Still Needs Manual Review
+
+Status: open.
+
+Automated checks now verify publishable-event rules, safe links, fallback behavior and core collection ordering. They do not prove that real Supabase rows are editorially good.
+
+Known limitations:
+
+- Legacy `evento.lugar` may mix venue, address and municipality.
+- Image quality is not manually reviewed by tests.
+- Official links are checked for safe URL scheme, not for live HTTP success.
+- Browser-level mobile QA is documented but still manual.
+
+Action recommended:
+
+- Run `docs/checklists/manual-qa.md` on real data before production deployment.
+- Run `docs/checklists/event-quality.md` on a representative Supabase export.
+- Add automated link/image checks later under FEAT-005 follow-up or CI hardening.

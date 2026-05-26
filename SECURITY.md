@@ -15,6 +15,7 @@
 - Use minimum necessary permissions.
 - If public Supabase variables are missing, the frontend must fall back to mock data or a controlled empty/error state.
 - Do not print Supabase keys or environment values in logs.
+- In production-like contexts, missing Supabase configuration must be visible as a controlled warning, not hidden silently.
 
 ## Event Data
 

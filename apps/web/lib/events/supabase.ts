@@ -27,7 +27,11 @@ export async function fetchSupabaseEvents(now = new Date()): Promise<EventSource
     return {
       kind: "mock",
       events: [],
-      warning: "Supabase no está configurado; usando eventos mock.",
+      warning:
+        process.env.NODE_ENV === "production"
+          ? "Supabase no está configurado; no se cargan eventos reales."
+          : "Supabase no está configurado; usando eventos mock de desarrollo.",
+      isFallback: true,
     };
   }
 
@@ -48,7 +52,11 @@ export async function fetchSupabaseEvents(now = new Date()): Promise<EventSource
     return {
       kind: "mock",
       events: [],
-      warning: "No se pudieron cargar eventos reales; usando eventos mock.",
+      warning:
+        process.env.NODE_ENV === "production"
+          ? "No se pudieron cargar eventos reales; la fuente debe revisarse."
+          : "No se pudieron cargar eventos reales; usando eventos mock de desarrollo.",
+      isFallback: true,
     };
   }
 

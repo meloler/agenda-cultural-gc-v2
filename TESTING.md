@@ -87,6 +87,10 @@ Current `apps/web` tests cover:
 - Detail components render date, place and price.
 - Safe external links reject unsafe schemes and set `target`/`rel` correctly.
 - Home cards link to `/events/[id]`.
+- Past events do not outrank upcoming events.
+- Empty event lists and optional missing fields do not break collection generation.
+- Production fallback messaging does not silently hide missing Supabase configuration.
+- Local event quality report counts rejected and incomplete events.
 
 ### packages/event-intelligence
 
@@ -149,6 +153,14 @@ After implementing FEAT-004:
 - `npm run typecheck` passed.
 - `npm run lint` passed with two non-blocking Next image warnings for mock/external images.
 - `npm test` passed with 33 real tests total.
+- `npm run build` passed.
+- `npm run validate` passed.
+
+After implementing FEAT-005:
+
+- `npm run typecheck` passed.
+- `npm run lint` passed with two non-blocking Next image warnings for mock/external images.
+- `npm test` passed with 41 real tests total.
 - `npm run build` passed.
 - `npm run validate` passed.
 

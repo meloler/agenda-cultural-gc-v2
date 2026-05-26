@@ -43,6 +43,11 @@ button {
   cursor: pointer;
 }
 
+:where(a, button):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--sea) 70%, white);
+  outline-offset: 4px;
+}
+
 .app-shell {
   width: min(100%, 1180px);
   margin: 0 auto;
@@ -504,6 +509,10 @@ button {
   padding: 20px;
 }
 
+.state-card--soft {
+  margin: 20px 14px;
+}
+
 .decision-panel h2,
 .recommendation h2 {
   margin: 0 0 14px;
@@ -578,6 +587,27 @@ button {
   color: var(--palm);
   font-size: 0.92rem;
   font-weight: 900;
+}
+
+.state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.state-actions a,
+.state-actions button {
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--sand-50);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-decoration: none;
 }
 
 @media (min-width: 720px) {

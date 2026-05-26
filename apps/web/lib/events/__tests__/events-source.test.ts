@@ -39,6 +39,14 @@ describe("Supabase event source mapping", () => {
     expect(event.source_url).toBe("https://example.com/real");
   });
 
+  it("handles place, municipality and address limitations without throwing", () => {
+    const event = mapSupabaseEvent(row({ lugar: "Auditorio Alfredo Kraus" }));
+
+    expect(event.venue_name).toBe("Auditorio Alfredo Kraus");
+    expect(event.address).toBe("Auditorio Alfredo Kraus");
+    expect(event.municipality).toBeNull();
+  });
+
   it("excludes Supabase events without valid date from generated collections", () => {
     const event = mapSupabaseEvent(row({ fecha_iso: "sin fecha" }));
     const collections = buildCollectionsFromEvents([event], context);

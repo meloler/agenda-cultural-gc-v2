@@ -8,6 +8,15 @@ describe("SafeExternalLink", () => {
     expect(renderToStaticMarkup(<SafeExternalLink href="javascript:alert(1)">Ir</SafeExternalLink>)).toBe("");
   });
 
+  it("rejects data and vbscript URLs", () => {
+    expect(isSafeExternalUrl("data:text/html,hello")).toBe(false);
+    expect(isSafeExternalUrl("vbscript:msgbox(1)")).toBe(false);
+  });
+
+  it("does not render a broken CTA when URL is missing", () => {
+    expect(renderToStaticMarkup(<SafeExternalLink href={null}>Ver información oficial</SafeExternalLink>)).toBe("");
+  });
+
   it("uses target blank and noopener noreferrer for safe URLs", () => {
     const html = renderToStaticMarkup(<SafeExternalLink href="https://example.com/evento">Ver información oficial</SafeExternalLink>);
 
