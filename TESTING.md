@@ -190,6 +190,51 @@ Pending sensors to add:
 - Data contract validation between Event Intelligence and frontend.
 - CI update for the workspace structure.
 
+## Required Sensors Before V1 Auth Implementation
+
+These tests do not exist yet because auth is not implemented. They must all pass before
+V1 login and personalization can be activated. Do not implement them prematurely.
+
+### Auth Flow
+
+- Sign up flow creates a valid authenticated session.
+- Sign in flow returns a valid authenticated session.
+- Sign out flow invalidates the session.
+- Unauthenticated requests to V1 personal data endpoints are rejected.
+
+### Row Level Security / Tenant Isolation
+
+- User A cannot read user B's `user_profile` row.
+- User A cannot read user B's `user_interest` rows.
+- User A cannot read user B's `saved_event` rows.
+- User A cannot read user B's `event_feedback` rows.
+- User A cannot read user B's `personalization_consent` row.
+- Service role bypass does not apply to frontend anon key requests.
+
+### Personal Data Controls
+
+- User can update their own `user_profile`.
+- User can delete their own `user_profile` and all related V1 rows.
+- User can export a list of their saved events.
+- Deleting account removes all V1 personal data.
+
+### Consent Gate
+
+- `behavioral_personalization_enabled` defaults to `false` for new users.
+- Behavioral signals are not collected without explicit V2 consent.
+- `explicit_preferences_enabled` must be `true` before preferences are stored.
+
+### V0 Preservation
+
+- Unauthenticated users can still browse all V0 discovery collections.
+- No V0 page returns a login redirect for anonymous requests.
+- Mock fallback still works for unauthenticated contexts.
+
+### Security
+
+- `SUPABASE_SERVICE_ROLE_KEY` does not appear in any `apps/web` source file.
+- Preference data does not appear in server logs or error responses.
+
 ## Manual Mobile QA
 
 Use `docs/checklists/manual-qa.md` once a V0 UI exists.

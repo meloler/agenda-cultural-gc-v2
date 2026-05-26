@@ -205,6 +205,64 @@ Public sources
   -> apps/web mobile discovery experience
 ```
 
+## Future Auth And Personalization Architecture
+
+This section documents the planned future architecture for V1/V2. Nothing in this section
+is implemented yet. Implementation requires a dedicated feature with its own checklist.
+
+### Auth Provider
+
+Recommended: Supabase Auth (consistent with the existing data layer).
+
+See `docs/decisions/ADR-004-auth-personalization.md` for alternatives and rationale.
+
+### V0 / V1 / V2 Separation
+
+| Phase | Auth | Data | Tracking |
+|-------|------|------|----------|
+| V0 | Anonymous | Public events only | None |
+| V1 | Optional registered user | Public events + explicit preferences | None |
+| V2 | Registered user | V1 + behavioral signals | Opt-in only |
+
+V0 must continue to work fully even after V1 is deployed. Registration is never forced.
+
+### Conceptual Entities (V1)
+
+No migrations exist. These define the future contract only.
+
+- `user_profile` — explicit preferences set during onboarding.
+- `user_interest` — cultural interest tags with explicit weight and source.
+- `saved_event` — events saved by the user.
+- `event_feedback` — like / not_interested per event.
+- `personalization_consent` — consent version and per-feature opt-in flags.
+
+See `docs/plans/active/user-personalization-v1.md` for full field definitions.
+
+### Row Level Security
+
+RLS must be enabled and tested on all V1 user tables before any real user data is stored.
+
+Rules:
+- Each user can read and write only their own rows.
+- Unauthenticated users cannot read any V1 table.
+- Service role bypass only in trusted server/pipeline contexts.
+
+### Frontend Constraints (V1)
+
+- `SUPABASE_SERVICE_ROLE_KEY` must never appear in `apps/web` source.
+- Public anon key only in frontend.
+- Privileged operations (admin, batch) only in server/pipeline contexts.
+- No personal data in frontend logs or error traces.
+
+### Activation Gate
+
+V1 auth must not be activated until:
+
+- `docs/checklists/auth-readiness.md` is complete.
+- `docs/checklists/personalization-readiness.md` is complete.
+- All required sensors in `TESTING.md` pass.
+- Privacy review is completed.
+
 ## Production Safety
 
 No production deploys, migrations, destructive data changes or secret changes without explicit approval.

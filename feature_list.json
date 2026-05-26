@@ -113,7 +113,7 @@
         "docs/decisions/ADR-004-auth-personalization.md"
       ],
       "risk": "AÃ±adir personalizaciÃ³n antes de tiempo introduce deuda legal, de privacidad y de producto.",
-      "passes": false
+      "passes": true
     }
   ]
 }

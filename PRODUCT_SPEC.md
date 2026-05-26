@@ -156,3 +156,59 @@ Past events should not be prioritized in public discovery collections.
 - Every collection can explain why an event is there.
 - The app works well on mobile first.
 - The pipeline remains intact.
+
+## Roadmap V1 And V2
+
+This section documents planned future phases. No V1 or V2 feature is implemented yet.
+
+### V1 — Registered User With Explicit Preferences (future)
+
+V1 adds optional user registration. Registration is never mandatory for basic browsing.
+V0 discovery continues to work fully without an account.
+
+V1 scope:
+
+- Optional account creation via email or managed auth provider.
+- Preference onboarding: preferred municipality/zone, cultural interests, budget range,
+  plans with children yes/no.
+- Save events for later.
+- Like / not interested per event.
+- Simple collection reordering or filtering based on explicit preferences.
+
+V1 explicitly excludes:
+
+- Implicit behavioral tracking (view time, scroll, click history).
+- Opaque recommendation models.
+- Automatic notifications without explicit consent.
+- Direct purchase or payment flow.
+- Comments or reviews.
+- Data sale or sharing with third parties.
+
+V1 must not be implemented until:
+
+- `docs/checklists/auth-readiness.md` is complete.
+- `docs/checklists/personalization-readiness.md` is complete.
+- RLS, migrations, auth flow tests and privacy review are done.
+- A dedicated feature (post-FEAT-006) is defined and approved.
+
+### V2 — Behavioral Personalization With Consent (future, separate)
+
+V2 is a distinct future phase after V1 is stable and validated.
+
+V2 may include behavioral personalization only if:
+
+- Explicit opt-in consent per signal type is in place.
+- Data minimization is enforced.
+- Retention and deletion are defined and enforced.
+- Personalization is explainable in plain language to the user.
+- User can disable behavioral personalization without losing their account.
+- Privacy review is completed.
+
+V2 explicitly excludes:
+
+- Any behavioral tracking without explicit consent.
+- Selling or sharing behavioral data.
+- Black-box recommendation models without explainability.
+
+See `docs/decisions/ADR-004-auth-personalization.md` for the full decision record and
+`docs/plans/active/user-personalization-v1.md` for the conceptual data model.
