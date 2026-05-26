@@ -50,3 +50,25 @@ Mitigation: V0 anonymous only. V1/V2 require consent, retention and deletion des
 - Supabase schema changes needed for Event Intelligence: TBD — requires user decision.
 - Final cheap-price threshold: TBD — requires user decision.
 - Whether legacy frontend remains deployable during rebuild: TBD — requires user decision.
+
+## R8 — npm audit moderate vulnerabilities
+
+Status: open.
+
+`npm audit --json` currently reports 3 moderate vulnerabilities:
+
+- `postcss` `<8.5.10`: moderate XSS advisory `GHSA-qx2v-qp2m-jg93`, pulled transitively through `next`.
+- `next`: moderate because it depends on the vulnerable `postcss` range reported by npm audit.
+- `ws` `>=8.0.0 <8.20.1`: moderate uninitialized memory disclosure advisory `GHSA-58qx-3vcg-4xpx`, transitive dependency.
+
+Impact assessment:
+
+- Current `apps/web` is a placeholder and does not connect to production data or Supabase.
+- `postcss`/`next` affect the web build/runtime dependency chain and should be reviewed before production deployment.
+- `ws` appears transitive/development/runtime tooling related and should be reviewed with dependency updates.
+
+Action recommended:
+
+- Do not run `npm audit fix --force` blindly; npm suggests a major/incoherent downgrade path for `next` in this environment.
+- Re-run audit after dependency updates or when Next/PostCSS patched versions are available.
+- Treat this as a blocker before production deployment, not a blocker for local scaffold work.

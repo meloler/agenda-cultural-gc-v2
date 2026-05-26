@@ -4,123 +4,96 @@
 
 Branch: `rebuild/product-harness-v0`.
 
-This is a controlled restart from `main`, not a full deletion. The old static frontend is isolated in `legacy/frontend-static/` for reference. The new minimal web app shell now exists in `apps/web/`. The `scrapers/` pipeline remains untouched and must be preserved.
+This is a controlled restart from `main`, not a full deletion. The old static frontend is isolated in `legacy/frontend-static/` for reference. The new minimal web app shell exists in `apps/web/`. The `scrapers/` pipeline remains untouched and must be preserved.
 
 ## Previous Completed Steps
 
 ### Product Harness
 
-Created the project harness:
-
-- `PROJECT.md`
-- `PRODUCT_SPEC.md`
-- `ARCHITECTURE.md`
-- `AGENTS.md`
-- `ROADMAP.md`
-- `RISKS.md`
-- `SECURITY.md`
-- `TESTING.md`
-- `feature_list.json`
-- `progress.md`
-- `init.sh`
-- ADRs, playbooks, checklists and plan folders under `docs/`.
+Created the project harness docs, ADRs, playbooks, checklists and plan folders.
 
 ### Legacy Frontend Isolation
 
-Moved the old static frontend to `legacy/frontend-static/`:
+Moved the old static frontend to `legacy/frontend-static/` and documented it as reference only.
 
-- `index.html`
-- `app.js`
-- `style.css`
-- `manifest.json`
-- `sw.js`
-- `purify.min.js`
-- old mobile prototypes
-- Stitch design artifacts
+### Minimal apps/web Scaffold
 
-Created `legacy/frontend-static/README.md`.
+Created a minimal Next.js + TypeScript app in `apps/web/`, npm workspace scripts, and `packages/event-intelligence/` placeholder.
 
-## Current Task: Minimal apps/web Scaffold
+## Current Task: Repository Hygiene Before FEAT-001
 
-Created a minimal Next.js + TypeScript app in `apps/web/`.
+Performed safe repo hygiene before implementing Event Intelligence.
 
-Created/updated:
+Changes made:
 
-- `package.json`
-- `package-lock.json`
+- Confirmed `node_modules/` was tracked by Git from the old repo state.
+- Removed `node_modules/` from the Git index with `git rm -r --cached node_modules`.
+- Kept local dependencies installed; files were removed from tracking, not from local working dependencies.
+- Confirmed no tracked generated artifacts remain for patterns: `node_modules/`, `.next/`, `dist/`, `build/`, `coverage/`, `.log`, `.tmp`, `.cache/`, `.tsbuildinfo`.
+- Confirmed `.gitignore` covers `node_modules/`, nested `node_modules/`, `.next/`, nested `.next/`, `dist/`, `out/` and `*.tsbuildinfo`.
+- Documented npm audit risk in `RISKS.md`.
+
+Files updated:
+
 - `.gitignore`
-- `apps/web/package.json`
-- `apps/web/next.config.ts`
-- `apps/web/eslint.config.mjs`
-- `apps/web/tsconfig.json`
-- `apps/web/next-env.d.ts`
-- `apps/web/app/layout.tsx`
-- `apps/web/app/page.tsx`
-- `apps/web/app/globals.css`
-- `packages/event-intelligence/README.md`
-- `docs/decisions/ADR-002-stack.md`
-- `ARCHITECTURE.md`
-- `TESTING.md`
-- `AGENTS.md`
+- `RISKS.md`
 - `progress.md`
 
-## Decisions Made
+Index-only cleanup:
 
-- Stack provisional: `apps/web` with Next.js + TypeScript.
-- Root repo uses npm workspaces.
-- `packages/event-intelligence/` is reserved as a placeholder only.
-- The initial app page is a minimal placeholder.
-- No FEAT-001 implementation was started.
-- No Supabase connection was added.
-- No login or personalization was added.
-- `scrapers/` was not changed.
-- `vercel.json` was not changed in this task.
-- `node_modules/` and Next build outputs were added to `.gitignore` to avoid committing generated install/build artifacts.
+- `node_modules/` removed from Git tracking.
 
-## Assumptions — To Be Validated
+## npm Audit Result
 
-- Next.js + TypeScript is the right stack for V0.
-- New app remains in `apps/web/`.
-- Event Intelligence will live in `packages/event-intelligence/`.
-- Vercel should later be configured explicitly for the monorepo/new app.
+Command:
 
-## Current Root Scripts
+```bash
+npm audit --json
+```
 
-- `npm install`
-- `npm run dev`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run build`
-- `npm test`
-- `npm run validate`
+Result: 3 moderate vulnerabilities.
+
+Details:
+
+- `postcss` `<8.5.10`: moderate XSS advisory `GHSA-qx2v-qp2m-jg93`, transitive through `next`.
+- `next`: moderate because it depends on the affected `postcss` range reported by npm audit.
+- `ws` `>=8.0.0 <8.20.1`: moderate uninitialized memory disclosure advisory `GHSA-58qx-3vcg-4xpx`, transitive.
+
+Action taken:
+
+- No automatic fix applied.
+- No `npm audit fix --force` run.
+- Risk documented for follow-up before production deployment.
 
 ## Validation Run
 
 Commands executed:
 
-- `npm install` — passed.
+- `npm install` — passed; still reports 3 moderate vulnerabilities.
+- `npm run validate` — passed.
+
+`npm run validate` executed:
+
 - `npm run typecheck` — passed.
-- `npm run lint` — initially failed due ESLint flat-config/Next config issue; config was corrected; passed.
-- `npm run build` — initially failed due BOM encoding in `apps/web/package.json` and `apps/web/tsconfig.json`; encoding was corrected; passed.
+- `npm run lint` — passed.
+- `npm run build` — passed.
 - `npm test` — passed as placeholder, prints that no tests are configured yet.
-- `npm run validate` — passed: typecheck, lint, build and placeholder test.
 
 Additional checks:
 
 - `feature_list.json` remains unchanged with all features `passes:false`.
 - No files under `scrapers/` changed.
+- `vercel.json` unchanged.
 
 ## Risks / Blockers
 
-- `vercel.json` still points to the old root static frontend flow. It was intentionally not changed to avoid accidental deployment/config breakage.
-- CI still needs to be updated for the new workspace structure.
-- `npm test` is only a placeholder; real tests are still pending.
-- `npm install` reported 3 moderate vulnerabilities. No automatic `npm audit fix` was run because it may change dependency versions outside this task scope.
-- `node_modules/` contains generated local install artifacts and is intentionally ignored for new files. Existing tracked historical `node_modules` content remains a separate cleanup risk.
+- 3 moderate npm audit findings remain open.
+- `npm test` is still only a placeholder.
+- CI still needs to be updated for the workspace structure.
+- `vercel.json` still needs a separate explicit review for `apps/web`.
 - No Event Intelligence implementation exists yet.
 - No Supabase data contract exists yet.
 
 ## Next Recommended Task
 
 Update CI and deployment harness for the new workspace without deploying production: make CI run `npm run validate`, keep scraper checks separate, and document the required Vercel project-root/build setting for `apps/web`.
-
