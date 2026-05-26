@@ -1,0 +1,100 @@
+{
+  "features": [
+    {
+      "id": "FEAT-001",
+      "category": "event-intelligence",
+      "title": "Event Intelligence: evento publicable, scoring y colecciones",
+      "description": "Crear una capa que valide si un evento es publicable, calcule scoring auditable, asigne colecciones dinámicas y explique por qué aparece destacado.",
+      "acceptance_criteria": [
+        "Existe una regla documentada de evento publicable.",
+        "Existe una fórmula de scoring simple y auditable.",
+        "Cada colección MVP tiene reglas de asignación.",
+        "Cada evento destacado puede explicar sus señales principales.",
+        "Funciona con datos mock o sample sin tocar producción."
+      ],
+      "dependencies": ["PRODUCT_SPEC.md", "ARCHITECTURE.md", "docs/decisions/ADR-003-data-model.md"],
+      "risk": "Una mala fórmula puede convertir la app en otro listado cronológico o esconder eventos relevantes.",
+      "passes": false
+    },
+    {
+      "id": "FEAT-002",
+      "category": "frontend-v0",
+      "title": "Nueva home mobile-first con colecciones dinámicas usando datos mock",
+      "description": "Construir la primera home tipo Netflix/Spotify con nube de intención y carriles de colecciones usando datos mock.",
+      "acceptance_criteria": [
+        "La home prioriza colecciones, no calendario ni tabla.",
+        "La experiencia está diseñada primero para móvil.",
+        "Usa datos mock controlados.",
+        "No requiere login.",
+        "No conecta a producción."
+      ],
+      "dependencies": ["FEAT-001"],
+      "risk": "Si se conecta demasiado pronto a datos reales, la UX puede quedar secuestrada por problemas de calidad de datos.",
+      "passes": false
+    },
+    {
+      "id": "FEAT-003",
+      "category": "data-integration",
+      "title": "Conexión de la home a Supabase o fuente de eventos curados",
+      "description": "Conectar la nueva home a una fuente curada de eventos, manteniendo service role key fuera del frontend.",
+      "acceptance_criteria": [
+        "Existe un contrato de datos documentado.",
+        "La app no consume secretos privados.",
+        "La integración puede fallar con un estado vacío claro.",
+        "Los datos se filtran por evento publicable.",
+        "La conexión no rompe el pipeline existente."
+      ],
+      "dependencies": ["FEAT-001", "FEAT-002", "SECURITY.md"],
+      "risk": "Exponer credenciales o acoplar la UI a tablas internas de Supabase.",
+      "passes": false
+    },
+    {
+      "id": "FEAT-004",
+      "category": "frontend-v0",
+      "title": "Ficha de evento optimizada para decisión rápida",
+      "description": "Crear una ficha de evento centrada en decidir: qué es, cuándo, dónde, precio, para quién, por qué merece la pena y acción principal.",
+      "acceptance_criteria": [
+        "La ficha muestra fecha, hora, lugar, precio y fuente si existen.",
+        "La ficha explica señales relevantes del evento.",
+        "La acción principal es clara.",
+        "Funciona bien en móvil.",
+        "No requiere login."
+      ],
+      "dependencies": ["FEAT-002"],
+      "risk": "Copiar la ficha antigua puede mantener una experiencia demasiado informativa y poco decisional.",
+      "passes": false
+    },
+    {
+      "id": "FEAT-005",
+      "category": "quality",
+      "title": "QA mobile, calidad de eventos y revisión de enlaces/datos",
+      "description": "Añadir validaciones manuales y automáticas mínimas para comprobar móvil, calidad de evento, links, imágenes y datos clave.",
+      "acceptance_criteria": [
+        "Existe checklist manual mobile.",
+        "Existe checklist de calidad de evento.",
+        "Existe comando o proceso documentado para validación.",
+        "Se revisan enlaces e imágenes críticas.",
+        "Los fallos bloqueantes quedan documentados."
+      ],
+      "dependencies": ["TESTING.md", "docs/checklists/manual-qa.md", "docs/checklists/event-quality.md"],
+      "risk": "Sin QA la app puede verse bien con mock pero fallar con datos reales.",
+      "passes": false
+    },
+    {
+      "id": "FEAT-006",
+      "category": "future-personalization",
+      "title": "Preparación futura para usuario registrado y preferencias explícitas, sin implementarlo todavía",
+      "description": "Documentar y preparar decisiones para V1/V2 sin añadir login ni personalización en V0.",
+      "acceptance_criteria": [
+        "V0 no implementa login.",
+        "V1 define preferencias explícitas como alcance futuro.",
+        "V2 define consentimiento, retención y borrado antes de personalización conductual.",
+        "No se almacena dato personal nuevo en V0.",
+        "Las decisiones quedan en ADR."
+      ],
+      "dependencies": ["SECURITY.md", "docs/decisions/ADR-004-auth-personalization.md"],
+      "risk": "Añadir personalización antes de tiempo introduce deuda legal, de privacidad y de producto.",
+      "passes": false
+    }
+  ]
+}

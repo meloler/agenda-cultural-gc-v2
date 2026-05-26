@@ -1,26 +1,92 @@
-# Arquitectura del Proyecto
+﻿# Architecture
 
-Este documento define la arquitectura general e interacciones de todo el sistema de la Agenda Cultural de Gran Canaria. Se considera la **fuente única de verdad** técnica para el proyecto.
+## Current Architecture
 
-## Diseño General Desacoplado
+The repository currently has:
 
-La plataforma funciona en dos bloques principales independientes vinculados por una base de datos central en la nube.
+- A legacy vanilla frontend at the repository root.
+- A Python ingestion pipeline in `scrapers/`.
+- Supabase as event storage and frontend data source.
+- Build scripts in `scripts/` for environment injection and feed generation.
+- Vercel deployment configuration.
 
-1. **Frontend (Vercel) -> Supabase**
-   - La interfaz pública (Vanilla JS/HTML/CSS) está alojada en Vercel de forma estática.
-   - La aplicación cliente lee los eventos directamente desde Supabase empleando el SDK oficial. Toda la interacción va directa a la base de datos (PostgreSQL), la cual dispone de políticas de seguridad para accesos anónimos.
-   - *No existe un backend custom (API node/python)* en este paso de consulta para simplificar mantenimiento y latencias.
+## Target Architecture For Controlled Rebuild
 
-2. **Jobs y Scrapers -> Supabase**
-   - El ecosistema de scripts en Python que hace *scraping*, enriquecimiento IA, categorización y geocodificación es el encargado exclusivo de la ingesta de datos.
-   - Una vez la data está procesada, curada y geolocalizada localmente, se realiza un push directamente a las tablas de Supabase para su consumo por el Frontend.
+```text
+apps/
+  web/
+    # future mobile-first discovery app
 
-### Estructura de Carpetas
+scrapers/
+  # existing ingestion, enrichment, geolocation and export pipeline
 
-- `root/`: Frontend estático (HTML, JS, CSS) y configuración de Vercel.
-- `scrapers/`: Scripts de Python descritos en el punto 2 (Scrapers, Procesamiento e Ingesta).
-- `scripts/`: Utilidades de construcción del frontend (generación de feeds, inyección de variables).
+docs/
+  # decisions, playbooks, checklists and plans
 
-### Código Legacy
+scripts/
+  # shared build/validation scripts
 
-Elementos como el antiguo directorio `api/`, `deploy_backend/` y configuraciones redundantes han sido eliminados. Toda la lógica de backend reside ahora en `scrapers/` o directamente en las reglas de negocio de Supabase.
+legacy/
+  # current frontend after a future approved move
+```
+
+## Pipeline To Preserve
+
+`scrapers/` remains the ingestion system:
+
+1. Scrape events from public sources.
+2. Enrich event details with existing IA pipeline where configured.
+3. Classify events.
+4. Audit places and locations.
+5. Geolocate.
+6. Sanitize.
+7. Export Excel/JSON.
+8. Upload curated events to Supabase.
+
+## New Event Intelligence Layer
+
+A new Event Intelligence layer should sit between raw/curated event data and the frontend experience.
+
+Responsibilities:
+
+- Validate whether an event is publishable.
+- Calculate simple auditable scoring.
+- Assign dynamic collections.
+- Explain why an event appears in a collection.
+- Provide stable data for the mobile-first app.
+
+Implementation location TBD — requires user decision.
+
+Potential options:
+
+- Python module inside `scrapers/app/intelligence/`.
+- Separate scripts under `scripts/event-intelligence/`.
+- Frontend adapter under `apps/web/` for V0 mock/derived collections.
+
+## Frontend Direction
+
+The future app should live under `apps/web/`.
+
+Stack TBD — requires user decision.
+
+Constraints:
+
+- Mobile-first.
+- No login in V0.
+- Must support mock data before production data connection.
+- Must consume curated event shape, not raw scraper internals.
+
+## Data Flow Target
+
+```text
+Public sources
+  -> scrapers/
+  -> enrichment/classification/geolocation/sanitization
+  -> Supabase or curated event export
+  -> Event Intelligence
+  -> apps/web mobile discovery experience
+```
+
+## Production Safety
+
+No production deploys, migrations, destructive data changes or secret changes without explicit approval.
