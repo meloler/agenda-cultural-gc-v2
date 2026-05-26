@@ -20,7 +20,7 @@ apps/
     components/
       # V0 home components
     lib/
-      # mock data and collection presentation helpers
+      # event source, mock data and collection presentation helpers
 
 packages/
   event-intelligence/
@@ -143,6 +143,47 @@ Current FEAT-002 implementation:
 - `apps/web/lib/collections.ts` adapts Event Intelligence output for the home.
 - The UI imports `packages/event-intelligence`; it does not duplicate scoring or collection logic.
 - `apps/web/next.config.ts` uses `transpilePackages` so Next can consume the local workspace package.
+
+Current FEAT-003 implementation:
+
+- `apps/web/lib/events/source.ts` reads only public Supabase configuration.
+- `apps/web/lib/events/supabase.ts` fetches curated future rows from the `evento` table when public config exists.
+- `apps/web/lib/events/map-supabase-event.ts` maps legacy Supabase rows to the Event Intelligence event model.
+- `apps/web/lib/events/get-home-events.ts` is the single data entrypoint for the home.
+- If Supabase is missing, empty or unavailable, the home falls back to mock events.
+- The home still filters, scores and assigns collections through Event Intelligence.
+
+Supabase row fields currently mapped:
+
+- `id` -> `id`
+- `nombre` -> `title`
+- `descripcion` -> `description`
+- `fecha_iso` + `hora` -> `starts_at`
+- `lugar` -> `venue_name` and `address`
+- `estilo` -> `category`
+- `precio_num` -> `price` / `is_free`
+- `imagen_url` -> `image_url`
+- `source_id` -> `source_name`
+- `url_venta` -> `source_url`
+- `latitud` / `longitud` -> coordinates
+
+TBD — requires user decision: final municipality/address separation if the real Supabase table keeps only `lugar`.
+
+Current FEAT-004 implementation:
+
+- `apps/web/app/events/[id]/page.tsx` renders the event detail route.
+- `apps/web/app/events/[id]/not-found.tsx` renders controlled not-found state.
+- `apps/web/lib/events/get-event-by-id.ts` retrieves a single publishable event from the same curated source/fallback layer.
+- `apps/web/components/EventDetailHero.tsx` renders image, title, category and editorial signal.
+- `apps/web/components/EventDecisionPanel.tsx` renders date, time, place, price, source and official CTA.
+- `apps/web/components/EventRecommendationReasons.tsx` renders Event Intelligence reasons.
+- `apps/web/components/SafeExternalLink.tsx` validates external URLs before rendering links.
+- Home cards link to `/events/[id]`.
+
+External link policy:
+
+- Only `http:` and `https:` URLs render.
+- Links open in a new tab with `rel="noopener noreferrer"`.
 
 ## Data Flow Target
 

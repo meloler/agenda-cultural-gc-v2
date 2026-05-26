@@ -48,7 +48,26 @@ It contains:
 - Horizontal collection rails generated from Event Intelligence.
 - Event cards focused on fast decisions: what, when, where, price, category and why it appears.
 
-Current FEAT-002 data is mock-only and clearly marked as demo content.
+Current home data behavior:
+
+- If public Supabase variables are configured, the home can load curated real events.
+- If Supabase is not configured or fails, the home falls back safely to mock data.
+- In both cases, events pass through Event Intelligence before appearing in collections.
+
+### Event Detail V0 Shape
+
+The event detail page is optimized for quick mobile decision-making.
+
+It contains:
+
+- A visual hero with image or fallback placeholder.
+- Event title and primary category/tag.
+- Date, time when available, place, address when available, price and source.
+- 2-4 explainable recommendation reasons from Event Intelligence.
+- A safe external CTA only when the official URL uses `http` or `https`.
+- A clear back link to the home.
+
+The page does not include login, favorites, personalization, tracking or interactive maps.
 
 ### Excluded
 

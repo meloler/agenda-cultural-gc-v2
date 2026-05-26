@@ -78,6 +78,15 @@ Current `apps/web` tests cover:
 - Events are sorted by descending Event Intelligence score inside each collection.
 - Main intention chips are available.
 - The mock data set is present and varied.
+- Supabase rows map to the Event Intelligence model.
+- Supabase rows without valid dates do not appear in collections.
+- Missing public Supabase config produces controlled fallback.
+- Real-like events are still ordered by Event Intelligence score.
+- Frontend source does not reference the Supabase service role key.
+- Event detail lookup returns publishable events and rejects non-publishable ones.
+- Detail components render date, place and price.
+- Safe external links reject unsafe schemes and set `target`/`rel` correctly.
+- Home cards link to `/events/[id]`.
 
 ### packages/event-intelligence
 
@@ -125,6 +134,22 @@ After implementing FEAT-002:
 - `npm run lint` passed with one non-blocking Next image warning for mock images.
 - `npm test` passed with 19 real tests total.
 - `npm run build` passed after removing BOM from package JSON files and configuring local package transpilation.
+- `npm run validate` passed.
+
+After implementing FEAT-003:
+
+- `npm run typecheck` passed.
+- `npm run lint` passed with one non-blocking Next image warning for mock images.
+- `npm test` passed with 25 real tests total.
+- `npm run build` passed.
+- `npm run validate` passed.
+
+After implementing FEAT-004:
+
+- `npm run typecheck` passed.
+- `npm run lint` passed with two non-blocking Next image warnings for mock/external images.
+- `npm test` passed with 33 real tests total.
+- `npm run build` passed.
 - `npm run validate` passed.
 
 Security note: `npm install` reported 3 moderate vulnerabilities. No automatic `npm audit fix` was run because that may change dependency versions outside this task scope.

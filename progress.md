@@ -28,43 +28,50 @@ Removed tracked `node_modules/` from the Git index without deleting local depend
 
 Implemented `packages/event-intelligence/` as a pure TypeScript package with publishable-event validation, quality issues, deterministic scoring, MVP collection assignment and ranking explanations.
 
-Validation passed with 14 real Event Intelligence tests.
-
 ### FEAT-002: Mobile-First Mock Home
 
 Implemented the first V0 home using mock data and Event Intelligence.
 
+### FEAT-003: Curated Event Source / Supabase Fallback
+
+Implemented a safe data source layer for the home, with optional public Supabase config and mock fallback.
+
+### FEAT-004: Event Detail Page
+
+Implemented the first event detail page optimized for fast mobile decision-making.
+
 What changed:
 
-- Replaced the placeholder page with a mobile-first discovery home.
-- Added a simple product header.
-- Added hero copy around: `¿Qué plan te apetece?`.
-- Added an intention cloud with the required chips.
-- Added horizontal collection rails.
-- Added event cards showing image/placeholder, title, date, time, place, price, category, editorial signal and ranking reason.
-- Added mock events covering today, weekend, free, family, music, theatre, market, hidden gem, incomplete-but-publishable and non-publishable cases.
-- Added a web collection adapter that consumes Event Intelligence instead of duplicating scoring or collection logic.
-- Added real `apps/web` Vitest tests for collection presentation.
-- Updated root `npm test` so it runs Event Intelligence tests and web tests.
+- Added route `apps/web/app/events/[id]/page.tsx`.
+- Added controlled not-found route state.
+- Added `getEventById` using the same curated source/fallback layer from FEAT-003.
+- Prevented non-publishable events from rendering as valid detail pages.
+- Linked home event cards to `/events/[id]`.
+- Added detail hero with image or placeholder, title, category and signal.
+- Added decision panel with date, time, place, address, price, source and official CTA.
+- Added recommendation reasons powered by Event Intelligence.
+- Added safe external link validation for official URLs.
+- Added tests for detail lookup, non-publicable events, not found, safe links, detail rendering, Event Intelligence reasons and card navigation.
 
 Files created or updated:
 
-- `apps/web/app/page.tsx`
-- `apps/web/app/globals.css`
-- `apps/web/components/Hero.tsx`
-- `apps/web/components/IntentCloud.tsx`
-- `apps/web/components/EventRail.tsx`
+- `apps/web/app/events/[id]/page.tsx`
+- `apps/web/app/events/[id]/not-found.tsx`
+- `apps/web/components/EventDetailHero.tsx`
+- `apps/web/components/EventDecisionPanel.tsx`
+- `apps/web/components/EventRecommendationReasons.tsx`
+- `apps/web/components/SafeExternalLink.tsx`
 - `apps/web/components/EventCard.tsx`
-- `apps/web/lib/mock-events.ts`
-- `apps/web/lib/collections.ts`
-- `apps/web/lib/__tests__/collections.test.ts`
-- `apps/web/package.json`
-- `apps/web/next.config.ts`
-- `packages/event-intelligence/package.json`
-- `package.json`
-- `package-lock.json`
+- `apps/web/components/__tests__/SafeExternalLink.test.tsx`
+- `apps/web/components/__tests__/EventDetail.test.tsx`
+- `apps/web/components/__tests__/EventCard.test.tsx`
+- `apps/web/lib/events/get-event-by-id.ts`
+- `apps/web/lib/events/presentation.ts`
+- `apps/web/lib/events/__tests__/get-event-by-id.test.ts`
+- `apps/web/app/globals.css`
 - `PRODUCT_SPEC.md`
 - `ARCHITECTURE.md`
+- `SECURITY.md`
 - `TESTING.md`
 - `feature_list.json`
 - `progress.md`
@@ -74,37 +81,36 @@ Important boundaries respected:
 - `scrapers/` unchanged.
 - `legacy/frontend-static/` unchanged.
 - `vercel.json` unchanged.
-- No Supabase connection added.
 - No login implemented.
-- No persistent favorites implemented.
+- No favorites implemented.
 - No personalization implemented.
-- No production connection added.
+- No tracking implemented.
+- No production deployment.
 - No secrets added.
+- No service role key used in `apps/web` source.
 
-## FEAT-002 Decisions
+## FEAT-004 Decisions
 
-- The V0 home uses mock data only.
-- The visual direction is warm editorial/island culture rather than generic dashboard UI.
-- Collections are generated in `apps/web/lib/collections.ts` using Event Intelligence.
-- `apps/web/next.config.ts` transpiles `@agenda-cultural-gc/event-intelligence` so Next can consume the local workspace package.
-- Component tests are deferred; current tests cover the presentation logic that decides what appears in the home.
+- Event detail uses the same event source/fallback path as the home.
+- Unsafe official links are not rendered.
+- No map is included in V0 detail; location remains textual for fast decision.
+- Component tests use React static rendering instead of a heavier browser/component testing stack.
 
 Assumptions — to be validated:
 
-- Mock image URLs are acceptable for V0 visual review and are not production data.
-- The intention chips are visual/non-persistent in FEAT-002; filtering behavior is future scope.
-- Friday evening is documented in product spec, but Event Intelligence weekend logic still uses Saturday/Sunday until the scoring rule is explicitly changed.
+- `source_url` is the official destination when available.
+- `lugar` can still stand in for venue/address until the real data contract is refined.
+- Image optimization with `next/image` is deferred until external image domains are decided.
 
 ## Validation Run
 
-Commands executed for FEAT-002:
+Commands executed for FEAT-004:
 
-- `npm install` — passed; still reports 3 moderate vulnerabilities.
 - `npm run typecheck` — passed.
-- `npm run lint` — passed with one non-blocking Next image warning for mock images.
-- `npm test` — passed, 19 tests total.
+- `npm run lint` — passed with two non-blocking Next image warnings for mock/external images.
+- `npm test` — passed, 33 tests total.
 - `npm run build` — passed.
-- `npm run validate` — passed.\n- Local preview check at `http://localhost:3100` — passed: HTTP 200, hero text and collection text found.
+- `npm run validate` — passed.
 
 Additional checks:
 
@@ -117,10 +123,9 @@ Additional checks:
 - 3 moderate npm audit findings remain open and documented in `RISKS.md`.
 - CI still needs to be updated for the workspace structure in a later explicit task.
 - `vercel.json` still needs a separate explicit review for `apps/web`.
-- Mock UI is not connected to real data yet.
-- Event detail page is still future scope.
-- Component/browser-level tests are not configured yet.
+- Real Supabase data quality depends on RLS/public read configuration and current table contents.
+- Browser-level mobile QA is still manual.
 
 ## Next Recommended Task
 
-Run a visual review of the FEAT-002 home locally, then implement FEAT-004 or a small FEAT-002 polish pass before connecting any real data.
+Run a mobile visual QA pass on the home and event detail pages, then implement FEAT-005: mobile QA, event quality and link/data review.

@@ -1,10 +1,10 @@
 ﻿import { EventRail } from "../components/EventRail";
 import { Hero } from "../components/Hero";
 import { IntentCloud } from "../components/IntentCloud";
-import { buildHomeCollections } from "../lib/collections";
+import { getHomeEvents } from "../lib/events/get-home-events";
 
-export default function HomePage() {
-  const collections = buildHomeCollections();
+export default async function HomePage() {
+  const { collections, source, warning } = await getHomeEvents();
 
   return (
     <main className="app-shell" aria-labelledby="page-title">
@@ -15,7 +15,17 @@ export default function HomePage() {
         </div>
       </header>
 
-      <Hero collections={collections} />
+      {warning ? (
+        <aside className="source-banner" aria-label="Estado de la fuente de datos">
+          {warning}
+        </aside>
+      ) : (
+        <aside className="source-banner source-banner--live" aria-label="Estado de la fuente de datos">
+          Eventos reales curados desde Supabase.
+        </aside>
+      )}
+
+      <Hero collections={collections} source={source} />
       <IntentCloud />
 
       <section className="collections" aria-labelledby="collections-title">
@@ -26,7 +36,7 @@ export default function HomePage() {
         {collections.length > 0 ? (
           collections.map((collection) => <EventRail collection={collection} key={collection.id} />)
         ) : (
-          <p className="empty-state">No hay planes mock publicables para esta demo.</p>
+          <p className="empty-state">No hay planes publicables para mostrar ahora mismo.</p>
         )}
       </section>
     </main>

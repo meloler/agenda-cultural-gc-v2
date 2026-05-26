@@ -4,33 +4,33 @@
       "id": "FEAT-001",
       "category": "event-intelligence",
       "title": "Event Intelligence: evento publicable, scoring y colecciones",
-      "description": "Crear una capa que valide si un evento es publicable, calcule scoring auditable, asigne colecciones dinámicas y explique por qué aparece destacado.",
+      "description": "Crear una capa que valide si un evento es publicable, calcule scoring auditable, asigne colecciones dinÃ¡micas y explique por quÃ© aparece destacado.",
       "acceptance_criteria": [
         "Existe una regla documentada de evento publicable.",
-        "Existe una fórmula de scoring simple y auditable.",
-        "Cada colección MVP tiene reglas de asignación.",
-        "Cada evento destacado puede explicar sus señales principales.",
-        "Funciona con datos mock o sample sin tocar producción."
+        "Existe una fÃ³rmula de scoring simple y auditable.",
+        "Cada colecciÃ³n MVP tiene reglas de asignaciÃ³n.",
+        "Cada evento destacado puede explicar sus seÃ±ales principales.",
+        "Funciona con datos mock o sample sin tocar producciÃ³n."
       ],
       "dependencies": [
         "PRODUCT_SPEC.md",
         "ARCHITECTURE.md",
         "docs/decisions/ADR-003-data-model.md"
       ],
-      "risk": "Una mala fórmula puede convertir la app en otro listado cronológico o esconder eventos relevantes.",
+      "risk": "Una mala fÃ³rmula puede convertir la app en otro listado cronolÃ³gico o esconder eventos relevantes.",
       "passes": true
     },
     {
       "id": "FEAT-002",
       "category": "frontend-v0",
-      "title": "Nueva home mobile-first con colecciones dinámicas usando datos mock",
-      "description": "Construir la primera home tipo Netflix/Spotify con nube de intención y carriles de colecciones usando datos mock.",
+      "title": "Nueva home mobile-first con colecciones dinÃ¡micas usando datos mock",
+      "description": "Construir la primera home tipo Netflix/Spotify con nube de intenciÃ³n y carriles de colecciones usando datos mock.",
       "acceptance_criteria": [
         "La home prioriza colecciones, no calendario ni tabla.",
-        "La experiencia está diseñada primero para móvil.",
+        "La experiencia estÃ¡ diseÃ±ada primero para mÃ³vil.",
         "Usa datos mock controlados.",
         "No requiere login.",
-        "No conecta a producción."
+        "No conecta a producciÃ³n."
       ],
       "dependencies": [
         "FEAT-001"
@@ -41,14 +41,14 @@
     {
       "id": "FEAT-003",
       "category": "data-integration",
-      "title": "Conexión de la home a Supabase o fuente de eventos curados",
+      "title": "ConexiÃ³n de la home a Supabase o fuente de eventos curados",
       "description": "Conectar la nueva home a una fuente curada de eventos, manteniendo service role key fuera del frontend.",
       "acceptance_criteria": [
         "Existe un contrato de datos documentado.",
         "La app no consume secretos privados.",
-        "La integración puede fallar con un estado vacío claro.",
+        "La integraciÃ³n puede fallar con un estado vacÃ­o claro.",
         "Los datos se filtran por evento publicable.",
-        "La conexión no rompe el pipeline existente."
+        "La conexiÃ³n no rompe el pipeline existente."
       ],
       "dependencies": [
         "FEAT-001",
@@ -56,36 +56,36 @@
         "SECURITY.md"
       ],
       "risk": "Exponer credenciales o acoplar la UI a tablas internas de Supabase.",
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-004",
       "category": "frontend-v0",
-      "title": "Ficha de evento optimizada para decisión rápida",
-      "description": "Crear una ficha de evento centrada en decidir: qué es, cuándo, dónde, precio, para quién, por qué merece la pena y acción principal.",
+      "title": "Ficha de evento optimizada para decisiÃ³n rÃ¡pida",
+      "description": "Crear una ficha de evento centrada en decidir: quÃ© es, cuÃ¡ndo, dÃ³nde, precio, para quiÃ©n, por quÃ© merece la pena y acciÃ³n principal.",
       "acceptance_criteria": [
         "La ficha muestra fecha, hora, lugar, precio y fuente si existen.",
-        "La ficha explica señales relevantes del evento.",
-        "La acción principal es clara.",
-        "Funciona bien en móvil.",
+        "La ficha explica seÃ±ales relevantes del evento.",
+        "La acciÃ³n principal es clara.",
+        "Funciona bien en mÃ³vil.",
         "No requiere login."
       ],
       "dependencies": [
         "FEAT-002"
       ],
       "risk": "Copiar la ficha antigua puede mantener una experiencia demasiado informativa y poco decisional.",
-      "passes": false
+      "passes": true
     },
     {
       "id": "FEAT-005",
       "category": "quality",
-      "title": "QA mobile, calidad de eventos y revisión de enlaces/datos",
-      "description": "Añadir validaciones manuales y automáticas mínimas para comprobar móvil, calidad de evento, links, imágenes y datos clave.",
+      "title": "QA mobile, calidad de eventos y revisiÃ³n de enlaces/datos",
+      "description": "AÃ±adir validaciones manuales y automÃ¡ticas mÃ­nimas para comprobar mÃ³vil, calidad de evento, links, imÃ¡genes y datos clave.",
       "acceptance_criteria": [
         "Existe checklist manual mobile.",
         "Existe checklist de calidad de evento.",
-        "Existe comando o proceso documentado para validación.",
-        "Se revisan enlaces e imágenes críticas.",
+        "Existe comando o proceso documentado para validaciÃ³n.",
+        "Se revisan enlaces e imÃ¡genes crÃ­ticas.",
         "Los fallos bloqueantes quedan documentados."
       ],
       "dependencies": [
@@ -99,12 +99,12 @@
     {
       "id": "FEAT-006",
       "category": "future-personalization",
-      "title": "Preparación futura para usuario registrado y preferencias explícitas, sin implementarlo todavía",
-      "description": "Documentar y preparar decisiones para V1/V2 sin añadir login ni personalización en V0.",
+      "title": "PreparaciÃ³n futura para usuario registrado y preferencias explÃ­citas, sin implementarlo todavÃ­a",
+      "description": "Documentar y preparar decisiones para V1/V2 sin aÃ±adir login ni personalizaciÃ³n en V0.",
       "acceptance_criteria": [
         "V0 no implementa login.",
-        "V1 define preferencias explícitas como alcance futuro.",
-        "V2 define consentimiento, retención y borrado antes de personalización conductual.",
+        "V1 define preferencias explÃ­citas como alcance futuro.",
+        "V2 define consentimiento, retenciÃ³n y borrado antes de personalizaciÃ³n conductual.",
         "No se almacena dato personal nuevo en V0.",
         "Las decisiones quedan en ADR."
       ],
@@ -112,7 +112,7 @@
         "SECURITY.md",
         "docs/decisions/ADR-004-auth-personalization.md"
       ],
-      "risk": "Añadir personalización antes de tiempo introduce deuda legal, de privacidad y de producto.",
+      "risk": "AÃ±adir personalizaciÃ³n antes de tiempo introduce deuda legal, de privacidad y de producto.",
       "passes": false
     }
   ]

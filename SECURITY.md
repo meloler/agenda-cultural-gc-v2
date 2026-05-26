@@ -9,10 +9,12 @@
 
 ## Supabase
 
-- Frontend may use only public anon key when appropriate.
+- Frontend may use only public keys through `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` in frontend code, static assets, logs or docs.
 - Service role operations must run only in trusted server/local pipeline contexts.
 - Use minimum necessary permissions.
+- If public Supabase variables are missing, the frontend must fall back to mock data or a controlled empty/error state.
+- Do not print Supabase keys or environment values in logs.
 
 ## Event Data
 
@@ -27,6 +29,14 @@ V0 deals with public event information:
 - Public price or ticket info.
 
 Avoid storing private user data in V0.
+
+## External Event Links
+
+- Render official event links only after URL validation.
+- Allow only `http:` and `https:` schemes.
+- Reject unsafe schemes such as `javascript:` and `data:`.
+- External links must use `target="_blank"` with `rel="noopener noreferrer"`.
+- Do not log clicked URLs or introduce tracking in V0.
 
 ## V1/V2 Personal Data
 
